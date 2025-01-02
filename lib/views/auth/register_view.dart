@@ -23,7 +23,7 @@ class RegisterView extends StatelessWidget {
               ElevatedButton.icon(
                 onPressed: () => _authController.loginWithGoogle(),
                 icon: Icon(Icons.email),
-                label: Text("Sign in with Google"),
+                label: Text("Sign Up with Google"),
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),

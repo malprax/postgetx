@@ -1,9 +1,10 @@
 import 'package:get/get.dart';
 import 'package:postgetx/views/auth/login_view.dart';
+import 'package:postgetx/views/auth/register_view.dart';
 import '../views/dashboard/dashboard_view.dart';
 
 class AppPages {
-  static const INITIAL = '/login'; // Initial route (e.g., Login page)
+  static const INITIAL = '/dashboard'; // Initial route (e.g., Login page)
 
   static final routes = [
     GetPage(
@@ -11,6 +12,13 @@ class AppPages {
       page: () => LoginView(),
       binding: BindingsBuilder(() {
         // Bind any login-related controllers
+      }),
+    ),
+    GetPage(
+      name: '/register',
+      page: () => RegisterView(),
+      binding: BindingsBuilder(() {
+        // Bind any dashboard-related controllers
       }),
     ),
     GetPage(

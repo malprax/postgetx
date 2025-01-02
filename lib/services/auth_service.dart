@@ -4,7 +4,6 @@ import '../models/user.dart';
 class AuthService {
   final _usersCollection = FirebaseFirestore.instance.collection('users');
 
-  // Save user to Firestore
   Future<void> saveUser(UserModel user) async {
     try {
       await _usersCollection.doc(user.uid).set(user.toMap());
@@ -14,7 +13,6 @@ class AuthService {
     }
   }
 
-  // Get user from Firestore
   Future<UserModel?> getUser(String uid) async {
     try {
       final doc = await _usersCollection.doc(uid).get();

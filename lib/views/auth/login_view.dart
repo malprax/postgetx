@@ -10,16 +10,31 @@ class LoginView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text('Login')),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton.icon(
-              icon: Icon(Icons.login),
-              label: Text('Sign in with Google'),
-              onPressed: () => _authController.loginWithGoogle(),
-            ),
-          ],
-        ),
+        child: Obx(() {
+          if (_authController.isLoading.value) {
+            return CircularProgressIndicator();
+          }
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton.icon(
+                onPressed: () => _authController.loginWithGoogle(),
+                icon: Icon(Icons.email),
+                label: Text("Sign in with Google"),
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
+              ),
+              SizedBox(height: 20),
+              TextButton(
+                onPressed: () {
+                  Get.offNamed('/register');
+                },
+                child: Text('Don’t have an account? Register here'),
+              ),
+            ],
+          );
+        }),
       ),
     );
   }
