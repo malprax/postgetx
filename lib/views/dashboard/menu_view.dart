@@ -4,7 +4,7 @@ class MenuView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Text('Menu View - Display product menu here'),
+      child: Text('Beranda disini'),
     );
   }
 }
