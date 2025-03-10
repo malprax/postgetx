@@ -4,7 +4,7 @@ class MenuView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Text('Beranda disini'),
+      child: Text('Dashboard disini agar bisa di akses'),
     );
   }
 }
