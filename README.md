@@ -67,85 +67,71 @@ _Updated: April 2025_
 
 
 ## 📁 Project Structure
-lib/
-│── main.dart
-│
-├── routes/
-│   ├── app_pages.dart          # Definisi rute dan page GetX
-│   ├── app_routes.dart         # Konstanta rute
+- **lib/**
+  - **main.dart**
+  - **routes/**
+    - *app_pages.dart*  <!-- Definisi rute dan page GetX -->
+    - *app_routes.dart* <!-- Konstanta rute -->
+  - **bindings/**
+    - *initial_binding.dart*    <!-- Binding awal -->
+    - *auth_binding.dart*       <!-- Binding auth (jika dipisah per modul) -->
+    - *dashboard_binding.dart*  <!-- Binding dashboard (opsional) -->
+  - **modules/**
+    - **auth/**
+      - **controllers/**
+        - *auth_controller.dart*
+      - **views/**
+        - *login_view.dart*
+        - *register_view.dart*
+      - **widgets/**
+        - *custom_auth_field.dart* <!-- (opsional UI reuse) -->
+    - **dashboard/**
+      - **controllers/**
+        - *dashboard_controller.dart* <!-- (jika ada logic) -->
+      - **views/**
+        - *dashboard_view.dart*
+      - **widgets/**
+        - *dashboard_card.dart* <!-- (opsional UI komponen) -->
+    - **pos/**
+      - **controllers/**
+      - **views/**
+      - **widgets/**
+    - **stock/**
+      - **controllers/**
+      - **views/**
+      - **widgets/**
+    - **orders/**
+      - **controllers/**
+      - **views/**
+      - **widgets/**
+    - **tracking/** <!-- Modul Pelacakan Pesanan (upcoming) -->
+      - **controllers/**
+      - **views/**
+      - **widgets/**
+    - **preorder/** <!-- Modul Pre-Order (upcoming) -->
+      - **controllers/**
+      - **views/**
+      - **widgets/**
+    - **loyalty/** <!-- Modul Loyalty Program (upcoming) -->
+      - **controllers/**
+      - **views/**
+      - **widgets/**
+  - **services/**
+    - *firebase_service.dart*     <!-- Integrasi Firebase -->
+    - *user_role_service.dart*    <!-- Cek dan simpan role user (admin, kurir, dst) -->
+  - **models/**
+    - *user_model.dart*           <!-- Struktur data pengguna -->
+    - *order_model.dart*          <!-- Struktur data pesanan -->
+    - *etc...*
+  - **utils/**
+    - *constants.dart*            <!-- Warna, font, dll. -->
+    - *helpers.dart*              <!-- Fungsi-fungsi pembantu umum -->
+  - **themes/**
+    - *app_theme.dart*            <!-- Tema umum aplikasi -->
+  - **widgets/**
+    - *custom_button.dart*        <!-- Widget reusable global -->
+    - *app_loader.dart*           <!-- Widget loading -->
 
-├── bindings/
-│   ├── initial_binding.dart    # Binding awal
-│   ├── auth_binding.dart       # Binding auth (jika dipisah per modul)
-│   ├── dashboard_binding.dart  # Binding dashboard (opsional)
-
-├── modules/
-│   ├── auth/
-│   │   ├── controllers/
-│   │   │   └── auth_controller.dart
-│   │   ├── views/
-│   │   │   ├── login_view.dart
-│   │   │   └── register_view.dart
-│   │   └── widgets/
-│   │       └── custom_auth_field.dart (opsional UI reuse)
-│
-│   ├── dashboard/
-│   │   ├── controllers/
-│   │   │   └── dashboard_controller.dart (jika ada logic)
-│   │   ├── views/
-│   │   │   └── dashboard_view.dart
-│   │   └── widgets/
-│   │       └── dashboard_card.dart (opsional UI komponen)
-│
-│   ├── pos/
-│   │   ├── controllers/
-│   │   └── views/
-│   │   └── widgets/
-│
-│   ├── stock/
-│   │   ├── controllers/
-│   │   └── views/
-│   │   └── widgets/
-│
-│   ├── orders/
-│   │   ├── controllers/
-│   │   └── views/
-│   │   └── widgets/
-│
-│   ├── tracking/               # Modul Pelacakan Pesanan (upcoming)
-│   │   ├── controllers/
-│   │   └── views/
-│   │   └── widgets/
-│
-│   ├── preorder/               # Modul Pre-Order (upcoming)
-│   │   ├── controllers/
-│   │   └── views/
-│   │   └── widgets/
-│
-│   ├── loyalty/                # Modul Loyalty Program (upcoming)
-│   │   ├── controllers/
-│   │   └── views/
-│   │   └── widgets/
-
-├── services/
-│   ├── firebase_service.dart     # Integrasi Firebase
-│   ├── user_role_service.dart    # Cek dan simpan role user (admin, kurir, dst)
-
-├── models/
-│   ├── user_model.dart           # Struktur data pengguna
-│   ├── order_model.dart          # Struktur data pesanan
-│   └── etc...
-
-├── utils/
-│   ├── constants.dart            # Warna, font, dll.
-│   ├── helpers.dart              # Fungsi-fungsi pembantu umum
-
-├── themes/
-│   ├── app_theme.dart            # Tema umum aplikasi
-
-├── widgets/
-│   ├── custom_button.dart        # Widget reusable global
-│   └── app_loader.dart           # Widget loading
 
 
 
