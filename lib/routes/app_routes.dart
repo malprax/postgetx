@@ -1,32 +1,8 @@
-import 'package:get/get.dart';
-import 'package:postgetx/views/auth/login_view.dart';
-import 'package:postgetx/views/auth/register_view.dart';
-import '../views/dashboard/dashboard_view.dart';
+// routes/app_routes.dart
+part of 'app_pages.dart';
 
-class AppPages {
-  static const INITIAL = '/dashboard'; // Initial route (e.g., Login page)
-
-  static final routes = [
-    GetPage(
-      name: '/login',
-      page: () => LoginView(),
-      binding: BindingsBuilder(() {
-        // Bind any login-related controllers
-      }),
-    ),
-    GetPage(
-      name: '/register',
-      page: () => RegisterView(),
-      binding: BindingsBuilder(() {
-        // Bind any dashboard-related controllers
-      }),
-    ),
-    GetPage(
-      name: '/dashboard',
-      page: () => DashboardView(),
-      binding: BindingsBuilder(() {
-        // Bind any dashboard-related controllers
-      }),
-    ),
-  ];
+abstract class Routes {
+  static const LOGIN = '/login';
+  static const REGISTER = '/register';
+  static const DASHBOARD = '/dashboard';
 }
