@@ -1,8 +1,8 @@
 // routes/app_pages.dart
 import 'package:get/get.dart';
-import '../views/auth/login_page.dart';
-import '../views/auth/register_page.dart';
-import '../views/dashboard/dashboard_page.dart';
+import '../modules/auth/login_page.dart';
+import '../modules/auth/register_page.dart';
+import '../modules/dashboard/dashboard_page.dart';
 
 part 'app_routes.dart';
 

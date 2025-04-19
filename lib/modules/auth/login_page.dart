@@ -1,7 +1,7 @@
 // modules/auth/login_page.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:postgetx/controllers/auth/auth_controller.dart';
+import 'package:postgetx/modules/auth/controllers.dart/auth_controller.dart';
 import 'package:postgetx/routes/app_pages.dart';
 
 class LoginPage extends StatelessWidget {

@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../models/user.dart';
+import '../models/user_model.dart';
 
 class AuthService {
   final _usersCollection = FirebaseFirestore.instance.collection('users');

@@ -1,7 +1,7 @@
 // modules/auth/register_page.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:postgetx/controllers/auth/auth_controller.dart';
+import 'package:postgetx/modules/auth/controllers.dart/auth_controller.dart';
 
 class RegisterPage extends StatelessWidget {
   final AuthController authController = Get.find();
