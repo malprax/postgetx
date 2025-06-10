@@ -1,15 +1,25 @@
-// routes/app_pages.dart
+// lib/routes/app_pages.dart
 import 'package:get/get.dart';
-import '../modules/auth/login_page.dart';
-import '../modules/auth/register_page.dart';
-import '../modules/dashboard/dashboard_page.dart';
-
-part 'app_routes.dart';
+import '../modules/auth/views/login_view.dart';
+import '../modules/auth/views/register_view.dart';
+import '../modules/dashboard/views/dashboard_view.dart';
+import 'app_routes.dart';
 
 class AppPages {
-  static final pages = [
-    GetPage(name: Routes.LOGIN, page: () => LoginPage()),
-    GetPage(name: Routes.REGISTER, page: () => RegisterPage()),
-    GetPage(name: Routes.DASHBOARD, page: () => DashboardPage()),
+  static const INITIAL = Routes.INITIAL;
+
+  static final routes = [
+    GetPage(
+      name: Routes.LOGIN,
+      page: () => LoginView(),
+    ),
+    GetPage(
+      name: Routes.REGISTER,
+      page: () => RegisterView(),
+    ),
+    GetPage(
+      name: Routes.DASHBOARD,
+      page: () => DashboardView(),
+    ),
   ];
 }
