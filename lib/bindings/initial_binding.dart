@@ -7,6 +7,5 @@ class InitialBinding extends Bindings {
   @override
   void dependencies() {
     Get.put(AuthController());
-    Get.put(DashboardController());
   }
 }

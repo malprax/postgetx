@@ -1,68 +1,69 @@
-// lib/modules/auth/controllers/auth_controller.dart
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import '../../../routes/app_routes.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../../models/user_model.dart';
+import '../../../services/auth_service.dart';
+import '../../../services/user_service.dart';
 
 class AuthController extends GetxController {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
-  var isLoading = false.obs;
+  final authService = AuthService();
+  final userService = UserService();
+
+  final Rxn<User> firebaseUser = Rxn<User>();
+  final Rxn<UserModel> currentUserModel = Rxn<UserModel>();
+
+  @override
+  void onInit() {
+    firebaseUser.bindStream(authService.authStateChanges);
+    ever(firebaseUser, _handleUserChanged);
+    super.onInit();
+  }
+
+  Future<void> _handleUserChanged(User? user) async {
+    if (user != null) {
+      final userData = await userService.getUserByUid(user.uid);
+      if (userData != null) {
+        currentUserModel.value = userData;
+      }
+    }
+  }
 
   Future<void> login(String email, String password) async {
     try {
-      isLoading.value = true;
-      await _auth.signInWithEmailAndPassword(email: email, password: password);
-      Get.offAllNamed(Routes.DASHBOARD);
-    } on FirebaseAuthException catch (e) {
-      Get.snackbar('Login Gagal', e.message ?? 'Terjadi kesalahan');
-    } finally {
-      isLoading.value = false;
+      final user = await authService.signIn(email, password);
+      if (user != null) Get.offAllNamed('/dashboard');
+    } catch (e) {
+      Get.snackbar('Login Gagal', e.toString());
     }
   }
 
-  Future<void> register(String email, String password) async {
+  Future<void> register(
+      String name, String email, String password, String role) async {
     try {
-      isLoading.value = true;
-      await _auth.createUserWithEmailAndPassword(
-          email: email, password: password);
-      Get.offAllNamed(Routes.DASHBOARD);
-    } on FirebaseAuthException catch (e) {
-      Get.snackbar('Registrasi Gagal', e.message ?? 'Terjadi kesalahan');
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  Future<void> loginWithGoogle() async {
-    try {
-      isLoading.value = true;
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) {
-        isLoading.value = false;
-        return; // user cancelled
+      final user = await authService.register(email, password);
+      if (user != null) {
+        final newUser = UserModel(
+          uid: user.uid,
+          email: user.email ?? '',
+          name: name,
+          role: role,
+          isActive: true,
+          createdAt: DateTime.now(),
+        );
+        await userService.saveUser(newUser);
+        currentUserModel.value = newUser;
+        Get.offAllNamed('/dashboard');
       }
-
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      await _auth.signInWithCredential(credential);
-      Get.offAllNamed(Routes.DASHBOARD);
-    } on FirebaseAuthException catch (e) {
-      Get.snackbar('Login Google Gagal', e.message ?? 'Terjadi kesalahan');
-    } finally {
-      isLoading.value = false;
+    } catch (e) {
+      Get.snackbar('Registrasi Gagal', e.toString());
     }
   }
 
-  void logout() async {
-    await _auth.signOut();
-    await _googleSignIn.signOut();
-    Get.offAllNamed(Routes.LOGIN);
+  Future<void> logout() async {
+    await authService.signOut();
+    currentUserModel.value = null;
+    Get.offAllNamed('/login');
   }
+
+  bool get isLoggedIn => firebaseUser.value != null;
 }
