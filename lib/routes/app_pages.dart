@@ -2,6 +2,7 @@
 import 'package:get/get.dart';
 import 'package:postgetx/modules/audit/views/audit_log_view.dart';
 import 'package:postgetx/modules/auth/controllers/auth_controller.dart';
+import 'package:postgetx/modules/auth/views/forgot_password_view.dart';
 import 'package:postgetx/modules/dashboard/views/dashboard_admin_view.dart';
 import 'package:postgetx/modules/dashboard/views/dashboard_customer_view.dart';
 import 'package:postgetx/modules/dashboard/views/dashboard_guest_view.dart';
@@ -32,6 +33,11 @@ class AppPages {
       page: () => RegisterView(
         enableRoleSelection: false,
       ),
+    ),
+
+    GetPage(
+      name: Routes.forgotPassword,
+      page: () => ForgotPasswordView(),
     ),
     GetPage(
       name: Routes.dashboard,

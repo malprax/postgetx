@@ -27,7 +27,8 @@ class PosController extends GetxController {
     final snapshot = await FirebaseFirestore.instance.collection('menu').get();
 
     final items = snapshot.docs
-        .map((doc) => MenuItemModel.fromMap(doc.data(), doc.id))
+        .map((doc) => MenuItemModel.fromMap(
+            doc.data() as String, doc.id as Map<String, dynamic>))
         .toList();
     menuItems.assignAll(items);
   }

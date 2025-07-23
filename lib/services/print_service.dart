@@ -20,19 +20,22 @@ class PrintService {
       printer.printCustom("STRUK PEMBAYARAN", 2, 1);
       printer.printNewLine();
       for (var item in items) {
-        printer.printCustom("${item.name} (${item.size})", 1, 0);
+        final extraLabel = item.isExtra ? "[Extra] " : "";
+        printer.printCustom("$extraLabel${item.name} (${item.size})", 1, 0);
         printer.printCustom(
-            "${item.quantity} x ${item.price} = Rp ${(item.quantity * item.price).toStringAsFixed(0)}",
-            0,
-            0);
+          "${item.quantity} x ${item.price} = Rp ${(item.quantity * item.price).toStringAsFixed(0)}",
+          0,
+          0,
+        );
       }
       printer.printNewLine();
       printer.printCustom("Subtotal : Rp ${total.toStringAsFixed(0)}", 1, 0);
       printer.printCustom("Diskon : ${discount.toStringAsFixed(0)}%", 1, 0);
       printer.printCustom(
-          "Total Bayar : Rp ${(total - (total * discount / 100)).toStringAsFixed(0)}",
-          1,
-          0);
+        "Total Bayar : Rp ${(total - (total * discount / 100)).toStringAsFixed(0)}",
+        1,
+        0,
+      );
       printer.printCustom("Tunai : Rp ${paid.toStringAsFixed(0)}", 1, 0);
       printer.printCustom("Kembalian : Rp ${change.toStringAsFixed(0)}", 1, 0);
       printer.printNewLine();

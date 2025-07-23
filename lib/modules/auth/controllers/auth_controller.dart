@@ -22,16 +22,39 @@ class AuthController extends GetxController {
     super.onInit();
   }
 
-  void _handleUserChanged(User? user) async {
-    if (user != null) {
-      print("User logged in: ${user.uid}");
-      final doc = await _firestore.collection('users').doc(user.uid).get();
-      if (doc.exists) {
-        currentUserModel.value = UserModel.fromMap(doc.id, doc.data()!);
+  void _handleUserChanged(User? firebaseUser) async {
+    try {
+      if (firebaseUser != null && firebaseUser.emailVerified) {
+        final String uid = firebaseUser.uid;
+        print("[Auth] User logged in: $uid");
+
+        final doc = await _firestore.collection('users').doc(uid).get();
+
+        if (doc.exists && doc.data() != null) {
+          currentUserModel.value = UserModel.fromMap(doc.id, doc.data()!);
+
+          // Hanya arahkan ke dashboard jika belum di sana
+          if (Get.currentRoute != '/dashboard') {
+            Get.offAllNamed('/dashboard');
+          }
+        } else {
+          print("[Auth] No user document found in Firestore for: $uid");
+          Get.snackbar(
+              "Login Error", "Data pengguna tidak ditemukan di database.");
+        }
+      } else {
+        print("[Auth] User is null, logged out, or email belum diverifikasi");
+
+        currentUserModel.value = null;
+
+        // Hanya redirect ke login jika bukan sudah di login
+        if (Get.currentRoute != '/login') {
+          Get.offAllNamed('/login');
+        }
       }
-    } else {
-      print("User is null (logged out)");
-      currentUserModel.value = null;
+    } catch (e) {
+      print("[Auth] Error in _handleUserChanged: $e");
+      Get.snackbar("Auth Error", "Terjadi kesalahan saat memuat data user.");
     }
   }
 
@@ -40,10 +63,7 @@ class AuthController extends GetxController {
       final doc = await _firestore.collection('users').doc(uid).get();
       if (doc.exists && doc.data() != null) {
         currentUserModel.value = UserModel.fromMap(doc.id, doc.data()!);
-        print("UserModel loaded for: ${doc.id}");
-      } else {
-        print("No user data found for UID: $uid");
-      }
+      } else {}
     } catch (e) {
       print("Error fetching user model: $e");
       Get.snackbar('Error', 'Failed to fetch user data');
@@ -66,8 +86,12 @@ class AuthController extends GetxController {
         email: email,
         password: password,
       );
-      print("[Register] Firebase Auth success. Saving user data to Firestore");
 
+      // Kirim email verifikasi
+      await result.user!.sendEmailVerification();
+      print("[Register] Email verification sent to $email");
+
+      // Simpan data user di Firestore
       await _firestore.collection('users').doc(result.user!.uid).set({
         'name': name,
         'email': email,
@@ -76,9 +100,41 @@ class AuthController extends GetxController {
         'createdAt': FieldValue.serverTimestamp(),
         'photoUrl': '',
       });
-      print("[Register] User registered and data saved.");
 
-      Get.offAllNamed('/dashboard');
+      Get.dialog(
+        AlertDialog(
+          title: const Text("Verifikasi Email"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text("Link verifikasi telah dikirim ke email $email.\n"
+                  "Silakan verifikasi email Anda sebelum login."),
+              const SizedBox(height: 16),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.refresh),
+                label: const Text("Kirim Ulang Email Verifikasi"),
+                onPressed: () {
+                  resendVerificationEmail();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
+                  foregroundColor: Colors.white,
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Get.back(); // Close dialog
+                Get.offAllNamed('/login');
+              },
+              child: const Text("OK"),
+            ),
+          ],
+        ),
+        barrierDismissible: false,
+      );
     } catch (e) {
       print("[Register] Error: $e");
       Get.snackbar('Register Failed', e.toString());
@@ -95,21 +151,27 @@ class AuthController extends GetxController {
     }
 
     try {
-      print("[Login] Attempting login for $email");
       final result = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
-      print("[Login] Firebase login successful. UID: ${result.user?.uid}");
+
+      if (!(result.user?.emailVerified ?? false)) {
+        await _auth.signOut(); // Jangan lanjutkan login
+        Get.snackbar(
+          'Email Belum Diverifikasi',
+          'Silakan periksa email Anda dan klik link verifikasi sebelum login.',
+          backgroundColor: Colors.orange[100],
+          colorText: Colors.orange[900],
+        );
+        return;
+      }
 
       final uid = result.user?.uid;
       if (uid != null) {
         await fetchUserModel(uid);
       }
 
-      print("[Login] Navigating to dashboard");
-
       Get.offAllNamed('/dashboard');
     } catch (e) {
-      print("[Login] Failed: $e");
       Get.snackbar('Login Failed', e.toString());
     }
   }
@@ -125,5 +187,74 @@ class AuthController extends GetxController {
 
     final doc = await _firestore.collection('roles').doc(uid).get();
     return doc.data()?['role'] ?? 'customer';
+  }
+
+  Future<void> forgotPassword() async {
+    final email = emailController.text.trim();
+
+    if (email.isEmpty || !email.contains('@')) {
+      Get.snackbar(
+        'Error',
+        'Please enter a valid email address.',
+        backgroundColor: Colors.red[100],
+        colorText: Colors.red[800],
+      );
+      return;
+    }
+
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      Get.snackbar(
+        'Success',
+        'Password reset link sent to $email',
+        backgroundColor: Colors.green[100],
+        colorText: Colors.green[800],
+        snackPosition: SnackPosition.TOP,
+      );
+    } on FirebaseAuthException catch (e) {
+      Get.snackbar(
+        'Reset Failed',
+        e.message ?? 'Failed to send reset email.',
+        backgroundColor: Colors.red[100],
+        colorText: Colors.red[800],
+        snackPosition: SnackPosition.TOP,
+      );
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Something went wrong. Please try again.',
+        backgroundColor: Colors.red[100],
+        colorText: Colors.red[800],
+      );
+    }
+  }
+
+  Future<void> resendVerificationEmail() async {
+    final user = _auth.currentUser;
+    if (user != null && !user.emailVerified) {
+      try {
+        await user.sendEmailVerification();
+        Get.snackbar(
+          'Terkirim',
+          'Email verifikasi telah dikirim ulang ke ${user.email}',
+          backgroundColor: Colors.green[100],
+          colorText: Colors.green[900],
+        );
+      } catch (e) {
+        Get.snackbar(
+          'Gagal',
+          'Gagal mengirim ulang email verifikasi.',
+          backgroundColor: Colors.red[100],
+          colorText: Colors.red[900],
+        );
+      }
+    } else {
+      Get.snackbar(
+        'Info',
+        'Akun sudah diverifikasi atau belum login.',
+        backgroundColor: Colors.blue[100],
+        colorText: Colors.blue[900],
+      );
+    }
   }
 }

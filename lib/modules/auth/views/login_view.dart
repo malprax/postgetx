@@ -75,7 +75,8 @@ class LoginView extends StatelessWidget {
                           alignment: Alignment.centerRight,
                           child: TextButton(
                             onPressed: () {
-                              // TODO: implement forgot password
+                              Get.toNamed(
+                                  '/forgot-password'); // Pastikan rute ini ada di AppRoutes
                             },
                             child: const Text("Forgot Password?"),
                           ),

@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import '../../../models/menu_item_model.dart';
 import '../controllers/pos_controller.dart';
 
 class PosView extends StatelessWidget {
