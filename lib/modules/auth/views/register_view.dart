@@ -1,77 +1,168 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/auth_controller.dart';
+import 'package:postgetx/modules/auth/controllers/auth_controller.dart';
 
-class RegisterView extends StatefulWidget {
-  final bool enableRoleSelection; // 🔥 hanya untuk admin
-  const RegisterView({super.key, this.enableRoleSelection = false});
+class RegisterView extends StatelessWidget {
+  final bool enableRoleSelection;
 
-  @override
-  State<RegisterView> createState() => _RegisterViewState();
-}
+  RegisterView({super.key, this.enableRoleSelection = true});
 
-class _RegisterViewState extends State<RegisterView> {
-  final controller = Get.find<AuthController>();
-  final nameC = TextEditingController();
-  final emailC = TextEditingController();
-  final passwordC = TextEditingController();
+  final AuthController authController = Get.put(AuthController());
 
-  String selectedRole = 'customer';
+  final RxString selectedRole = 'customer'.obs;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Register')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: ListView(
-          children: [
-            TextField(
-              controller: nameC,
-              decoration: const InputDecoration(labelText: 'Nama Lengkap'),
-            ),
-            TextField(
-              controller: emailC,
-              decoration: const InputDecoration(labelText: 'Email'),
-            ),
-            TextField(
-              controller: passwordC,
-              decoration: const InputDecoration(labelText: 'Password'),
-              obscureText: true,
-            ),
-            if (widget.enableRoleSelection) ...[
-              const SizedBox(height: 12),
-              DropdownButtonFormField<String>(
-                value: selectedRole,
-                onChanged: (val) => setState(() => selectedRole = val!),
-                items: ['admin', 'staff', 'kurir', 'customer']
-                    .map((role) => DropdownMenuItem(
-                          value: role,
-                          child: Text(role.toUpperCase()),
-                        ))
-                    .toList(),
-                decoration: const InputDecoration(labelText: 'Pilih Role'),
+      backgroundColor: const Color.fromARGB(255, 195, 213, 248),
+      body: Stack(
+        children: [
+          Center(
+            child: Container(
+              width: 800,
+              height: 550,
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(32),
               ),
-            ],
-            const SizedBox(height: 24),
-            ElevatedButton(
+              child: Row(
+                children: [
+                  /// Illustration
+                  Expanded(
+                    child: Image.asset(
+                      'assets/login_amico.png',
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                  const VerticalDivider(width: 32),
+
+                  /// Form Section
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text("Register",
+                            style: TextStyle(
+                                fontSize: 26, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 24),
+                        TextField(
+                          controller: authController.nameController,
+                          decoration: InputDecoration(
+                            labelText: 'Full Name',
+                            prefixIcon: const Icon(Icons.person_outline),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        TextField(
+                          controller: authController.emailController,
+                          decoration: InputDecoration(
+                            labelText: 'Email',
+                            prefixIcon: const Icon(Icons.email_outlined),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        TextField(
+                          controller: authController.passwordController,
+                          obscureText: true,
+                          decoration: InputDecoration(
+                            labelText: 'Password',
+                            prefixIcon: const Icon(Icons.lock_outline),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        /// Role dropdown (optional)
+                        if (enableRoleSelection)
+                          Obx(
+                            () => DropdownButtonFormField<String>(
+                              value: selectedRole.value,
+                              onChanged: (val) =>
+                                  selectedRole.value = val ?? 'customer',
+                              decoration: InputDecoration(
+                                labelText: 'Select Role',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              items: const [
+                                DropdownMenuItem(
+                                    value: 'admin', child: Text('Admin')),
+                                DropdownMenuItem(
+                                    value: 'staff', child: Text('Staff')),
+                                DropdownMenuItem(
+                                    value: 'customer', child: Text('Customer')),
+                              ],
+                            ),
+                          ),
+                        const SizedBox(height: 24),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 48,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              authController.register(role: selectedRole.value);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  const Color.fromARGB(255, 5, 82, 236),
+                              foregroundColor:
+                                  const Color.fromARGB(237, 255, 255, 255),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: const Text("Register"),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        TextButton(
+                          onPressed: () {
+                            Get.back(); // back to login
+                          },
+                          child: const Text.rich(
+                            TextSpan(
+                              children: [
+                                TextSpan(text: "Already have an account? "),
+                                TextSpan(
+                                  text: "Log In",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                )
+                              ],
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          /// ⬅️ Back Button (pojok kiri atas)
+          Positioned(
+            top: 40,
+            left: 24,
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              color: Colors.black87,
+              tooltip: 'Kembali',
               onPressed: () {
-                controller.register(
-                  nameC.text.trim(),
-                  emailC.text.trim(),
-                  passwordC.text.trim(),
-                  widget.enableRoleSelection ? selectedRole : 'customer',
-                );
+                Get.back();
               },
-              child: const Text('Daftar'),
             ),
-            if (!widget.enableRoleSelection)
-              TextButton(
-                onPressed: () => Get.back(),
-                child: const Text('Sudah punya akun? Login'),
-              ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

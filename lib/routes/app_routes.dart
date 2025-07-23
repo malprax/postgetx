@@ -3,6 +3,21 @@ abstract class Routes {
   static const login = '/login';
   static const register = '/register';
   static const dashboard = '/dashboard';
+
   static const users = '/users';
   static const profile = '/profile';
+  static const auditlogs = '/audit-logs';
+  // static const report = '/report';
+
+  static const category = '/category';
+  static const pos = '/pos';
+  static const stock = '/stock';
+  static const orders = '/orders';
+
+  static const loyalty = '/loyalty';
+  static const preorder = '/preorder';
+  static const tracking = '/tracking';
+  static const audit = '/audit';
+
+  static const initial = dashboard;
 }

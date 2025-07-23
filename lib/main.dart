@@ -1,15 +1,16 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:postgetx/bindings/app_bindings.dart';
+import 'package:postgetx/firebase_options.dart';
 import 'package:postgetx/routes/app_routes.dart';
+
 import 'package:postgetx/themes/app_theme.dart';
 import 'routes/app_pages.dart';
-import 'bindings/initial_binding.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const RetailApp());
 }
 
@@ -21,11 +22,9 @@ class RetailApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Retail Management System',
       theme: AppTheme.light,
-      initialBinding: InitialBinding(),
-      initialRoute: FirebaseAuth.instance.currentUser != null
-          ? Routes.dashboard
-          : Routes.login,
+      initialRoute: Routes.initial,
       getPages: AppPages.routes,
+      initialBinding: AppBindings(),
     );
   }
 }

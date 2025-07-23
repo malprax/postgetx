@@ -6,7 +6,7 @@ class UserModel {
   final String name;
   final String role;
   final bool isActive;
-  final DateTime createdAt;
+  final DateTime? createdAt;
   final String photoUrl;
 
   UserModel({
@@ -15,19 +15,24 @@ class UserModel {
     required this.name,
     required this.role,
     required this.isActive,
-    required this.createdAt,
+    this.createdAt,
     this.photoUrl = '',
   });
 
   // Create UserModel from Map retrieved from Firestore
-  factory UserModel.fromMap(Map<String, dynamic> map) {
+  factory UserModel.fromMap(String id, Map<String, dynamic> map) {
+    Timestamp? timestamp;
+    if (map['createdAt'] != null && map['createdAt'] is Timestamp) {
+      timestamp = map['createdAt'] as Timestamp;
+    }
+
     return UserModel(
-      uid: map['uid'] ?? '',
+      uid: map['uid'] ?? id,
       email: map['email'] ?? '',
       name: map['name'] ?? '',
       role: map['role'] ?? '',
       isActive: map['isActive'] ?? true,
-      createdAt: (map['createdAt'] as Timestamp).toDate(),
+      createdAt: timestamp?.toDate(),
       photoUrl: map['photoUrl'] ?? '',
     );
   }

@@ -1,3 +1,4 @@
+// dashboard_controller.dart
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -20,7 +21,7 @@ class DashboardController extends GetxController {
     final start = DateTime(now.year, now.month, now.day);
     final end = start.add(const Duration(days: 1));
 
-    // Pesanan hari ini
+    // Orders today
     final orderSnap = await FirebaseFirestore.instance
         .collection('orders')
         .where('createdAt', isGreaterThanOrEqualTo: start)
@@ -28,14 +29,14 @@ class DashboardController extends GetxController {
         .get();
     ordersToday.value = orderSnap.docs.length;
 
-    // Stok rendah
+    // Low stock
     final stockSnap = await FirebaseFirestore.instance
         .collection('products')
-        .where('stock', isLessThanOrEqualTo: 5) // misalnya batas kritis
+        .where('stock', isLessThanOrEqualTo: 5)
         .get();
     lowStockCount.value = stockSnap.docs.length;
 
-    // Pelanggan aktif
+    // Active customers
     final userSnap = await FirebaseFirestore.instance
         .collection('users')
         .where('role', isEqualTo: 'customer')
@@ -45,7 +46,6 @@ class DashboardController extends GetxController {
   }
 
   Future<void> fetchSalesChart() async {
-    // Misal: total order per hari untuk 7 hari terakhir
     final now = DateTime.now();
     List<Map<String, dynamic>> chart = [];
 

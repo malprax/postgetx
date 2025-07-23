@@ -1111,6 +1111,85 @@ class LoyaltyView extends StatelessWidget {
 
 
 
+lib/
+├── main.dart
+├── routes/
+│   ├── app_pages.dart            # Definisi semua rute
+│   └── app_routes.dart           # Konstanta nama rute
+├── bindings/
+│   ├── initial_binding.dart
+│   ├── auth_binding.dart
+│   ├── dashboard_binding.dart
+│   ├── tracking_binding.dart
+│   └── tracking_log_binding.dart
+├── modules/
+│   ├── auth/
+│   │   ├── controllers/auth_controller.dart
+│   │   ├── views/login_view.dart
+│   │   ├── views/register_view.dart
+│   │   └── widgets/custom_auth_field.dart
+│   ├── dashboard/
+│   │   ├── controllers/dashboard_controller.dart
+│   │   ├── views/dashboard_view.dart
+│   │   └── widgets/dashboard_card.dart
+│   ├── users/
+│   │   ├── controllers/user_controller.dart
+│   │   ├── views/user_list_view.dart
+│   │   ├── views/user_form_view.dart
+│   │   └── widgets/user_tile.dart
+│   ├── profile/
+│   │   ├── controllers/profile_controller.dart
+│   │   └── views/profile_view.dart
+│   ├── tracking/
+│   │   ├── controllers/tracking_controller.dart
+│   │   ├── views/tracking_view.dart
+│   │   └── widgets/tracking_status_widget.dart
+│   ├── tracking_logs/
+│   │   ├── controllers/tracking_log_controller.dart
+│   │   ├── views/tracking_log_view.dart       # 📄 Daftar histori tracking
+│   │   ├── services/export_tracking_log.dart  # 📤 Export Excel/PDF
+│   │   └── widgets/log_tile.dart
+│   ├── orders/
+│   │   ├── controllers/order_controller.dart
+│   │   ├── views/order_list_view.dart
+│   │   └── widgets/order_card.dart
+│   ├── stock/
+│   │   ├── controllers/stock_controller.dart
+│   │   ├── views/stock_view.dart
+│   │   └── widgets/stock_tile.dart
+│   ├── preorder/
+│   │   ├── controllers/preorder_controller.dart
+│   │   ├── views/preorder_view.dart
+│   │   └── widgets/preorder_tile.dart
+│   ├── loyalty/
+│   │   ├── controllers/loyalty_controller.dart
+│   │   ├── views/loyalty_view.dart
+│   │   └── widgets/loyalty_card.dart
+├── services/
+│   ├── auth_service.dart         # Login/register/logout
+│   ├── user_service.dart         # Role & manajemen user
+│   ├── firebase_service.dart     # Helper firebase init
+│   └── export_service.dart       # 🔄 Export PDF/Excel log
+├── models/
+│   ├── user_model.dart
+│   ├── order_model.dart
+│   ├── tracking_model.dart
+│   └── tracking_log_model.dart   # Model untuk log status
+├── utils/
+│   ├── constants.dart
+│   └── helpers.dart
+├── themes/
+│   └── app_theme.dart
+└── widgets/
+    ├── custom_button.dart
+    ├── app_loader.dart
+    └── empty_state.dart
+
+
+    <a href="https://storyset.com/online">Online illustrations by Storyset</a>
+
+
+
 
 
 

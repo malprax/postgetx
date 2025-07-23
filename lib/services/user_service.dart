@@ -19,7 +19,7 @@ class UserService {
     try {
       final doc = await _usersRef.doc(uid).get();
       if (doc.exists) {
-        return UserModel.fromMap(doc.data()!);
+        return UserModel.fromMap(doc.id, doc.data()!);
       }
       return null;
     } catch (e) {
@@ -36,6 +36,8 @@ class UserService {
   // Ambil semua user
   Future<List<UserModel>> getAllUsers() async {
     final snapshot = await _usersRef.get();
-    return snapshot.docs.map((doc) => UserModel.fromMap(doc.data())).toList();
+    return snapshot.docs
+        .map((doc) => UserModel.fromMap(doc.id, doc.data()))
+        .toList();
   }
 }
