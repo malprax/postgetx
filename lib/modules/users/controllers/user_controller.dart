@@ -1,11 +1,11 @@
-import 'package:get/get.dart';
+// lib/modules/users/controllers/user_controller.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get.dart';
 import '../../../models/user_model.dart';
-import '../../../services/user_service.dart';
 
 class UsersController extends GetxController {
-  final userService = UserService();
-  final RxList<UserModel> userList = <UserModel>[].obs;
+  final userList = <UserModel>[].obs;
+  final isLoading = false.obs;
 
   @override
   void onInit() {
@@ -14,17 +14,45 @@ class UsersController extends GetxController {
   }
 
   Future<void> fetchUsers() async {
-    final users = await userService.getAllUsers();
-    userList.assignAll(users);
-  }
+    try {
+      isLoading.value = true;
+      final snapshot =
+          await FirebaseFirestore.instance.collection('users').get();
 
-  Future<void> deleteUser(String uid) async {
-    await FirebaseFirestore.instance.collection('users').doc(uid).delete();
-    fetchUsers();
+      final users = snapshot.docs.map((doc) {
+        return UserModel.fromMap(doc.id, doc.data());
+      }).toList();
+
+      userList.assignAll(users);
+    } catch (e) {
+      print("[UsersController] Error fetching users: $e");
+      Get.snackbar("Gagal Memuat Pengguna",
+          "Pastikan Anda memiliki izin sebagai admin.");
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   Future<void> toggleStatus(UserModel user) async {
-    await userService.setUserActive(user.uid, !user.isActive);
-    fetchUsers();
+    try {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .update({
+        'isActive': !user.isActive,
+      });
+      fetchUsers();
+    } catch (e) {
+      Get.snackbar("Error", "Gagal mengubah status: $e");
+    }
+  }
+
+  Future<void> deleteUser(String uid) async {
+    try {
+      await FirebaseFirestore.instance.collection('users').doc(uid).delete();
+      fetchUsers();
+    } catch (e) {
+      Get.snackbar("Error", "Gagal menghapus pengguna: $e");
+    }
   }
 }

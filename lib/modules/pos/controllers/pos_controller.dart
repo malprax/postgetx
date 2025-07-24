@@ -11,11 +11,19 @@ class PosController extends GetxController {
   final cartItems = <CartItemModel>[].obs;
   final discount = 0.0.obs;
   final payment = TextEditingController();
-
   final totalAmount = 0.0.obs;
   final totalAfterDiscount = 0.0.obs;
-
   final isLoading = false.obs;
+
+  final categories = <String>["All"].obs;
+  final selectedCategory = "All".obs;
+
+  List<MenuItemModel> get filteredMenu {
+    if (selectedCategory.value == 'All') return menuItems;
+    return menuItems
+        .where((item) => item.category == selectedCategory.value)
+        .toList();
+  }
 
   @override
   void onInit() {
@@ -25,12 +33,18 @@ class PosController extends GetxController {
 
   void fetchMenuItems() async {
     final snapshot = await FirebaseFirestore.instance.collection('menu').get();
-
     final items = snapshot.docs
-        .map((doc) => MenuItemModel.fromMap(
-            doc.data() as String, doc.id as Map<String, dynamic>))
+        .map((doc) =>
+            MenuItemModel.fromMap(doc.id, doc.data() as Map<String, dynamic>))
         .toList();
     menuItems.assignAll(items);
+
+    final allCategories = items.map((e) => e.category).toSet().toList();
+    categories.assignAll(['All', ...allCategories]);
+  }
+
+  void setCategoryFilter(String category) {
+    selectedCategory.value = category;
   }
 
   void addItem(MenuItemModel item, String size) {
@@ -40,12 +54,14 @@ class PosController extends GetxController {
       cartItems[existing].quantity++;
       cartItems.refresh();
     } else {
+      final variant = item.variants.firstWhere((v) => v.size == size);
       cartItems.add(CartItemModel(
         id: item.id,
         name: item.name,
-        price: (item.prices[size] ?? 0).toDouble(),
+        price: variant.price.toDouble(),
         quantity: 1,
         size: size,
+        isExtra: item.isExtra,
       ));
     }
     calculateTotal();
@@ -56,13 +72,13 @@ class PosController extends GetxController {
     calculateTotal();
   }
 
-  void increaseQty(CartItemModel item) {
+  void increaseQuantity(CartItemModel item) {
     item.quantity++;
     cartItems.refresh();
     calculateTotal();
   }
 
-  void decreaseQty(CartItemModel item) {
+  void decreaseQuantity(CartItemModel item) {
     if (item.quantity > 1) {
       item.quantity--;
       cartItems.refresh();
@@ -83,9 +99,35 @@ class PosController extends GetxController {
     calculateTotal();
   }
 
+  Future<void> printReceipt() async {
+    final paid = double.tryParse(payment.text) ?? 0;
+    final change = paid - totalAfterDiscount.value;
+
+    await PrintService().printReceipt(
+      items: cartItems,
+      total: totalAmount.value,
+      discount: discount.value,
+      paid: paid,
+      change: change,
+    );
+  }
+
   Future<void> checkout() async {
     final paymentReceived = double.tryParse(payment.text) ?? 0;
     final change = paymentReceived - totalAfterDiscount.value;
+
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      Get.snackbar("Belum Login", "Silakan login terlebih dahulu.");
+      return;
+    }
+
+    if (!user.emailVerified) {
+      Get.snackbar("Email Belum Diverifikasi",
+          "Silakan verifikasi email Anda terlebih dahulu.");
+      return;
+    }
 
     if (paymentReceived < totalAfterDiscount.value) {
       Get.snackbar('Pembayaran Kurang', 'Jumlah pembayaran tidak mencukupi.');
@@ -94,22 +136,20 @@ class PosController extends GetxController {
 
     try {
       isLoading.value = true;
-      final uid = FirebaseAuth.instance.currentUser?.uid ?? 'unknown';
+      final uid = user.uid;
       final now = DateTime.now();
 
-      // Simpan ke Firestore (orders)
       final orderRef =
           await FirebaseFirestore.instance.collection('orders').add({
         'items': cartItems.map((e) => e.toMap()).toList(),
-        'total': totalAfterDiscount.value,
+        'total': totalAmount.value,
         'discount': discount.value,
-        'payment': paymentReceived,
+        'paid': paymentReceived,
         'change': change,
         'createdBy': uid,
         'createdAt': now,
       });
 
-      // Simpan ke order_logs
       for (var item in cartItems) {
         await FirebaseFirestore.instance.collection('order_logs').add({
           'orderId': orderRef.id,
@@ -123,7 +163,6 @@ class PosController extends GetxController {
         });
       }
 
-      // Simpan ke sales_report
       await FirebaseFirestore.instance.collection('sales_report').add({
         'date': now.toIso8601String().substring(0, 10),
         'total': totalAfterDiscount.value,
@@ -131,14 +170,7 @@ class PosController extends GetxController {
         'createdAt': now,
       });
 
-      // Cetak nota ke printer
-      await PrintService().printReceipt(
-        items: cartItems,
-        total: totalAmount.value,
-        discount: discount.value,
-        paid: paymentReceived,
-        change: change,
-      );
+      await printReceipt();
 
       Get.defaultDialog(
         title: 'Pembayaran Sukses',
@@ -152,11 +184,10 @@ class PosController extends GetxController {
         ),
         textConfirm: 'OK',
         onConfirm: () {
-          Get.back(); // Tutup dialog
+          Get.back();
         },
       );
 
-      // Reset keranjang
       cartItems.clear();
       payment.clear();
       discount.value = 0;

@@ -10,7 +10,7 @@ import 'package:postgetx/modules/dashboard/views/dashboard_staff_view.dart';
 import 'package:postgetx/modules/loyalty/views/loyalty_view.dart';
 
 import 'package:postgetx/modules/orders/views/order_view.dart';
-import 'package:postgetx/modules/pos/views/category_view.dart';
+import 'package:postgetx/modules/menu/views/category_view.dart';
 import 'package:postgetx/modules/pos/views/pos_view.dart';
 import 'package:postgetx/modules/preorder/views/preorder_view.dart';
 import 'package:postgetx/modules/profile/views/profile_view.dart';

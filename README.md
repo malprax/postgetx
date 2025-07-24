@@ -1190,7 +1190,57 @@ lib/
 
 
 
+Mantap! Kita lanjut bertahap. Berikut saran urutan agar rapi dan stabil:
 
+⸻
+
+✅ Tahap Selanjutnya: Integrasi Tampilan Cetak Ulang Nota / Histori Order
+
+Akan kita buat:
+	1.	order_history_view.dart
+	•	Menampilkan daftar order sebelumnya.
+	•	Tampilkan tanggal, total, kasir, dan tombol “Cetak Ulang”.
+	2.	Endpoint Firestore: orders
+	•	Query berdasarkan tanggal (opsional), kasir tertentu (opsional).
+	3.	Tombol Print akan memanggil kembali PrintService().printReceipt(...) berdasarkan data order.
+
+⸻
+
+Setelah itu:
+
+📦 Tahap Otomasi Stok:
+
+Akan dibuat:
+	1.	Tiap item yang dipesan akan mengurangi stok di koleksi stok / inventory.
+	2.	Perlu struktur seperti:
+
+/menu
+  - id: ayam_bakar
+    name: Ayam Bakar
+    ...
+    stock: 45
+
+	3.	Fungsi:
+
+Future<void> decreaseStock(String itemId, int qty);
+
+
+⸻
+
+🔧 Opsi Tambahan (bisa dilanjutkan setelah dua tahap di atas):
+	•	Riwayat transaksi per kasir / per hari
+	•	Filter histori per tanggal
+	•	Ekspor PDF / Excel dari order
+	•	Cetak nota dalam format struk rapi
+	•	Sistem refund atau void order
+	•	Support open table atau dine-in vs takeaway
+
+⸻
+
+Jika setuju, saya akan mulai dengan:
+✅ order_history_view.dart untuk tampilan histori + cetak ulang nota.
+
+Lanjutkan?
 
 
 

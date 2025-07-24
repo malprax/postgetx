@@ -1,8 +1,7 @@
+// lib/modules/users/views/users_view.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:postgetx/modules/users/controllers/user_controller.dart';
-
-import '../../../models/user_model.dart';
 import 'user_form_view.dart';
 
 class UsersView extends StatelessWidget {
@@ -19,9 +18,14 @@ class UsersView extends StatelessWidget {
         child: const Icon(Icons.add),
       ),
       body: Obx(() {
+        if (controller.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
         final users = controller.userList;
-        if (users.isEmpty)
-          return const Center(child: Text('Belum ada pengguna.'));
+        if (users.isEmpty) {
+          return const Center(child: Text('Tidak ada data pengguna.'));
+        }
 
         return ListView.builder(
           itemCount: users.length,

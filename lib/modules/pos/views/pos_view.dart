@@ -12,25 +12,54 @@ class PosView extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(PosController());
     final currencyFormat = NumberFormat.currency(locale: 'id', symbol: 'Rp');
-    final TextEditingController paidController = TextEditingController();
 
     return Scaffold(
       appBar: AppBar(title: const Text('POS System')),
-      body: Obx(() => Column(
+      body: Obx(() => Row(
             children: [
-              // Menu Grid
+              // 📁 Kategori Sidebar
+              Container(
+                width: 180,
+                color: Colors.grey[100],
+                padding: const EdgeInsets.all(8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Kategori',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16)),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: controller.categories
+                          .map((category) => ChoiceChip(
+                                label: Text(category),
+                                selected: controller.selectedCategory.value ==
+                                    category,
+                                onSelected: (_) =>
+                                    controller.setCategoryFilter(category),
+                              ))
+                          .toList(),
+                    ),
+                  ],
+                ),
+              ),
+
+              // 🧾 Menu Grid
               Expanded(
+                flex: 3,
                 child: GridView.builder(
                   padding: const EdgeInsets.all(12),
-                  itemCount: controller.menuItems.length,
+                  itemCount: controller.filteredMenu.length,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
+                    crossAxisCount: 3,
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
-                    childAspectRatio: 1.2,
+                    childAspectRatio: 1.1,
                   ),
                   itemBuilder: (context, index) {
-                    final item = controller.menuItems[index];
+                    final item = controller.filteredMenu[index];
                     return Card(
                       elevation: 4,
                       child: Column(
@@ -40,12 +69,12 @@ class PosView extends StatelessWidget {
                               style:
                                   const TextStyle(fontWeight: FontWeight.bold)),
                           const SizedBox(height: 8),
-                          for (var entry in item.prices.entries)
+                          for (var variant in item.variants)
                             ElevatedButton(
                               onPressed: () =>
-                                  controller.addItem(item, entry.key),
+                                  controller.addItem(item, variant.size),
                               child: Text(
-                                  '${entry.key} - ${currencyFormat.format(entry.value)}'),
+                                  '${variant.size} - ${currencyFormat.format(variant.price)}'),
                             )
                         ],
                       ),
@@ -53,15 +82,16 @@ class PosView extends StatelessWidget {
                   },
                 ),
               ),
-              const Divider(),
-              // Cart Summary
+
+              // 🛒 Ringkasan Order
               Expanded(
+                flex: 2,
                 child: Padding(
                   padding: const EdgeInsets.all(12),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Cart Items',
+                      const Text('Ringkasan Order',
                           style: TextStyle(
                               fontSize: 16, fontWeight: FontWeight.bold)),
                       Expanded(
@@ -69,13 +99,34 @@ class PosView extends StatelessWidget {
                           itemCount: controller.cartItems.length,
                           itemBuilder: (context, index) {
                             final item = controller.cartItems[index];
-                            return ListTile(
-                              title: Text('${item.name} (${item.size})'),
-                              subtitle: Text(
-                                  '${item.quantity} x ${currencyFormat.format(item.price)}'),
-                              trailing: IconButton(
-                                icon: const Icon(Icons.delete),
-                                onPressed: () => controller.removeItem(item),
+                            return Card(
+                              margin: const EdgeInsets.symmetric(vertical: 4),
+                              child: ListTile(
+                                title: Text('${item.name} (${item.size})'),
+                                subtitle: Text(
+                                    '${item.quantity} x ${currencyFormat.format(item.price)}'),
+                                trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(Icons.remove),
+                                      onPressed: () =>
+                                          controller.decreaseQuantity(item),
+                                    ),
+                                    Text('${item.quantity}'),
+                                    IconButton(
+                                      icon: const Icon(Icons.add),
+                                      onPressed: () =>
+                                          controller.increaseQuantity(item),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.delete,
+                                          color: Colors.red),
+                                      onPressed: () =>
+                                          controller.removeItem(item),
+                                    ),
+                                  ],
+                                ),
                               ),
                             );
                           },
@@ -86,7 +137,7 @@ class PosView extends StatelessWidget {
                           'Subtotal: ${currencyFormat.format(controller.totalAmount.value)}'),
                       Row(
                         children: [
-                          const Text('Discount: '),
+                          const Text('Diskon: '),
                           DropdownButton<double>(
                             value: controller.discount.value,
                             items: const [0, 5, 10, 15, 20]
@@ -99,54 +150,66 @@ class PosView extends StatelessWidget {
                         ],
                       ),
                       Text(
-                          'Total After Discount: ${currencyFormat.format(controller.totalAfterDiscount.value)}'),
+                          'Total: ${currencyFormat.format(controller.totalAfterDiscount.value)}'),
                       const SizedBox(height: 12),
                       TextField(
-                        controller: paidController,
+                        controller: controller.payment,
                         keyboardType: TextInputType.number,
                         decoration:
-                            const InputDecoration(labelText: 'Amount Paid'),
+                            const InputDecoration(labelText: 'Jumlah Bayar'),
                       ),
                       const SizedBox(height: 12),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          icon: const Icon(Icons.payment),
-                          label: const Text('Charge'),
-                          onPressed: () async {
-                            final paid = double.tryParse(paidController.text);
-                            if (paid == null ||
-                                paid < controller.totalAfterDiscount.value) {
-                              Get.snackbar('Error', 'Insufficient payment');
-                              return;
-                            }
-                            final change =
-                                paid - controller.totalAfterDiscount.value;
-                            await controller.checkout();
-                            Get.defaultDialog(
-                              title: 'Success',
-                              content: Column(
-                                children: [
-                                  const Icon(Icons.check_circle,
-                                      color: Colors.green, size: 48),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                      'Change: ${currencyFormat.format(change)}')
-                                ],
-                              ),
-                              confirm: ElevatedButton(
-                                onPressed: () => Get.back(),
-                                child: const Text('OK'),
-                              ),
-                            );
-                            paidController.clear();
-                          },
-                        ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              icon: const Icon(Icons.print),
+                              label: const Text('Cetak Nota'),
+                              onPressed: () => controller.printReceipt(),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              icon: const Icon(Icons.payment),
+                              label: const Text('Charge'),
+                              onPressed: () async {
+                                final paid =
+                                    double.tryParse(controller.payment.text);
+                                if (paid == null ||
+                                    paid <
+                                        controller.totalAfterDiscount.value) {
+                                  Get.snackbar('Error', 'Pembayaran kurang');
+                                  return;
+                                }
+                                final change =
+                                    paid - controller.totalAfterDiscount.value;
+                                await controller.checkout();
+                                Get.defaultDialog(
+                                  title: 'Sukses',
+                                  content: Column(
+                                    children: [
+                                      const Icon(Icons.check_circle,
+                                          color: Colors.green, size: 48),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                          'Kembalian: ${currencyFormat.format(change)}')
+                                    ],
+                                  ),
+                                  confirm: ElevatedButton(
+                                    onPressed: () => Get.back(),
+                                    child: const Text('OK'),
+                                  ),
+                                );
+                              },
+                            ),
+                          )
+                        ],
                       )
                     ],
                   ),
                 ),
-              ),
+              )
             ],
           )),
     );
