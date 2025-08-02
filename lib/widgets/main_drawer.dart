@@ -1,4 +1,3 @@
-// lib/widgets/main_drawer.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../modules/auth/controllers/auth_controller.dart';
@@ -18,17 +17,21 @@ class MainDrawer extends StatelessWidget {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
+          // Header
           UserAccountsDrawerHeader(
             accountName: Text(user?.name ?? 'Guest'),
             accountEmail: Text(user?.email ?? 'Not Logged In'),
-            currentAccountPicture: const CircleAvatar(
-              backgroundImage: AssetImage('assets/user_avatar.png'),
+            currentAccountPicture: CircleAvatar(
+              backgroundImage: const AssetImage('assets/user_avatar.png'),
+              onBackgroundImageError: (_, __) => const Icon(Icons.person),
             ),
-            decoration: const BoxDecoration(
-              color: Colors.pink,
-            ),
+            decoration: const BoxDecoration(color: Colors.pink),
           ),
-          if (role == 'admin' || role == 'staff') ...[
+
+          // =======================
+          // Admin & Staff
+          // =======================
+          if (user != null && (role == 'admin' || role == 'staff')) ...[
             _drawerTile(
               icon: Icons.dashboard,
               title: 'Dashboard',
@@ -55,7 +58,11 @@ class MainDrawer extends StatelessWidget {
               route: Routes.category,
             ),
           ],
-          if (role == 'admin') ...[
+
+          // =======================
+          // Admin Only
+          // =======================
+          if (user != null && role == 'admin') ...[
             _drawerTile(
               icon: Icons.supervised_user_circle,
               title: 'User Management',
@@ -67,7 +74,11 @@ class MainDrawer extends StatelessWidget {
               route: Routes.auditlogs,
             ),
           ],
-          if (role == 'customer') ...[
+
+          // =======================
+          // Customer
+          // =======================
+          if (user != null && role == 'customer') ...[
             _drawerTile(
               icon: Icons.loyalty,
               title: 'Loyalty Program',
@@ -84,19 +95,30 @@ class MainDrawer extends StatelessWidget {
               route: Routes.tracking,
             ),
           ],
-          _drawerTile(
-            icon: Icons.person,
-            title: 'My Profile',
-            route: Routes.profile,
-          ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.logout),
-            title: const Text('Logout'),
-            onTap: () async {
-              await auth.logout();
-            },
-          ),
+
+          // =======================
+          // Profile (semua login)
+          // =======================
+          if (user != null)
+            _drawerTile(
+              icon: Icons.person,
+              title: 'My Profile',
+              route: Routes.profile,
+            ),
+
+          // =======================
+          // Logout (semua login)
+          // =======================
+          if (user != null) ...[
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: const Text('Logout'),
+              onTap: () async {
+                await auth.logout();
+              },
+            ),
+          ],
         ],
       ),
     );

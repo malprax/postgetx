@@ -5,6 +5,7 @@ import '../../../modules/dashboard/controllers/dashboard_controller.dart';
 import '../../../modules/auth/controllers/auth_controller.dart';
 import '../widgets/dashboard_summary_card.dart';
 import '../widgets/sales_chart.dart';
+import '../../../widgets/email_verification_banner.dart';
 
 class DashboardAdminView extends StatelessWidget {
   const DashboardAdminView({super.key});
@@ -25,25 +26,7 @@ class DashboardAdminView extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (!auth.emailVerified.value)
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    margin: const EdgeInsets.only(bottom: 12),
-                    color: Colors.amber.shade100,
-                    child: Row(
-                      children: const [
-                        Icon(Icons.warning_amber_rounded),
-                        SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            "Email Anda belum terverifikasi. Silakan verifikasi email Anda untuk akses penuh.",
-                            style: TextStyle(fontSize: 13),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-
+                EmailVerificationBanner(),
                 // 👋 Greeting
                 Text('Welcome Admin, ${user?.name ?? ''}',
                     style: const TextStyle(

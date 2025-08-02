@@ -3,6 +3,7 @@
 // ================================
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:postgetx/widgets/email_verification_banner.dart';
 import '../../auth/controllers/auth_controller.dart';
 
 class DashboardCustomerView extends StatelessWidget {
@@ -30,62 +31,7 @@ class DashboardCustomerView extends StatelessWidget {
               Text("Email: ${user?.email ?? ''}"),
               Text("Role: ${user?.role ?? ''}"),
               const SizedBox(height: 16),
-              if (!auth.emailVerified.value) ...[
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  margin: const EdgeInsets.only(bottom: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.orange[100],
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.orange),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        '⚠️ Akun Anda belum diverifikasi.',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.deepOrange),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'Silakan cek email Anda dan klik tautan verifikasi untuk mengaktifkan akun.',
-                      ),
-                      const SizedBox(height: 8),
-                      ElevatedButton.icon(
-                        onPressed: () async {
-                          try {
-                            await auth.sendVerificationEmail();
-                            Get.snackbar('Terkirim',
-                                'Email verifikasi berhasil dikirim ulang.');
-                          } catch (e) {
-                            Get.snackbar(
-                                'Error', 'Gagal mengirim email verifikasi: $e');
-                          }
-                        },
-                        icon: const Icon(Icons.email),
-                        label: const Text('Kirim Ulang Email Verifikasi'),
-                      ),
-                      const SizedBox(height: 8),
-                      ElevatedButton.icon(
-                        onPressed: () async {
-                          await auth.reloadEmailStatus();
-                          if (auth.emailVerified.value) {
-                            Get.snackbar('Sukses', 'Email sudah diverifikasi!');
-                          } else {
-                            Get.snackbar('Belum Diverifikasi',
-                                'Email Anda belum diverifikasi.');
-                          }
-                        },
-                        icon: const Icon(Icons.refresh),
-                        label: const Text('Periksa Status Email'),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+              EmailVerificationBanner(),
               ElevatedButton.icon(
                 icon: const Icon(Icons.shopping_cart),
                 label: const Text('Riwayat Order Saya'),

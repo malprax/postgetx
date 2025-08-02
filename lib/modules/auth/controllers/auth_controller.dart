@@ -13,6 +13,7 @@ class AuthController extends GetxController {
   final firebaseUser = Rxn<User>();
   final currentUserModel = Rxn<UserModel>();
   final emailVerified = false.obs;
+  final isUserModelLoaded = false.obs;
 
   // TextEditingControllers for login/register/forgot password
   final emailController = TextEditingController();
@@ -31,6 +32,7 @@ class AuthController extends GetxController {
       } else {
         currentUserModel.value = null;
         emailVerified.value = false;
+        isUserModelLoaded.value = true;
       }
     });
     super.onInit();
@@ -43,6 +45,7 @@ class AuthController extends GetxController {
       currentUserModel.value =
           UserModel.fromMap(doc.id, doc.data() as Map<String, dynamic>);
     }
+    isUserModelLoaded.value = true;
   }
 
   Future<void> sendVerificationEmail() async {
@@ -131,6 +134,7 @@ class AuthController extends GetxController {
     firebaseUser.value = null;
     currentUserModel.value = null;
     emailVerified.value = false;
+    isUserModelLoaded.value = false;
     emailController.clear();
     passwordController.clear();
     nameController.clear();

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:postgetx/modules/auth/controllers/auth_controller.dart';
 import '../../../models/cart_item_model.dart';
 import '../../../models/menu_item_model.dart';
 import '../../../services/print_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class PosController extends GetxController {
+  final auth = Get.find<AuthController>();
   final menuItems = <MenuItemModel>[].obs;
   final cartItems = <CartItemModel>[].obs;
   final discount = 0.0.obs;
@@ -32,15 +34,21 @@ class PosController extends GetxController {
   }
 
   void fetchMenuItems() async {
-    final snapshot = await FirebaseFirestore.instance.collection('menu').get();
-    final items = snapshot.docs
-        .map((doc) =>
-            MenuItemModel.fromMap(doc.id, doc.data() as Map<String, dynamic>))
-        .toList();
-    menuItems.assignAll(items);
+    try {
+      final snapshot =
+          await FirebaseFirestore.instance.collection('menu_items').get();
+      menuItems.value = snapshot.docs
+          .map((doc) => MenuItemModel.fromMap(
+              doc.data() as String, doc.id as Map<String, dynamic>))
+          .toList();
 
-    final allCategories = items.map((e) => e.category).toSet().toList();
-    categories.assignAll(['All', ...allCategories]);
+      // Extract categories from menu items
+      final allCategories = menuItems.map((e) => e.category).toSet().toList();
+      allCategories.sort();
+      categories.value = ['All', ...allCategories];
+    } catch (e) {
+      Get.snackbar('Error', 'Gagal mengambil data menu: $e');
+    }
   }
 
   void setCategoryFilter(String category) {
@@ -196,6 +204,39 @@ class PosController extends GetxController {
       Get.snackbar('Error', 'Gagal menyimpan transaksi: $e');
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<void> saveOrderToFirestore({
+    required double amountPaid,
+  }) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final orderId = FirebaseFirestore.instance.collection('orders').doc().id;
+    final now = DateTime.now();
+
+    await FirebaseFirestore.instance.collection('orders').doc(orderId).set({
+      'orderId': orderId,
+      'cashierId': user.uid,
+      'cashierName': auth.currentUserModel.value?.name ?? '',
+      'total': totalAmount.value,
+      'discount': discount.value,
+      'totalAfterDiscount': totalAfterDiscount.value,
+      'amountPaid': amountPaid,
+      'change': amountPaid - totalAfterDiscount.value,
+      'createdAt': now.toIso8601String(),
+    });
+
+    for (final item in cartItems) {
+      await FirebaseFirestore.instance.collection('order_items').add({
+        'orderId': orderId,
+        'name': item.name,
+        'size': item.size,
+        'price': item.price,
+        'quantity': item.quantity,
+        'subtotal': item.price * item.quantity,
+      });
     }
   }
 }

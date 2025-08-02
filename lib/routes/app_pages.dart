@@ -8,6 +8,7 @@ import 'package:postgetx/modules/dashboard/views/dashboard_customer_view.dart';
 import 'package:postgetx/modules/dashboard/views/dashboard_guest_view.dart';
 import 'package:postgetx/modules/dashboard/views/dashboard_staff_view.dart';
 import 'package:postgetx/modules/loyalty/views/loyalty_view.dart';
+import 'package:postgetx/modules/orders/views/order_history_view.dart';
 
 import 'package:postgetx/modules/orders/views/order_view.dart';
 import 'package:postgetx/modules/menu/views/category_view.dart';
@@ -88,6 +89,10 @@ class AppPages {
     GetPage(
       name: Routes.orders,
       page: () => OrderView(),
+    ),
+    GetPage(
+      name: Routes.orderHistory,
+      page: () => OrderHistoryView(),
     ),
     GetPage(
       name: Routes.loyalty,

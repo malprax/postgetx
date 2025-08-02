@@ -51,5 +51,7 @@
 	<array>
 		<string>_dartobservatory._tcp</string>
 	</array>
+	<key>NSLocalNetworkUsageDescription</key>
+  	<string>Aplikasi ini memerlukan akses jaringan lokal untuk debugging dan profiling.</string>
 </dict>
 </plist>

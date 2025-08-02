@@ -22,12 +22,17 @@ class DashboardController extends GetxController {
     final end = start.add(const Duration(days: 1));
 
     // Orders today
-    final orderSnap = await FirebaseFirestore.instance
-        .collection('orders')
-        .where('createdAt', isGreaterThanOrEqualTo: start)
-        .where('createdAt', isLessThan: end)
-        .get();
-    ordersToday.value = orderSnap.docs.length;
+    try {
+      final orderSnap = await FirebaseFirestore.instance
+          .collection('orders')
+          .where('createdAt', isGreaterThanOrEqualTo: start)
+          .where('createdAt', isLessThan: end)
+          .get();
+      ordersToday.value = orderSnap.docs.length;
+    } catch (e) {
+      print('error fetching orders today: $e');
+      Get.snackbar('Error', 'Gagal mengambil data pesanan hari ini');
+    }
 
     // Low stock
     final stockSnap = await FirebaseFirestore.instance

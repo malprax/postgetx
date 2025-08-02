@@ -182,9 +182,10 @@ class PosView extends StatelessWidget {
                                   Get.snackbar('Error', 'Pembayaran kurang');
                                   return;
                                 }
+                                await controller.checkout(); // reset cart
                                 final change =
                                     paid - controller.totalAfterDiscount.value;
-                                await controller.checkout();
+
                                 Get.defaultDialog(
                                   title: 'Sukses',
                                   content: Column(

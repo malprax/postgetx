@@ -14,6 +14,7 @@ abstract class Routes {
   static const pos = '/pos';
   static const stock = '/stock';
   static const orders = '/orders';
+  static const orderHistory = '/order-history';
 
   static const loyalty = '/loyalty';
   static const preorder = '/preorder';
