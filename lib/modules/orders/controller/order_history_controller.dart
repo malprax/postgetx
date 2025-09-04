@@ -17,9 +17,8 @@ class OrderHistoryController extends GetxController {
         .orderBy('createdAt', descending: true)
         .get();
 
-    orders.assignAll(snapshot.docs.map((e) => OrderModel.fromMap({
-          'id': e.id,
-          ...e.data(),
-        })));
+    orders.assignAll(snapshot.docs.map(
+      (doc) => OrderModel.fromMap(doc.id, doc.data()),
+    ));
   }
 }

@@ -1,9 +1,9 @@
+// lib/main.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:postgetx/bindings/app_bindings.dart';
 import 'package:postgetx/firebase_options.dart';
-import 'package:postgetx/modules/dashboard/views/dashboard_staff_view.dart';
 import 'package:postgetx/routes/app_pages.dart';
 import 'package:postgetx/themes/app_theme.dart';
 
@@ -11,10 +11,15 @@ import 'modules/auth/controllers/auth_controller.dart';
 import 'modules/dashboard/views/dashboard_admin_view.dart';
 import 'modules/dashboard/views/dashboard_customer_view.dart';
 import 'modules/dashboard/views/dashboard_guest_view.dart';
+import 'modules/dashboard/views/dashboard_staff_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // Inisialisasi AuthController sebelum build
+  Get.put(AuthController());
+
   runApp(const RetailApp());
 }
 
@@ -23,43 +28,49 @@ class RetailApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final auth = Get.put(AuthController());
-
     return Obx(() {
-      // Belum login → tampilkan dashboard guest
+      final auth = Get.find<AuthController>();
+
+      // Belum login
       if (auth.firebaseUser.value == null) {
         return GetMaterialApp(
           debugShowCheckedModeBanner: false,
           theme: AppTheme.light,
           initialBinding: AppBindings(),
           getPages: AppPages.routes,
-          home: const DashboardGuestView(),
+          initialRoute: '/login',
         );
       }
 
-      // Sudah login tapi user model belum dimuat → loading spinner
+      // Sudah login tapi user model belum selesai dimuat
       if (!auth.isUserModelLoaded.value) {
-        return const MaterialApp(
+        return GetMaterialApp(
           debugShowCheckedModeBanner: false,
-          home: Scaffold(
+          theme: AppTheme.light,
+          initialBinding: AppBindings(),
+          getPages: AppPages.routes,
+          home: const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           ),
         );
       }
 
-      // Sudah login dan user model sudah tersedia → arahkan berdasarkan role
-      final role = auth.currentUserModel.value?.role;
-      Widget homePage;
+      // Sudah login dan user model sudah tersedia
+      String role = auth.currentUserModel.value?.role ?? 'guest';
 
-      if (role == 'admin') {
-        homePage = const DashboardAdminView();
-      } else if (role == 'customer') {
-        homePage = const DashboardCustomerView();
-      } else if (role == 'staff') {
-        homePage = const DashboardStaffView();
-      } else {
-        // fallback untuk role lain seperti staff atau undefined
-        homePage = const DashboardGuestView();
+      Widget home;
+      switch (role) {
+        case 'admin':
+          home = const DashboardAdminView();
+          break;
+        case 'staff':
+          home = const DashboardStaffView();
+          break;
+        case 'customer':
+          home = const DashboardCustomerView();
+          break;
+        default:
+          home = const DashboardGuestView();
       }
 
       return GetMaterialApp(
@@ -67,7 +78,7 @@ class RetailApp extends StatelessWidget {
         theme: AppTheme.light,
         initialBinding: AppBindings(),
         getPages: AppPages.routes,
-        home: homePage,
+        home: home,
       );
     });
   }

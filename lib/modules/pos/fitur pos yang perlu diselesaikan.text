@@ -1,0 +1,116 @@
+🔜 Fitur POS yang Perlu Diselesaikan:
+	1.	[ ] Hapus kategori dari sidebar (opsional: konfirmasi jika masih ada menu)
+	2.	[ ] Tombol +Kategori saat belum ada kategori
+	3.	[ ] Indikator status (stok habis, promo, dsb.)
+	4.	[ ] Riwayat transaksi kasir (order history)
+	5.	[ ] Cetak ulang struk
+	6.	[ ] Integrasi printer Bluetooth (BP-ECO58D)
+	7.	[ ] Simpan log order ke Firestore (order_logs)
+	8.	[ ] Simpan laporan penjualan harian (sales_report)
+	9.	[ ] Multi-user kasir (role-based history & sales)
+	10.	[ ] Export laporan PDF / Excel
+	11.	[ ] Filtering laporan per tanggal / user
+
+
+Apakah kamu ingin:
+	•	✅ Saya tambahkan showQuickAddMenuForm() sekarang? (menggunakan Get.dialog() dengan form sederhana)
+	•	✅ Sekalian buatkan file quick_add_menu_form.dart?
+	•	✅ Atau cukup navigasi ke halaman menu_form_view.dart jika ingin lebih lengkap?
+
+
+    ✅ DAFTAR KATEGORI UTAMA
+	1.	Tumpeng
+	2.	Nasi Kotak / Nasi Dos
+	3.	Tampah Komplit
+	4.	Extra Lauk / Tambahan
+	5.	Sate & Lontong
+
+⸻
+
+✅ MENU DAN VARIAN PER KATEGORI
+
+🟡 Kategori: Tumpeng
+	•	Tumpeng Mini 1 Orang
+	•	Tumpeng Mini Dekorasi
+	•	Tumpeng Besar 2 Gunung
+	•	Tumpeng Besar 1 Gunung
+	•	Varian:
+	•	Mini
+	•	Medium
+	•	Large
+
+⸻
+
+🟡 Kategori: Nasi Kotak / Nasi Dos
+	•	Nasi Kotak Ayam Kampung
+	•	Isi: Nasi, Ayam Goreng, Capcay/Sop Ayam, Tempe/Tahu, Lalapan, Sambal
+	•	Harga: Rp32.000
+	•	Nasi Kotak Bebek Goreng
+	•	Isi: Nasi, Bebek Goreng, Capcay/Sop Ayam, Tempe/Tahu, Lalapan, Sambal
+	•	Harga: Rp40.000
+
+⸻
+
+🟡 Kategori: Tampah Komplit
+
+Menu isi kombinasi dari:
+	•	Ayam Goreng Utuh
+	•	Telur Balado
+	•	Urap
+	•	Mie Kuning
+	•	Tempe Orek
+	•	Perkedel
+	•	Sambal & Lalapan
+
+Cocok dijadikan varian “Tampah A”, “Tampah B”, “Tampah Spesial”
+
+⸻
+
+🟡 Kategori: Extra Lauk
+
+(Disesuaikan dengan ukuran S, M, L, XL)
+	•	Tempe Bacem
+	•	Telur Balado
+	•	Perkedel Kentang
+	•	Tempe Orek
+	•	Sayur Urap
+	•	Sate Ayam
+
+Varian berdasarkan ukuran: S, M, L, XL
+
+⸻
+
+🟡 Kategori: Sate & Lontong
+	•	Sate Ayam (10 tusuk + lontong)
+	•	Bonus acar, sambal kacang
+	•	Lontong & Acar Komplit
+	•	Isi: Lontong, acar, kerupuk, sambal kacang
+
+🔜 Tahap Selanjutnya (Rekomendasi Fokus Berikutnya)
+
+Berikut pilihan prioritas untuk kamu pilih:
+	1.	Integrasi Gambar Menu:
+	•	Upload gambar dari gallery.
+	•	Simpan ke Firebase Storage.
+	•	Tautkan imageUrl ke model MenuItemModel.
+	2.	Edit Menu:
+	•	Form edit menu dengan prefill data.
+	•	Edit varian, deskripsi, kategori, gambar.
+	3.	Kategori Management dari POS Langsung:
+	•	Tambah kategori tanpa harus pindah halaman.
+	•	Dropdown + tombol tambah kategori.
+	4.	Cetak Struk Bluetooth (BP-ECO58D):
+	•	Format nota.
+	•	Integrasi dengan blue_thermal_printer.
+	5.	Riwayat Transaksi POS:
+	•	Lihat daftar order.
+	•	Fitur cetak ulang / simpan PDF.
+
+
+Kasir menekan tombol Cetak Nota:
+	•	Sistem menyimpan order ke database.
+	•	Menampilkan dialog “Nota Pembelian”.
+	•	Menampilkan jumlah kembalian.
+	•	Reset cart, status kembalian untuk transaksi baru.
+
+

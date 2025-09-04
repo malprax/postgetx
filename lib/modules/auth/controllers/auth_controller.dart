@@ -3,8 +3,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../models/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../../models/user_model.dart';
+import '../../../routes/app_routes.dart';
 
 class AuthController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -14,14 +15,16 @@ class AuthController extends GetxController {
   final currentUserModel = Rxn<UserModel>();
   final emailVerified = false.obs;
   final isUserModelLoaded = false.obs;
+  final isPasswordVisible = false.obs;
 
-  // TextEditingControllers for login/register/forgot password
+  // TextEditingControllers
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final nameController = TextEditingController();
 
   @override
   void onInit() {
+    super.onInit();
     _auth.authStateChanges().listen((user) async {
       currentUser.value = user;
       firebaseUser.value = user;
@@ -29,13 +32,17 @@ class AuthController extends GetxController {
       if (user != null) {
         await loadUserModel(user.uid);
         emailVerified.value = user.emailVerified;
+
+        // Redirect jika berada di login atau root
+        if (Get.currentRoute == Routes.login || Get.currentRoute == '/') {
+          _redirectBasedOnRole();
+        }
       } else {
         currentUserModel.value = null;
         emailVerified.value = false;
         isUserModelLoaded.value = true;
       }
     });
-    super.onInit();
   }
 
   Future<void> loadUserModel(String uid) async {
@@ -82,15 +89,35 @@ class AuthController extends GetxController {
   Future<void> login() async {
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
+
     if (email.isEmpty || password.isEmpty) {
       Get.snackbar('Error', 'Email dan Password harus diisi');
       return;
     }
+
     try {
-      await _auth.signInWithEmailAndPassword(email: email, password: password);
+      final result = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      if (!result.user!.emailVerified) {
+        Get.snackbar(
+            'Email Belum Aktif', 'Silakan verifikasi email terlebih dahulu.');
+        await _auth.signOut();
+        return;
+      }
+
+      await loadUserModel(result.user!.uid);
+      _redirectBasedOnRole();
     } catch (e) {
       Get.snackbar('Login Gagal', 'Terjadi kesalahan: $e');
     }
+  }
+
+  void _redirectBasedOnRole() {
+    // Gunakan route dashboard saja → AppPages akan memilih view berdasarkan role
+    Get.offAllNamed(Routes.dashboard);
   }
 
   Future<void> register({required String role}) async {
@@ -102,9 +129,12 @@ class AuthController extends GetxController {
       Get.snackbar('Error', 'Semua field wajib diisi');
       return;
     }
+
     try {
       final result = await _auth.createUserWithEmailAndPassword(
-          email: email, password: password);
+        email: email,
+        password: password,
+      );
 
       final uid = result.user!.uid;
 

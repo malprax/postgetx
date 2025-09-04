@@ -1243,5 +1243,7 @@ Jika setuju, saya akan mulai dengan:
 Lanjutkan?
 
 
+Keaktifan
+
 
 

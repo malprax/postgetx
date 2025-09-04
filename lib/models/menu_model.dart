@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class MenuModel {
   final String id;
   final String name;
-  final String category;
+  final String categoryId;
   final double basePrice;
   final List<String> sizes;
   final Map<String, double> sizePrices;
@@ -14,7 +14,7 @@ class MenuModel {
   MenuModel({
     required this.id,
     required this.name,
-    required this.category,
+    required this.categoryId,
     required this.basePrice,
     required this.sizes,
     required this.sizePrices,
@@ -26,7 +26,7 @@ class MenuModel {
     return MenuModel(
       id: id,
       name: data['name'] ?? '',
-      category: data['category'] ?? '',
+      categoryId: data['categoryId'] ?? '',
       basePrice: (data['basePrice'] ?? 0).toDouble(),
       sizes: List<String>.from(data['sizes'] ?? []),
       sizePrices: Map<String, double>.from(
@@ -41,7 +41,7 @@ class MenuModel {
   Map<String, dynamic> toMap() {
     return {
       'name': name,
-      'category': category,
+      'categoryId': categoryId,
       'basePrice': basePrice,
       'sizes': sizes,
       'sizePrices': sizePrices,

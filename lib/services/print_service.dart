@@ -50,7 +50,7 @@ class PrintService {
   Future<void> printOrder(OrderModel order) async {
     await printReceipt(
       items: order.items,
-      total: order.total,
+      total: order.totalAmount,
       discount: order.discount,
       paid: order.paid,
       change: order.change,

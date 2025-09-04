@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "329825818663",
+    "project_id": "posget",
+    "storage_bucket": "posget.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:329825818663:android:7928e2d42f558b33fad602",
+        "android_client_info": {
+          "package_name": "com.androidposgetx.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "329825818663-mejpanoagir0h72fuurlfa8795ean6k4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBjGfIUiu3hV0Eli9Yhl31hovdvcTtkAIs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "329825818663-mejpanoagir0h72fuurlfa8795ean6k4.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "329825818663-47rpiqfskk4gofu93veu2sfql3d2js78.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.postgetx"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -60,17 +60,28 @@ class LoginView extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 16),
-                        TextField(
-                          controller: authController.passwordController,
-                          obscureText: true,
-                          decoration: InputDecoration(
-                            labelText: 'Password',
-                            prefixIcon: const Icon(Icons.lock_outline),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                        ),
+                        Obx(() => TextField(
+                              controller: authController.passwordController,
+                              obscureText:
+                                  !authController.isPasswordVisible.value,
+                              decoration: InputDecoration(
+                                labelText: 'Password',
+                                prefixIcon: const Icon(Icons.lock_outline),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    authController.isPasswordVisible.value
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                  ),
+                                  onPressed: () {
+                                    authController.isPasswordVisible.toggle();
+                                  },
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            )),
                         Align(
                           alignment: Alignment.centerRight,
                           child: TextButton(

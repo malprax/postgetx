@@ -17,17 +17,11 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for android - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return android;
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
@@ -55,6 +49,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '329825818663',
     projectId: 'posget',
     storageBucket: 'posget.firebasestorage.app',
+    iosClientId: '329825818663-47rpiqfskk4gofu93veu2sfql3d2js78.apps.googleusercontent.com',
     iosBundleId: 'com.example.postgetx',
   );
 
@@ -64,6 +59,25 @@ class DefaultFirebaseOptions {
     messagingSenderId: '329825818663',
     projectId: 'posget',
     storageBucket: 'posget.firebasestorage.app',
+    iosClientId: '329825818663-47rpiqfskk4gofu93veu2sfql3d2js78.apps.googleusercontent.com',
     iosBundleId: 'com.example.postgetx',
   );
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyB1UOLJnLAQjk2K1dJwm3TWD4UpyNJChFE',
+    appId: '1:329825818663:web:efa77ae450004b30fad602',
+    messagingSenderId: '329825818663',
+    projectId: 'posget',
+    authDomain: 'posget.firebaseapp.com',
+    storageBucket: 'posget.firebasestorage.app',
+  );
+
+  static const FirebaseOptions android = FirebaseOptions(
+    apiKey: 'AIzaSyBjGfIUiu3hV0Eli9Yhl31hovdvcTtkAIs',
+    appId: '1:329825818663:android:7928e2d42f558b33fad602',
+    messagingSenderId: '329825818663',
+    projectId: 'posget',
+    storageBucket: 'posget.firebasestorage.app',
+  );
+
 }

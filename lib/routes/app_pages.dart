@@ -1,5 +1,6 @@
 // lib/routes/app_pages.dart
 import 'package:get/get.dart';
+import 'package:postgetx/bindings/pos_binding.dart';
 import 'package:postgetx/modules/audit/views/audit_log_view.dart';
 import 'package:postgetx/modules/auth/controllers/auth_controller.dart';
 import 'package:postgetx/modules/auth/views/forgot_password_view.dart';
@@ -8,10 +9,11 @@ import 'package:postgetx/modules/dashboard/views/dashboard_customer_view.dart';
 import 'package:postgetx/modules/dashboard/views/dashboard_guest_view.dart';
 import 'package:postgetx/modules/dashboard/views/dashboard_staff_view.dart';
 import 'package:postgetx/modules/loyalty/views/loyalty_view.dart';
+import 'package:postgetx/modules/menu/views/menu_form_view.dart';
 import 'package:postgetx/modules/orders/views/order_history_view.dart';
 
 import 'package:postgetx/modules/orders/views/order_view.dart';
-import 'package:postgetx/modules/menu/views/category_view.dart';
+import 'package:postgetx/modules/category/views/category_view.dart';
 import 'package:postgetx/modules/pos/views/pos_view.dart';
 import 'package:postgetx/modules/preorder/views/preorder_view.dart';
 import 'package:postgetx/modules/profile/views/profile_view.dart';
@@ -35,7 +37,6 @@ class AppPages {
         enableRoleSelection: false,
       ),
     ),
-
     GetPage(
       name: Routes.forgotPassword,
       page: () => ForgotPasswordView(),
@@ -70,17 +71,18 @@ class AppPages {
       name: Routes.auditlogs,
       page: () => const AuditLogView(),
     ),
-    // GetPage(
-    //   name: Routes.report,
-    //   page: () => const ReportView(),
-    // ),
+    GetPage(
+      name: Routes.menuform,
+      page: () => MenuFormView(),
+    ),
     GetPage(
       name: Routes.category,
-      page: () => const CategoryView(),
+      page: () => CategoryView(),
     ),
     GetPage(
       name: Routes.pos,
-      page: () => const PosView(),
+      page: () => PosView(),
+      binding: PosBinding(),
     ),
     GetPage(
       name: Routes.stock,

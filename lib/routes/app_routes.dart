@@ -8,8 +8,8 @@ abstract class Routes {
   static const users = '/users';
   static const profile = '/profile';
   static const auditlogs = '/audit-logs';
-  // static const report = '/report';
 
+  static const menuform = '/menu-form';
   static const category = '/category';
   static const pos = '/pos';
   static const stock = '/stock';
