@@ -13,9 +13,20 @@ import 'modules/dashboard/views/dashboard_customer_view.dart';
 import 'modules/dashboard/views/dashboard_guest_view.dart';
 import 'modules/dashboard/views/dashboard_staff_view.dart';
 
+void dumpFirebaseOptions() {
+  final o = Firebase.app().options;
+  // >>> Cocokkan semua ini dengan project di Console tempat koleksi orders terlihat <<<
+  debugPrint('FB projectId=${o.projectId}');
+  debugPrint('FB appId=${o.appId}');
+  debugPrint('FB apiKey=${o.apiKey}');
+  debugPrint('FB messagingSenderId=${o.messagingSenderId}');
+  debugPrint('FB storageBucket=${o.storageBucket}');
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  dumpFirebaseOptions();
 
   // Inisialisasi AuthController sebelum build
   Get.put(AuthController());

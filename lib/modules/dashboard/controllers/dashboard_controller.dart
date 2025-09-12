@@ -1,4 +1,6 @@
 // dashboard_controller.dart
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -11,22 +13,38 @@ class DashboardController extends GetxController {
 
   @override
   void onInit() {
+    debugAuthContext();
     fetchDashboardStats();
     fetchSalesChart();
     super.onInit();
+  }
+
+  Future<void> debugAuthContext() async {
+    final u = FirebaseAuth.instance.currentUser;
+    await u?.getIdToken(true); // force refresh token
+
+    final token = await u?.getIdTokenResult(true);
+    final doc =
+        await FirebaseFirestore.instance.collection('users').doc(u!.uid).get();
+
+    debugPrint('DBG uid=${u.uid}');
+    debugPrint('DBG token.role=${token?.claims?['role']}');
+    debugPrint('DBG users.role=${doc.data()?['role']}');
   }
 
   Future<void> fetchDashboardStats() async {
     final now = DateTime.now();
     final start = DateTime(now.year, now.month, now.day);
     final end = start.add(const Duration(days: 1));
+    final startTs = Timestamp.fromDate(start);
+    final endTs = Timestamp.fromDate(end);
 
     // Orders today
     try {
       final orderSnap = await FirebaseFirestore.instance
           .collection('orders')
-          .where('createdAt', isGreaterThanOrEqualTo: start)
-          .where('createdAt', isLessThan: end)
+          .where('createdAt', isGreaterThanOrEqualTo: startTs)
+          .where('createdAt', isLessThan: endTs)
           .get();
       ordersToday.value = orderSnap.docs.length;
     } catch (e) {
@@ -59,16 +77,24 @@ class DashboardController extends GetxController {
       final start = DateTime(day.year, day.month, day.day);
       final end = start.add(const Duration(days: 1));
 
-      final orders = await FirebaseFirestore.instance
-          .collection('orders')
-          .where('createdAt', isGreaterThanOrEqualTo: start)
-          .where('createdAt', isLessThan: end)
-          .get();
+      final startTs = Timestamp.fromDate(start);
+      final endTs = Timestamp.fromDate(end);
 
-      chart.add({
-        'day': '${start.day}/${start.month}',
-        'total': orders.docs.length,
-      });
+      try {
+        final orders = await FirebaseFirestore.instance
+            .collection('orders')
+            .where('createdAt', isGreaterThanOrEqualTo: startTs)
+            .where('createdAt', isLessThan: endTs)
+            .get();
+
+        debugPrint('DBG probe orders.length=${orders.docs.length}');
+        chart.add({
+          'day': '${start.day}/${start.month}',
+          'total': orders.docs.length,
+        });
+      } catch (e) {
+        debugPrint('DBG probe orders error -> $e');
+      }
     }
 
     salesData.assignAll(chart);

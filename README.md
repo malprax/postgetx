@@ -1247,3 +1247,22 @@ Keaktifan
 
 
 
+
+
+Program Kemitraan Masyarakat 
+Pelatihan Penggunaan Retail Management System untuk UMKM Jenis Usaha Catering Makanan
+
+Tim Pengabdi:
+Aulia Sabril
+Hasanah Nur
+Sutarsi Suhaeb
+Dian Atmasani
+
+Mitra
+Ayam Goreng Rempah Sulawesi
+
+PNBP Fakultas Teknik UNM
+2025
+
+
+PNBP UNM PKM Pelatihan Aplikasi Retail Management System 2025
