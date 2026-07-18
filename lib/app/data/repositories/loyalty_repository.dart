@@ -20,6 +20,18 @@ abstract class LoyaltyRepository {
     required String reason,
   });
 
+  Future<PosOperationResult<LoyaltyLedgerEntry>> redeemForOrder({
+    required String customerId,
+    required String orderId,
+    required int points,
+    required String reason,
+  });
+
+  Future<PosOperationResult<LoyaltyLedgerEntry>> restoreOrderRedemption({
+    required String orderId,
+    required String reason,
+  });
+
   Future<PosOperationResult<LoyaltyLedgerEntry>> reverseOrderEarning({
     required String orderId,
     required String reason,

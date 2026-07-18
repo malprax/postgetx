@@ -1165,6 +1165,7 @@ class CrudSection extends GetView<WorkspaceController> {
       LoyaltyEntryType.earned => 'Points earned',
       LoyaltyEntryType.redeemed => 'Points redeemed',
       LoyaltyEntryType.reversed => 'Points reversed',
+      LoyaltyEntryType.restored => 'Redeemed points restored',
       LoyaltyEntryType.adjusted => 'Points adjusted',
       LoyaltyEntryType.expired => 'Points expired',
       _ => 'Loyalty activity',

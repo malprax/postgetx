@@ -133,6 +133,146 @@ class LocalLoyaltyRepository implements LoyaltyRepository {
   }
 
   @override
+  Future<PosOperationResult<LoyaltyLedgerEntry>> redeemForOrder({
+    required String customerId,
+    required String orderId,
+    required int points,
+    required String reason,
+  }) async {
+    if (customerId.trim().isEmpty || orderId.trim().isEmpty) {
+      return PosOperationResult.failure(
+        'loyalty_reference_required',
+        'Customer and order references are required.',
+      );
+    }
+
+    if (points <= 0) {
+      return PosOperationResult.failure(
+        'invalid_loyalty_points',
+        'Redeemed points must be greater than zero.',
+      );
+    }
+
+    if (reason.trim().isEmpty) {
+      return PosOperationResult.failure(
+        'loyalty_reason_required',
+        'A redemption reason is required.',
+      );
+    }
+
+    final entries = _provider.readEntries();
+
+    final existing = entries
+        .where(
+          (entry) =>
+              entry.orderId == orderId &&
+              entry.type == LoyaltyEntryType.redeemed,
+        )
+        .firstOrNull;
+
+    if (existing != null) {
+      return PosOperationResult.success(
+        existing,
+        isIdempotent: true,
+      );
+    }
+
+    final balance = await getBalance(customerId);
+
+    if (balance < points) {
+      return PosOperationResult.failure(
+        'insufficient_loyalty_points',
+        'The customer does not have enough loyalty points.',
+      );
+    }
+
+    final now = DateTime.now();
+
+    final redemption = LoyaltyLedgerEntry(
+      id: 'loyalty-${now.microsecondsSinceEpoch}',
+      customerId: customerId.trim(),
+      type: LoyaltyEntryType.redeemed,
+      pointsDelta: -points,
+      createdAt: now,
+      actorId: _actorId(),
+      orderId: orderId.trim(),
+      reason: reason.trim(),
+    );
+
+    await _provider.writeEntries([
+      ...entries,
+      redemption,
+    ]);
+
+    return PosOperationResult.success(redemption);
+  }
+
+  @override
+  Future<PosOperationResult<LoyaltyLedgerEntry>> restoreOrderRedemption({
+    required String orderId,
+    required String reason,
+  }) async {
+    if (orderId.trim().isEmpty || reason.trim().isEmpty) {
+      return PosOperationResult.failure(
+        'loyalty_restoration_reference_required',
+        'Order and restoration reason are required.',
+      );
+    }
+
+    final entries = _provider.readEntries();
+
+    final existing = entries
+        .where(
+          (entry) =>
+              entry.orderId == orderId &&
+              entry.type == LoyaltyEntryType.restored,
+        )
+        .firstOrNull;
+
+    if (existing != null) {
+      return PosOperationResult.success(
+        existing,
+        isIdempotent: true,
+      );
+    }
+
+    final redemption = entries
+        .where(
+          (entry) =>
+              entry.orderId == orderId &&
+              entry.type == LoyaltyEntryType.redeemed,
+        )
+        .firstOrNull;
+
+    if (redemption == null) {
+      return PosOperationResult.failure(
+        'loyalty_redemption_missing',
+        'No redeemed points were found for this order.',
+      );
+    }
+
+    final now = DateTime.now();
+
+    final restoration = LoyaltyLedgerEntry(
+      id: 'loyalty-${now.microsecondsSinceEpoch}',
+      customerId: redemption.customerId,
+      type: LoyaltyEntryType.restored,
+      pointsDelta: -redemption.pointsDelta,
+      createdAt: now,
+      actorId: _actorId(),
+      orderId: orderId.trim(),
+      reason: reason.trim(),
+    );
+
+    await _provider.writeEntries([
+      ...entries,
+      restoration,
+    ]);
+
+    return PosOperationResult.success(restoration);
+  }
+
+  @override
   Future<PosOperationResult<LoyaltyLedgerEntry>> reverseOrderEarning({
     required String orderId,
     required String reason,

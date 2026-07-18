@@ -2,6 +2,7 @@ abstract final class LoyaltyEntryType {
   static const earned = 'earned';
   static const redeemed = 'redeemed';
   static const reversed = 'reversed';
+  static const restored = 'restored';
   static const adjusted = 'adjusted';
   static const expired = 'expired';
 
@@ -9,6 +10,7 @@ abstract final class LoyaltyEntryType {
     earned,
     redeemed,
     reversed,
+    restored,
     adjusted,
     expired,
   };

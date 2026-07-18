@@ -99,6 +99,87 @@ void main() {
     expect(await repository.getBalance('customer-1'), 0);
   });
 
+  test('order redemption is idempotent', () async {
+    await repository.earnForOrder(
+      customerId: 'customer-1',
+      orderId: 'order-redemption-source',
+      eligibleAmount: 50000,
+    );
+
+    final first = await repository.redeemForOrder(
+      customerId: 'customer-1',
+      orderId: 'checkout-order-1',
+      points: 3,
+      reason: 'Checkout redemption',
+    );
+
+    final duplicate = await repository.redeemForOrder(
+      customerId: 'customer-1',
+      orderId: 'checkout-order-1',
+      points: 3,
+      reason: 'Duplicate checkout redemption',
+    );
+
+    expect(first.isSuccess, isTrue);
+    expect(duplicate.isIdempotent, isTrue);
+    expect(await repository.getBalance('customer-1'), 2);
+
+    final ledger = await repository.getLedger(
+      customerId: 'customer-1',
+    );
+
+    expect(
+      ledger.where(
+        (entry) =>
+            entry.orderId == 'checkout-order-1' &&
+            entry.type == LoyaltyEntryType.redeemed,
+      ),
+      hasLength(1),
+    );
+  });
+
+  test('order redemption restoration is idempotent', () async {
+    await repository.earnForOrder(
+      customerId: 'customer-1',
+      orderId: 'order-restoration-source',
+      eligibleAmount: 50000,
+    );
+
+    await repository.redeemForOrder(
+      customerId: 'customer-1',
+      orderId: 'checkout-order-2',
+      points: 3,
+      reason: 'Checkout redemption',
+    );
+
+    final first = await repository.restoreOrderRedemption(
+      orderId: 'checkout-order-2',
+      reason: 'Refund restoration',
+    );
+
+    final duplicate = await repository.restoreOrderRedemption(
+      orderId: 'checkout-order-2',
+      reason: 'Duplicate refund restoration',
+    );
+
+    expect(first.isSuccess, isTrue);
+    expect(duplicate.isIdempotent, isTrue);
+    expect(await repository.getBalance('customer-1'), 5);
+
+    final ledger = await repository.getLedger(
+      customerId: 'customer-1',
+    );
+
+    expect(
+      ledger.where(
+        (entry) =>
+            entry.orderId == 'checkout-order-2' &&
+            entry.type == LoyaltyEntryType.restored,
+      ),
+      hasLength(1),
+    );
+  });
+
   test('provider clear removes local ledger', () async {
     await repository.earnForOrder(
       customerId: 'customer-1',
