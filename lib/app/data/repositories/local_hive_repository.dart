@@ -1463,8 +1463,23 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
 
       final now = DateTime.now();
       final actor = _currentUser!;
+      final customerId = order.customerId?.trim() ?? '';
+
+      final loyaltyBalanceBefore = customerId.isEmpty
+          ? 0
+          : await loyaltyRepository.getBalance(customerId);
+
+      final loyaltyPointsEarned = customerId.isEmpty
+          ? 0
+          : LoyaltyPointsPolicy.earnedPoints(order.totalAmount);
+
+      final loyaltyBalanceAfter = loyaltyBalanceBefore -
+          order.loyaltyPointsRedeemed +
+          loyaltyPointsEarned;
 
       final completed = order.copyWith(
+        loyaltyPointsEarned: loyaltyPointsEarned,
+        loyaltyBalanceAfter: loyaltyBalanceAfter,
         status: OrderStatus.completed,
         completedAt: now,
         paidAt: now,
@@ -1502,8 +1517,6 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
 
       await _putMaps('transactions', updatedOrders);
       _writeFaultInjector?.call('after_order');
-
-      final customerId = completed.customerId?.trim() ?? '';
 
       if (completed.loyaltyPointsRedeemed > 0) {
         final redemptionResult = await loyaltyRepository.redeemForOrder(

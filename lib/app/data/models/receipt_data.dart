@@ -11,6 +11,11 @@ class ReceiptData {
     required this.discountType,
     required this.discountValue,
     required this.discountAmount,
+    required this.loyaltyPointsRedeemed,
+    required this.loyaltyDiscount,
+    required this.loyaltyPointsEarned,
+    required this.loyaltyBalanceAfter,
+    required this.customerName,
     required this.taxableAmount,
     required this.taxType,
     required this.taxValue,
@@ -30,6 +35,11 @@ class ReceiptData {
         discountType: order.discountType,
         discountValue: order.discountValue,
         discountAmount: order.discount,
+        loyaltyPointsRedeemed: order.loyaltyPointsRedeemed,
+        loyaltyDiscount: order.loyaltyDiscount,
+        loyaltyPointsEarned: order.loyaltyPointsEarned,
+        loyaltyBalanceAfter: order.loyaltyBalanceAfter,
+        customerName: order.customerName,
         taxableAmount: order.taxableAmount,
         taxType: order.taxType,
         taxValue: order.taxValue,
@@ -48,6 +58,11 @@ class ReceiptData {
   final DiscountType discountType;
   final double discountValue;
   final double discountAmount;
+  final int loyaltyPointsRedeemed;
+  final double loyaltyDiscount;
+  final int loyaltyPointsEarned;
+  final int loyaltyBalanceAfter;
+  final String? customerName;
   final double taxableAmount;
   final TaxType taxType;
   final double taxValue;

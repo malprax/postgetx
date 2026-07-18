@@ -13,6 +13,8 @@ class OrderModel {
   final double discountValue;
   final int loyaltyPointsRedeemed;
   final double loyaltyDiscount;
+  final int loyaltyPointsEarned;
+  final int loyaltyBalanceAfter;
   final double taxableAmount;
   final double paid;
   final double change;
@@ -62,6 +64,8 @@ class OrderModel {
     double? discountValue,
     this.loyaltyPointsRedeemed = 0,
     this.loyaltyDiscount = 0,
+    this.loyaltyPointsEarned = 0,
+    this.loyaltyBalanceAfter = 0,
     double? taxableAmount,
     required this.paid,
     required this.change,
@@ -125,6 +129,8 @@ class OrderModel {
       'discountValue': discountValue,
       'loyaltyPointsRedeemed': loyaltyPointsRedeemed,
       'loyaltyDiscount': loyaltyDiscount,
+      'loyaltyPointsEarned': loyaltyPointsEarned,
+      'loyaltyBalanceAfter': loyaltyBalanceAfter,
       'taxableAmount': taxableAmount,
       'paid': paid,
       'change': change,
@@ -188,6 +194,8 @@ class OrderModel {
       loyaltyPointsRedeemed:
           (map['loyaltyPointsRedeemed'] as num?)?.toInt() ?? 0,
       loyaltyDiscount: (map['loyaltyDiscount'] as num?)?.toDouble() ?? 0,
+      loyaltyPointsEarned: (map['loyaltyPointsEarned'] as num?)?.toInt() ?? 0,
+      loyaltyBalanceAfter: (map['loyaltyBalanceAfter'] as num?)?.toInt() ?? 0,
       taxableAmount: (map['taxableAmount'] as num?)?.toDouble() ??
           subtotal -
               discount -
@@ -255,6 +263,8 @@ class OrderModel {
     double? discountValue,
     int? loyaltyPointsRedeemed,
     double? loyaltyDiscount,
+    int? loyaltyPointsEarned,
+    int? loyaltyBalanceAfter,
     double? taxableAmount,
     double? paid,
     double? change,
@@ -305,6 +315,8 @@ class OrderModel {
         loyaltyPointsRedeemed:
             loyaltyPointsRedeemed ?? this.loyaltyPointsRedeemed,
         loyaltyDiscount: loyaltyDiscount ?? this.loyaltyDiscount,
+        loyaltyPointsEarned: loyaltyPointsEarned ?? this.loyaltyPointsEarned,
+        loyaltyBalanceAfter: loyaltyBalanceAfter ?? this.loyaltyBalanceAfter,
         taxableAmount: taxableAmount ?? this.taxableAmount,
         paid: paid ?? this.paid,
         change: change ?? this.change,

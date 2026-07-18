@@ -37,6 +37,11 @@ class PdfHelper {
             pw.Text('Subtotal: ${RupiahFormatter.format(receipt.subtotal)}'),
             pw.Text(
                 'Discount${receipt.discountType == DiscountType.percentage ? ' (${receipt.discountValue.toStringAsFixed(0)}%)' : ''}: -${RupiahFormatter.format(receipt.discountAmount)}'),
+            if (receipt.loyaltyPointsRedeemed > 0)
+              pw.Text(
+                'Loyalty (${receipt.loyaltyPointsRedeemed} pts): '
+                '-${RupiahFormatter.format(receipt.loyaltyDiscount)}',
+              ),
             pw.Text(
                 'Taxable: ${RupiahFormatter.format(receipt.taxableAmount)}'),
             pw.Text(
@@ -48,6 +53,16 @@ class PdfHelper {
             pw.Text(
                 'Amount applied: ${RupiahFormatter.format(receipt.amountApplied)}'),
             pw.Text('Change: ${RupiahFormatter.format(receipt.change)}'),
+            if (receipt.customerName?.trim().isNotEmpty == true) ...[
+              pw.SizedBox(height: 10),
+              pw.Text('Customer: ${receipt.customerName}'),
+              pw.Text(
+                'Points earned: ${receipt.loyaltyPointsEarned}',
+              ),
+              pw.Text(
+                'Loyalty balance: ${receipt.loyaltyBalanceAfter} pts',
+              ),
+            ],
             pw.SizedBox(height: 16),
             pw.Center(child: pw.Text("Terima kasih!")),
           ],
