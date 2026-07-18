@@ -113,6 +113,7 @@ void main() {
         'package:postgetx/modules/settings/',
         'package:postgetx/themes/theme_controller.dart',
         'package:postgetx/themes/app_theme.dart',
+        'package:postgetx/widgets/',
       ];
 
       final violations = <String>[];

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../config/app_config.dart';
-import '../routes/app_routes.dart';
+import 'package:postgetx/config/app_config.dart';
+import 'package:postgetx/routes/app_routes.dart';
 
 class DemoModeBanner extends StatelessWidget {
   const DemoModeBanner({super.key});

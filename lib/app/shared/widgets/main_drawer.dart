@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:postgetx/app/modules/auth/controllers/auth_controller.dart';
-import '../routes/app_routes.dart';
+import 'package:postgetx/routes/app_routes.dart';
 
 class MainDrawer extends StatelessWidget {
   MainDrawer({super.key});

@@ -6,7 +6,7 @@ import 'package:printing/printing.dart';
 import 'package:postgetx/routes/app_routes.dart';
 import 'package:postgetx/app/core/services/print_service.dart';
 import 'package:postgetx/utils/pdf_helper.dart';
-import 'package:postgetx/widgets/demo_mode_banner.dart';
+import 'package:postgetx/app/shared/widgets/demo_mode_banner.dart';
 import 'package:postgetx/app/modules/orders/controllers/order_history_controller.dart';
 
 class OrderHistoryView extends StatelessWidget {

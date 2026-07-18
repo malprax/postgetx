@@ -3,8 +3,8 @@ import 'package:get/get.dart';
 
 import 'package:postgetx/config/app_config.dart';
 import 'package:postgetx/routes/app_routes.dart';
-import 'package:postgetx/widgets/demo_mode_banner.dart';
-import 'package:postgetx/widgets/main_drawer.dart';
+import 'package:postgetx/app/shared/widgets/demo_mode_banner.dart';
+import 'package:postgetx/app/shared/widgets/main_drawer.dart';
 import 'package:postgetx/app/modules/auth/controllers/auth_controller.dart';
 import '../controllers/dashboard_controller.dart';
 import '../widgets/dashboard_summary_card.dart';

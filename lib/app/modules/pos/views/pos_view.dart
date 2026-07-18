@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 
 import 'package:postgetx/app/data/models/menu_variant.dart';
 import 'package:postgetx/routes/app_routes.dart';
-import 'package:postgetx/widgets/demo_mode_banner.dart';
+import 'package:postgetx/app/shared/widgets/demo_mode_banner.dart';
 import '../controllers/pos_controller.dart';
 
 class PosView extends StatelessWidget {
