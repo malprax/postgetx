@@ -18,6 +18,7 @@ import 'package:postgetx/app/data/repositories/pos_operation_result.dart';
 import 'package:postgetx/app/data/repositories/loyalty_repository.dart';
 import 'package:postgetx/app/data/repositories/local_hive_repository.dart';
 import 'package:postgetx/app/core/services/printer_service.dart';
+import 'package:postgetx/app/core/services/loyalty_points_policy.dart';
 import 'package:postgetx/app/core/services/pos_total_calculator.dart';
 import 'package:postgetx/app/routes/app_routes.dart';
 import '../../../routes/browser_route_sync.dart';
@@ -46,6 +47,8 @@ class WorkspaceController extends GetxController {
   final orders = <OrderModel>[].obs;
   final customers = <CustomerModel>[].obs;
   final loyaltyBalances = <String, int>{}.obs;
+  final selectedCheckoutCustomer = Rxn<CustomerModel>();
+  final loyaltyPointsToRedeem = 0.obs;
   final expenses = <ExpenseModel>[].obs;
   final notifications = <LocalNotificationModel>[].obs;
   final trashOrders = <OrderModel>[].obs;
@@ -189,6 +192,34 @@ class WorkspaceController extends GetxController {
     };
   }
 
+  int get availableCheckoutPoints {
+    final customer = selectedCheckoutCustomer.value;
+    return customer == null ? 0 : loyaltyBalanceFor(customer.id);
+  }
+
+  double get checkoutLoyaltyDiscount {
+    return LoyaltyPointsPolicy.redemptionValue(
+      loyaltyPointsToRedeem.value,
+    );
+  }
+
+  void selectCheckoutCustomer(CustomerModel? customer) {
+    selectedCheckoutCustomer.value = customer;
+    loyaltyPointsToRedeem.value = 0;
+  }
+
+  void setLoyaltyPointsToRedeem(int points) {
+    if (selectedCheckoutCustomer.value == null) {
+      loyaltyPointsToRedeem.value = 0;
+      return;
+    }
+
+    loyaltyPointsToRedeem.value = points.clamp(
+      0,
+      availableCheckoutPoints,
+    );
+  }
+
   void setSalesRange(String value) => salesRange.value = value;
   void setReceiptRange(String value) => receiptRange.value = value;
 
@@ -224,6 +255,8 @@ class WorkspaceController extends GetxController {
   void clearCart() {
     cart.clear();
     resumedOrder.value = null;
+    selectedCheckoutCustomer.value = null;
+    loyaltyPointsToRedeem.value = 0;
   }
 
   Future<void> cancelCart() async {
@@ -234,6 +267,7 @@ class WorkspaceController extends GetxController {
         items: cart,
         discountType: discountType.value,
         discountValue: discountValue.value,
+        loyaltyDiscount: checkoutLoyaltyDiscount,
         taxType: taxType.value,
         taxValue: taxValue.value,
       );
@@ -242,6 +276,7 @@ class WorkspaceController extends GetxController {
         items: cart,
         discountType: discountType.value,
         discountValue: discountValue.value,
+        loyaltyDiscount: checkoutLoyaltyDiscount,
         taxType: taxType.value,
         taxValue: taxValue.value,
         amountPaid: amountReceived,
@@ -273,6 +308,10 @@ class WorkspaceController extends GetxController {
       discountType: calculation.discountType,
       discountValue: calculation.discountValue,
       discount: calculation.discountAmount,
+      loyaltyPointsRedeemed:
+          status == OrderStatus.completed ? loyaltyPointsToRedeem.value : 0,
+      loyaltyDiscount:
+          status == OrderStatus.completed ? calculation.loyaltyDiscount : 0,
       taxableAmount: calculation.taxableAmount,
       taxType: calculation.taxType,
       taxValue: calculation.taxValue,
@@ -289,8 +328,12 @@ class WorkspaceController extends GetxController {
       createdAt: now,
       createdBy: actor?.id ?? '',
       createdByName: actor?.name ?? '',
-      customerId: customerId ?? source?.customerId,
-      customerName: customerName ?? source?.customerName,
+      customerId: customerId ??
+          selectedCheckoutCustomer.value?.id ??
+          source?.customerId,
+      customerName: customerName ??
+          selectedCheckoutCustomer.value?.name ??
+          source?.customerName,
       notes: notes.isEmpty ? source?.notes ?? '' : notes,
       status: status,
       receiptStatus: receiptStatus,
@@ -359,6 +402,11 @@ class WorkspaceController extends GetxController {
         order.items.map((item) => CartItemModel.fromMap(item.toMap())));
     setDiscount(order.discountType, order.discountValue);
     setTax(order.taxType, order.taxValue);
+
+    final customer =
+        customers.where((item) => item.id == order.customerId).firstOrNull;
+
+    selectCheckoutCustomer(customer);
     resumedOrder.value = order;
     selectSection('Checkout');
   }
