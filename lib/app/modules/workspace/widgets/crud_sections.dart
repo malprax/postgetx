@@ -11,6 +11,7 @@ import '../../../data/models/customer_model.dart';
 import 'package:postgetx/app/data/models/menu_variant.dart';
 import 'package:postgetx/app/data/models/loyalty_ledger_entry.dart';
 import 'package:postgetx/app/core/services/product_image_service.dart';
+import 'package:postgetx/app/core/services/loyalty_points_policy.dart';
 import 'package:postgetx/app/core/helpers/rupiah_formatter.dart';
 import '../../../shared/forms/form_validators.dart';
 import '../../../shared/widgets/malprax_form_field.dart';
@@ -975,6 +976,23 @@ class CrudSection extends GetView<WorkspaceController> {
           ),
         ),
         actions: [
+          TextButton.icon(
+            key: ValueKey('redeem-points-${customer.id}'),
+            onPressed: controller.loyaltyBalanceFor(customer.id) <= 0
+                ? null
+                : () async {
+                    final redeemed = await _redeemPointsDialog(
+                      context,
+                      customer,
+                    );
+
+                    if (redeemed && context.mounted) {
+                      Navigator.pop(context);
+                    }
+                  },
+            icon: const Icon(Icons.redeem_outlined),
+            label: const Text('Redeem points'),
+          ),
           FilledButton(
             onPressed: () => Navigator.pop(context),
             child: const Text('Close'),
@@ -982,6 +1000,164 @@ class CrudSection extends GetView<WorkspaceController> {
         ],
       ),
     );
+  }
+
+  Future<bool> _redeemPointsDialog(
+    BuildContext context,
+    CustomerModel customer,
+  ) async {
+    final pointsController = TextEditingController();
+    final reasonController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+    var saving = false;
+
+    final redeemed = await showDialog<bool>(
+          context: context,
+          builder: (dialogContext) => StatefulBuilder(
+            builder: (context, setState) => AlertDialog(
+              scrollable: true,
+              title: const Text('Redeem loyalty points'),
+              content: SizedBox(
+                width: 420,
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Available: '
+                          '${controller.loyaltyBalanceFor(customer.id)} points',
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      TextFormField(
+                        key: const ValueKey('redeem-points-field'),
+                        controller: pointsController,
+                        keyboardType: TextInputType.number,
+                        textInputAction: TextInputAction.next,
+                        decoration: const InputDecoration(
+                          labelText: 'Points',
+                          hintText: 'Example: 10',
+                          prefixIcon: Icon(Icons.stars_outlined),
+                        ),
+                        onChanged: (_) => setState(() {}),
+                        validator: (value) {
+                          final points = int.tryParse(value?.trim() ?? '');
+
+                          if (points == null || points <= 0) {
+                            return 'Enter points greater than zero.';
+                          }
+
+                          if (points >
+                              controller.loyaltyBalanceFor(customer.id)) {
+                            return 'Customer does not have enough points.';
+                          }
+
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      TextFormField(
+                        key: const ValueKey('redeem-reason-field'),
+                        controller: reasonController,
+                        textInputAction: TextInputAction.done,
+                        decoration: const InputDecoration(
+                          labelText: 'Reason',
+                          hintText: 'Example: Member reward',
+                          prefixIcon: Icon(Icons.notes_outlined),
+                        ),
+                        validator: (value) =>
+                            value == null || value.trim().isEmpty
+                                ? 'Redemption reason is required.'
+                                : null,
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Reward value: ${RupiahFormatter.format(
+                            LoyaltyPointsPolicy.redemptionValue(
+                              int.tryParse(pointsController.text) ?? 0,
+                            ),
+                          )}',
+                          key: const ValueKey('redemption-value'),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed:
+                      saving ? null : () => Navigator.pop(dialogContext, false),
+                  child: const Text('Cancel'),
+                ),
+                FilledButton(
+                  key: const ValueKey('confirm-redeem-points'),
+                  onPressed: saving
+                      ? null
+                      : () async {
+                          if (!(formKey.currentState?.validate() ?? false)) {
+                            return;
+                          }
+
+                          setState(() => saving = true);
+
+                          final result = await controller.redeemCustomerPoints(
+                            customerId: customer.id,
+                            points: int.parse(pointsController.text.trim()),
+                            reason: reasonController.text.trim(),
+                          );
+
+                          if (!dialogContext.mounted) {
+                            return;
+                          }
+
+                          if (result.isSuccess) {
+                            Navigator.pop(dialogContext, true);
+                            return;
+                          }
+
+                          ScaffoldMessenger.of(dialogContext).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                result.message ??
+                                    'Loyalty points could not be redeemed.',
+                              ),
+                            ),
+                          );
+
+                          setState(() => saving = false);
+                        },
+                  child: saving
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Text('Redeem'),
+                ),
+              ],
+            ),
+          ),
+        ) ??
+        false;
+
+    await Future<void>.delayed(
+      const Duration(milliseconds: 250),
+    );
+
+    pointsController.dispose();
+    reasonController.dispose();
+    return redeemed;
   }
 
   String _loyaltyEntryLabel(LoyaltyLedgerEntry entry) {

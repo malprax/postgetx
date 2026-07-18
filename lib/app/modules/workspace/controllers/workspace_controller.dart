@@ -14,6 +14,7 @@ import 'package:postgetx/app/data/models/order_model.dart';
 import 'package:postgetx/app/data/models/role_permission.dart';
 import 'package:postgetx/app/data/models/user_model.dart';
 import 'package:postgetx/app/data/repositories/pos_repository.dart';
+import 'package:postgetx/app/data/repositories/pos_operation_result.dart';
 import 'package:postgetx/app/data/repositories/loyalty_repository.dart';
 import 'package:postgetx/app/data/repositories/local_hive_repository.dart';
 import 'package:postgetx/app/core/services/printer_service.dart';
@@ -511,6 +512,25 @@ class WorkspaceController extends GetxController {
     return loyaltyRepository.getLedger(
       customerId: customerId,
     );
+  }
+
+  Future<PosOperationResult<LoyaltyLedgerEntry>> redeemCustomerPoints({
+    required String customerId,
+    required int points,
+    required String reason,
+  }) async {
+    final result = await loyaltyRepository.redeem(
+      customerId: customerId,
+      points: points,
+      reason: reason,
+    );
+
+    if (result.isSuccess) {
+      loyaltyBalances[customerId] =
+          await loyaltyRepository.getBalance(customerId);
+    }
+
+    return result;
   }
 
   Future<void> deleteCustomer(String id) async {
