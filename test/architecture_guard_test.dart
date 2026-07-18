@@ -168,6 +168,27 @@ void main() {
       );
     });
 
+    test('lib root contains only app and main entry point', () {
+      final libRoot = Directory('${projectRoot.path}/lib');
+      final allowedPaths = <String>{
+        '${libRoot.path}/app',
+        '${libRoot.path}/main.dart',
+      };
+
+      final violations = libRoot
+          .listSync()
+          .where((entity) => !allowedPaths.contains(entity.path))
+          .map((entity) => _relativePath(projectRoot, entity))
+          .toList();
+
+      expect(
+        violations,
+        isEmpty,
+        reason:
+            'Production source must live under lib/app; only lib/main.dart is exempt.',
+      );
+    });
+
     test('migration backups and migration scripts stay outside the project',
         () {
       final violations = projectRoot

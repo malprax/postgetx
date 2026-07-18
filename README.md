@@ -7,7 +7,7 @@ Owner credentials are `owner@demo.local` / `owner123`; Staff credentials are
 `staff@demo.local` / `staff123`. Products, categories, customers, transactions,
 notifications, and lifecycle examples are seeded automatically on first launch.
 
-Data access is defined by repository interfaces in `lib/repositories`, allowing a
+Data access is defined by repository interfaces in `lib/app/data/repositories`, allowing a
 future PocketBase adapter without coupling controllers to a backend SDK.
 
 Tahap 1 — Kunci struktur target

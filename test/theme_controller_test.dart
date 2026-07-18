@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:postgetx/app/modules/settings/controllers/theme_controller.dart';
+import 'package:postgetx/app/data/providers/local/theme_preferences_provider.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -22,7 +23,7 @@ void main() {
   });
 
   test('light dark and auto selections apply immediately', () async {
-    final controller = ThemeController(box);
+    final controller = ThemeController(ThemePreferencesProvider(box));
     expect(controller.preference.value, AppThemePreference.dark);
     expect(controller.themeMode, ThemeMode.dark);
     await controller.select(AppThemePreference.light);
@@ -34,9 +35,9 @@ void main() {
   });
 
   test('theme preference persists in its separate box', () async {
-    final first = ThemeController(box);
+    final first = ThemeController(ThemePreferencesProvider(box));
     await first.select(AppThemePreference.dark);
-    final restored = ThemeController(box)..load();
+    final restored = ThemeController(ThemePreferencesProvider(box))..load();
     expect(restored.preference.value, AppThemePreference.dark);
   });
 }

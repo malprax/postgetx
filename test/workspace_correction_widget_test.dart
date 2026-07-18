@@ -17,6 +17,7 @@ import 'package:postgetx/app/data/repositories/local_hive_repository.dart';
 import 'package:postgetx/app/core/services/printer_service.dart';
 import 'package:postgetx/app/core/services/pos_total_calculator.dart';
 import 'package:postgetx/app/modules/settings/controllers/theme_controller.dart';
+import 'package:postgetx/app/data/providers/local/theme_preferences_provider.dart';
 import 'package:postgetx/app/core/helpers/rupiah_formatter.dart';
 
 class _NoopPrinter implements PrinterService {
@@ -42,7 +43,7 @@ void main() {
     await repository.resetDemoData();
     await repository.login(email: 'owner@demo.local', password: 'owner123');
     Get.put<LocalHiveRepository>(repository, permanent: true);
-    Get.put(ThemeController(box), permanent: true);
+    Get.put(ThemeController(ThemePreferencesProvider(box)), permanent: true);
     controller = Get.put(WorkspaceController(repository, _NoopPrinter()),
         permanent: true);
     await controller.refreshData();

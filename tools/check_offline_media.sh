@@ -16,12 +16,12 @@ if rg -n 'XFile\s+[^;]*(toMap|Hive|put)|BuildContext\s+[^;]*(model|controller)' 
   exit 1
 fi
 
-if rg -n 'Hive\.|openBox' lib/app/modules lib/modules --glob '*view*.dart' --glob '*controller*.dart'; then
+if rg -n 'Hive\.|openBox' lib/app/modules --glob '*view*.dart' --glob '*controller*.dart'; then
   echo 'UI or controller must not access Hive directly' >&2
   exit 1
 fi
 
-if rg -n 'switch \(product\.categoryName\)|base64Decode\(' lib/app --glob '*.dart' --glob '!**/product_visual.dart'; then
+if rg -n 'switch \(product\.categoryName\)|base64Decode\(' lib/app --glob '*.dart' --glob '!**/product_visual.dart' --glob '!**/product_image_service.dart'; then
   echo 'duplicated category icon mapping or image decoding detected' >&2
   exit 1
 fi

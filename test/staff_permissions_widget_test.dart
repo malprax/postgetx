@@ -13,6 +13,7 @@ import 'package:postgetx/app/data/models/order_model.dart';
 import 'package:postgetx/app/data/repositories/local_hive_repository.dart';
 import 'package:postgetx/app/core/services/printer_service.dart';
 import 'package:postgetx/app/modules/settings/controllers/theme_controller.dart';
+import 'package:postgetx/app/data/providers/local/theme_preferences_provider.dart';
 
 class _NoopPrinter implements PrinterService {
   @override
@@ -36,7 +37,7 @@ void main() {
     await repository.resetDemoData();
     await repository.login(email: 'staff@demo.local', password: 'staff123');
     Get.put<LocalHiveRepository>(repository, permanent: true);
-    Get.put(ThemeController(box), permanent: true);
+    Get.put(ThemeController(ThemePreferencesProvider(box)), permanent: true);
     controller = Get.put(WorkspaceController(repository, _NoopPrinter()),
         permanent: true);
     await controller.refreshData();

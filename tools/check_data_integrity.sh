@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-CONTROLLERS=$(find lib/app/modules lib/modules -path '*controller*.dart' -o -path '*/controllers/*.dart')
+CONTROLLERS=$(find lib/app/modules -path '*controller*.dart' -o -path '*/controllers/*.dart')
 
 if rg -n 'Hive\.|openBox' $CONTROLLERS; then
   echo 'controllers must not access Hive directly' >&2

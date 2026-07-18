@@ -174,6 +174,10 @@ class ProductImageService {
     }
   }
 
+  static int decodedStoredSize(String imageBase64) {
+    return base64Decode(imageBase64).length;
+  }
+
   static img.Image _resizeToLimit(img.Image image, int limit) {
     if (image.width <= limit && image.height <= limit) return image;
     if (image.width >= image.height) {

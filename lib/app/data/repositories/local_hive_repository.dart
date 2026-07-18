@@ -16,6 +16,7 @@ import 'package:postgetx/app/data/models/order_model.dart';
 import 'package:postgetx/app/data/models/role_permission.dart';
 import 'package:postgetx/app/data/models/user_model.dart';
 import 'package:postgetx/app/core/services/pos_total_calculator.dart';
+import 'package:postgetx/app/core/services/product_image_service.dart';
 import 'package:postgetx/app/core/helpers/customer_utils.dart';
 import 'package:postgetx/app/data/repositories/auth_repository.dart';
 import 'pos_operation_result.dart';
@@ -1019,9 +1020,12 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
 
     if (product.imageBase64.isNotEmpty) {
       try {
-        final bytes = base64Decode(product.imageBase64);
+        final decodedSize = ProductImageService.decodedStoredSize(
+          product.imageBase64,
+        );
 
-        if (bytes.isEmpty || bytes.length > 500 * 1024) {
+        if (decodedSize == 0 ||
+            decodedSize > ProductImageService.maxStoredSizeBytes) {
           throw const FormatException(
             'Product image must be an optimized local image.',
           );
