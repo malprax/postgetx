@@ -398,24 +398,29 @@ class CartPanel extends GetView<WorkspaceController> {
   }
 
   Future<void> _showCashPaymentDialog(BuildContext context) async {
-    final total = controller.totals.total;
     final received = TextEditingController();
     var amount = 0.0;
-    final quickAmounts = <double>{
-      total,
-      (total / 10000).ceil() * 10000,
-      (total / 20000).ceil() * 20000,
-      (total / 50000).ceil() * 50000,
-      (total / 100000).ceil() * 100000,
-    }.where((value) => value >= total).toList()
-      ..sort();
+
     await showDialog<void>(
       context: context,
       barrierDismissible: false,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) {
+          final total = controller.totals.total;
+          final availablePoints = controller.availableCheckoutPoints;
+          final selectedPoints = controller.loyaltyPointsToRedeem.value;
           final valid = amount.isFinite && amount >= total;
           final change = valid ? amount - total : 0.0;
+
+          final quickAmounts = <double>{
+            total,
+            (total / 10000).ceil() * 10000,
+            (total / 20000).ceil() * 20000,
+            (total / 50000).ceil() * 50000,
+            (total / 100000).ceil() * 100000,
+          }.where((value) => value >= total).toList()
+            ..sort();
+
           return AlertDialog(
             title: const Row(children: [
               Icon(Icons.payments_outlined),
@@ -429,8 +434,112 @@ class CartPanel extends GetView<WorkspaceController> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      DropdownButtonFormField<String?>(
+                        key: const ValueKey('checkout-customer-selector'),
+                        initialValue:
+                            controller.selectedCheckoutCustomer.value?.id,
+                        decoration: const InputDecoration(
+                          labelText: 'Customer (optional)',
+                          prefixIcon: Icon(Icons.person_outline),
+                        ),
+                        items: [
+                          const DropdownMenuItem<String?>(
+                            value: null,
+                            child: Text('Walk-in customer'),
+                          ),
+                          ...controller.customers.map(
+                            (customer) => DropdownMenuItem<String?>(
+                              value: customer.id,
+                              child: Text(
+                                '${customer.name} · '
+                                '${controller.loyaltyBalanceFor(customer.id)} pts',
+                              ),
+                            ),
+                          ),
+                        ],
+                        onChanged: (customerId) {
+                          final customer = controller.customers
+                              .where((item) => item.id == customerId)
+                              .firstOrNull;
+
+                          setState(() {
+                            controller.selectCheckoutCustomer(customer);
+                          });
+                        },
+                      ),
+                      if (controller.selectedCheckoutCustomer.value !=
+                          null) ...[
+                        const SizedBox(height: AppSpacing.md),
+                        Container(
+                          key: const ValueKey('checkout-loyalty-panel'),
+                          padding: const EdgeInsets.all(AppSpacing.md),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withValues(alpha: .08),
+                            borderRadius: BorderRadius.circular(AppRadius.md),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Text(
+                                'Available loyalty: $availablePoints points',
+                                key: const ValueKey(
+                                  'checkout-available-points',
+                                ),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              Slider(
+                                key: const ValueKey(
+                                  'checkout-loyalty-slider',
+                                ),
+                                value: selectedPoints.toDouble().clamp(
+                                      0,
+                                      availablePoints > 0
+                                          ? availablePoints.toDouble()
+                                          : 1,
+                                    ),
+                                min: 0,
+                                max: availablePoints > 0
+                                    ? availablePoints.toDouble()
+                                    : 1,
+                                divisions:
+                                    availablePoints > 0 ? availablePoints : 1,
+                                label: '$selectedPoints points',
+                                onChanged: availablePoints <= 0
+                                    ? null
+                                    : (value) {
+                                        setState(() {
+                                          controller.setLoyaltyPointsToRedeem(
+                                            value.round(),
+                                          );
+                                        });
+                                      },
+                              ),
+                              Text(
+                                '$selectedPoints points = '
+                                '${RupiahFormatter.format(
+                                  controller.checkoutLoyaltyDiscount,
+                                )}',
+                                key: const ValueKey(
+                                  'checkout-selected-points',
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: AppSpacing.lg),
                       _PaymentSummaryLine(
-                          label: 'Total Due', value: total, emphasized: true),
+                        label: 'Total Due',
+                        value: total,
+                        emphasized: true,
+                      ),
+                      if (controller.totals.loyaltyDiscount > 0)
+                        _PaymentSummaryLine(
+                          label: 'Loyalty Discount',
+                          value: -controller.totals.loyaltyDiscount,
+                        ),
                       const SizedBox(height: AppSpacing.lg),
                       MalpraxFormField(
                         key: const ValueKey('cash-received-input'),
@@ -889,6 +998,12 @@ class _CartFooter extends StatelessWidget {
             trailingIcon: Icons.edit_outlined,
           ),
         ),
+        if (totals.loyaltyDiscount > 0)
+          _line(
+            'Loyalty (${controller.loyaltyPointsToRedeem.value} pts)',
+            -totals.loyaltyDiscount,
+            danger: true,
+          ),
         InkWell(
           key: const ValueKey('edit-tax'),
           onTap: controller.cart.isEmpty ? null : showTax,
