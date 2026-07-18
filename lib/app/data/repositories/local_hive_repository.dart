@@ -1310,6 +1310,7 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
 
     final productSnapshot = _maps('products');
     final orderSnapshot = _maps('transactions');
+    final loyaltySnapshot = _maps(HiveLoyaltyProvider.storageKey);
 
     try {
       if (order.status != OrderStatus.draft &&
@@ -1430,6 +1431,25 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
       await _putMaps('transactions', updatedOrders);
       _writeFaultInjector?.call('after_order');
 
+      final customerId = completed.customerId?.trim() ?? '';
+
+      if (customerId.isNotEmpty) {
+        final loyaltyResult = await loyaltyRepository.earnForOrder(
+          customerId: customerId,
+          orderId: completed.id,
+          eligibleAmount: completed.totalAmount,
+        );
+
+        if (!loyaltyResult.isSuccess &&
+            loyaltyResult.code != 'no_loyalty_points') {
+          throw StateError(
+            loyaltyResult.message ?? 'Loyalty points could not be saved.',
+          );
+        }
+      }
+
+      _writeFaultInjector?.call('after_loyalty');
+
       await _notifyStockTransitions(
         productSnapshot,
         updatedProducts,
@@ -1450,6 +1470,10 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
       try {
         await _putMaps('products', productSnapshot);
         await _putMaps('transactions', orderSnapshot);
+        await _putMaps(
+          HiveLoyaltyProvider.storageKey,
+          loyaltySnapshot,
+        );
 
         return PosOperationResult.failure(
           'atomic_write_failed',
@@ -1798,6 +1822,7 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
 
     final productSnapshot = _maps('products');
     final orderSnapshot = _maps('transactions');
+    final loyaltySnapshot = _maps(HiveLoyaltyProvider.storageKey);
 
     try {
       final index = orderSnapshot.indexWhere(
@@ -1889,6 +1914,24 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
       await _putMaps('transactions', updatedOrders);
       _writeFaultInjector?.call('after_refund_order');
 
+      final customerId = refunded.customerId?.trim() ?? '';
+
+      if (customerId.isNotEmpty) {
+        final loyaltyResult = await loyaltyRepository.reverseOrderEarning(
+          orderId: refunded.id,
+          reason: 'Refund: ${reason.trim()}',
+        );
+
+        if (!loyaltyResult.isSuccess &&
+            loyaltyResult.code != 'loyalty_earning_missing') {
+          throw StateError(
+            loyaltyResult.message ?? 'Loyalty points could not be reversed.',
+          );
+        }
+      }
+
+      _writeFaultInjector?.call('after_refund_loyalty');
+
       await _notify(
         type: 'transactionRefunded',
         title: 'Transaction refunded',
@@ -1904,6 +1947,10 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
       try {
         await _putMaps('products', productSnapshot);
         await _putMaps('transactions', orderSnapshot);
+        await _putMaps(
+          HiveLoyaltyProvider.storageKey,
+          loyaltySnapshot,
+        );
 
         return PosOperationResult.failure(
           'atomic_write_failed',
