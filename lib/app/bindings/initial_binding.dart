@@ -19,7 +19,10 @@ class InitialBinding extends Bindings {
     Get.lazyPut<PrinterService>(PrintService.new, fenix: true);
     Get.lazyPut(
         () => WorkspaceController(
-            Get.find<PosRepository>(), Get.find<PrinterService>()),
+              Get.find<PosRepository>(),
+              Get.find<PrinterService>(),
+              Get.find<LoyaltyRepository>(),
+            ),
         fenix: true);
   }
 }

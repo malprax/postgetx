@@ -49,7 +49,8 @@ void main() {
     await repository.resetDemoData();
     await repository.login(email: 'owner@demo.local', password: 'owner123');
     printer = _FakePrinter();
-    controller = WorkspaceController(repository, printer);
+    controller =
+        WorkspaceController(repository, printer, repository.loyaltyRepository);
     await controller.refreshData();
   });
 
@@ -80,8 +81,8 @@ void main() {
   test('successful sale can return before browser receipt preview completes',
       () async {
     final blockingPrinter = _BlockingPrinter();
-    final nonBlockingController =
-        WorkspaceController(repository, blockingPrinter);
+    final nonBlockingController = WorkspaceController(
+        repository, blockingPrinter, repository.loyaltyRepository);
     await nonBlockingController.refreshData();
     nonBlockingController.addProduct(nonBlockingController.products
         .firstWhere((item) => item.id == 'water'));

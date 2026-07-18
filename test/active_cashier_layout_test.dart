@@ -33,7 +33,8 @@ void main() {
     repository = LocalHiveRepository.forBox(box);
     await repository.resetDemoData();
     await repository.login(email: 'owner@demo.local', password: 'owner123');
-    controller = Get.put(WorkspaceController(repository, _NoopPrinter()));
+    controller = Get.put(WorkspaceController(
+        repository, _NoopPrinter(), repository.loyaltyRepository));
     await controller.refreshData();
   });
 

@@ -8,11 +8,13 @@ import 'package:postgetx/app/data/models/expense_model.dart';
 import 'package:postgetx/app/data/models/menu_item_model.dart';
 import 'package:postgetx/app/data/models/menu_variant.dart';
 import 'package:postgetx/app/data/models/local_notification_model.dart';
+import 'package:postgetx/app/data/models/loyalty_ledger_entry.dart';
 import 'package:postgetx/app/data/models/order_lifecycle.dart';
 import 'package:postgetx/app/data/models/order_model.dart';
 import 'package:postgetx/app/data/models/role_permission.dart';
 import 'package:postgetx/app/data/models/user_model.dart';
 import 'package:postgetx/app/data/repositories/pos_repository.dart';
+import 'package:postgetx/app/data/repositories/loyalty_repository.dart';
 import 'package:postgetx/app/data/repositories/local_hive_repository.dart';
 import 'package:postgetx/app/core/services/printer_service.dart';
 import 'package:postgetx/app/core/services/pos_total_calculator.dart';
@@ -28,14 +30,21 @@ class ProductSale {
 }
 
 class WorkspaceController extends GetxController {
-  WorkspaceController(this.repository, this.printer);
+  WorkspaceController(
+    this.repository,
+    this.printer,
+    this.loyaltyRepository,
+  );
+
   final PosRepository repository;
   final PrinterService printer;
+  final LoyaltyRepository loyaltyRepository;
 
   final products = <MenuItemModel>[].obs;
   final categories = <CategoryModel>[].obs;
   final orders = <OrderModel>[].obs;
   final customers = <CustomerModel>[].obs;
+  final loyaltyBalances = <String, int>{}.obs;
   final expenses = <ExpenseModel>[].obs;
   final notifications = <LocalNotificationModel>[].obs;
   final trashOrders = <OrderModel>[].obs;
@@ -80,6 +89,20 @@ class WorkspaceController extends GetxController {
     orders.assignAll(allOrders.where((order) => !order.isDeleted));
     trashOrders.assignAll(allOrders.where((order) => order.isDeleted));
     customers.assignAll(results[3] as List<CustomerModel>);
+
+    final balances = await Future.wait(
+      customers.map(
+        (customer) => loyaltyRepository.getBalance(customer.id),
+      ),
+    );
+
+    loyaltyBalances.assignAll(
+      Map<String, int>.fromIterables(
+        customers.map((customer) => customer.id),
+        balances,
+      ),
+    );
+
     expenses.assignAll(results[4] as List<ExpenseModel>);
     notifications.assignAll(results[5] as List<LocalNotificationModel>);
     loading.value = false;
@@ -476,6 +499,18 @@ class WorkspaceController extends GetxController {
     }
 
     await refreshData();
+  }
+
+  int loyaltyBalanceFor(String customerId) {
+    return loyaltyBalances[customerId] ?? 0;
+  }
+
+  Future<List<LoyaltyLedgerEntry>> loyaltyLedgerFor(
+    String customerId,
+  ) {
+    return loyaltyRepository.getLedger(
+      customerId: customerId,
+    );
   }
 
   Future<void> deleteCustomer(String id) async {

@@ -44,7 +44,9 @@ void main() {
     await repository.login(email: 'owner@demo.local', password: 'owner123');
     Get.put<LocalHiveRepository>(repository, permanent: true);
     Get.put(ThemeController(ThemePreferencesProvider(box)), permanent: true);
-    controller = Get.put(WorkspaceController(repository, _NoopPrinter()),
+    controller = Get.put(
+        WorkspaceController(
+            repository, _NoopPrinter(), repository.loyaltyRepository),
         permanent: true);
     await controller.refreshData();
   });

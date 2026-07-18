@@ -9,6 +9,7 @@ import 'package:postgetx/app/data/models/order_model.dart';
 import 'package:postgetx/app/data/models/role_permission.dart';
 import '../../../data/models/customer_model.dart';
 import 'package:postgetx/app/data/models/menu_variant.dart';
+import 'package:postgetx/app/data/models/loyalty_ledger_entry.dart';
 import 'package:postgetx/app/core/services/product_image_service.dart';
 import 'package:postgetx/app/core/helpers/rupiah_formatter.dart';
 import '../../../shared/forms/form_validators.dart';
@@ -164,7 +165,14 @@ class CrudSection extends GetView<WorkspaceController> {
         'Add Customer',
         () => _customerDialog(context),
         MalpraxTable(
-            columns: const ['Name', 'Email', 'Role', 'Status', 'Actions'],
+            columns: const [
+              'Name',
+              'Email',
+              'Member',
+              'Contact',
+              'Points',
+              'Actions'
+            ],
             rows: controller.customers
                 .map((customer) => [
                       Text(customer.name),
@@ -173,7 +181,14 @@ class CrudSection extends GetView<WorkspaceController> {
                       Text(customer.phone.trim().isEmpty
                           ? 'No phone'
                           : customer.phone),
+                      Text(
+                        '${controller.loyaltyBalanceFor(customer.id)} pts',
+                        key: ValueKey('loyalty-balance-${customer.id}'),
+                        style: const TextStyle(fontWeight: FontWeight.w700),
+                      ),
                       _actions(
+                          onView: () =>
+                              _customerLoyaltyDialog(context, customer),
                           onEdit: () => _customerDialog(context, customer),
                           onDelete: () => _confirm(
                               context,
@@ -604,9 +619,18 @@ class CrudSection extends GetView<WorkspaceController> {
                 .toList()),
       ));
 
-  Widget _actions(
-          {required VoidCallback onEdit, required VoidCallback onDelete}) =>
+  Widget _actions({
+    VoidCallback? onView,
+    required VoidCallback onEdit,
+    required VoidCallback onDelete,
+  }) =>
       Wrap(children: [
+        if (onView != null)
+          IconButton(
+            tooltip: 'View loyalty points',
+            onPressed: onView,
+            icon: const Icon(Icons.stars_outlined),
+          ),
         IconButton(
             tooltip: 'Edit',
             onPressed: onEdit,
@@ -878,6 +902,97 @@ class CrudSection extends GetView<WorkspaceController> {
                 ]));
     await Future<void>.delayed(const Duration(milliseconds: 250));
     value.dispose();
+  }
+
+  Future<void> _customerLoyaltyDialog(
+    BuildContext context,
+    CustomerModel customer,
+  ) async {
+    final ledger = await controller.loyaltyLedgerFor(customer.id);
+
+    if (!context.mounted) {
+      return;
+    }
+
+    await showDialog<void>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text('${customer.name} Loyalty'),
+        content: SizedBox(
+          width: 520,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${controller.loyaltyBalanceFor(customer.id)} points',
+                key: ValueKey('loyalty-dialog-balance-${customer.id}'),
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.primary,
+                    ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              if (ledger.isEmpty)
+                const Text('No loyalty activity yet.')
+              else
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxHeight: 340),
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    itemCount: ledger.length,
+                    separatorBuilder: (_, __) => const Divider(),
+                    itemBuilder: (_, index) {
+                      final entry = ledger[index];
+                      final positive = entry.pointsDelta >= 0;
+
+                      return ListTile(
+                        key: ValueKey('loyalty-entry-${entry.id}'),
+                        contentPadding: EdgeInsets.zero,
+                        leading: CircleAvatar(
+                          child: Icon(
+                            positive ? Icons.add : Icons.remove,
+                          ),
+                        ),
+                        title: Text(_loyaltyEntryLabel(entry)),
+                        subtitle: Text(
+                          '${DateFormat('dd MMM yyyy, HH:mm').format(entry.createdAt)}'
+                          '${entry.orderId == null ? '' : ' · ${entry.orderId}'}',
+                        ),
+                        trailing: Text(
+                          '${positive ? '+' : ''}${entry.pointsDelta} pts',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                            color:
+                                positive ? AppColors.success : AppColors.danger,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+            ],
+          ),
+        ),
+        actions: [
+          FilledButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _loyaltyEntryLabel(LoyaltyLedgerEntry entry) {
+    return switch (entry.type) {
+      LoyaltyEntryType.earned => 'Points earned',
+      LoyaltyEntryType.redeemed => 'Points redeemed',
+      LoyaltyEntryType.reversed => 'Points reversed',
+      LoyaltyEntryType.adjusted => 'Points adjusted',
+      LoyaltyEntryType.expired => 'Points expired',
+      _ => 'Loyalty activity',
+    };
   }
 
   Future<void> _customerDialog(BuildContext context,
