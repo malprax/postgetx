@@ -30,6 +30,12 @@ void main() {
         'lib/modules/pos': 'lib/app/modules/pos',
         'lib/bindings/pos_binding.dart':
             'lib/app/modules/pos/bindings/pos_binding.dart',
+        'lib/models/cart_item_model.dart':
+            'lib/app/data/models/cart_item_model.dart',
+        'lib/services/receipt_data.dart':
+            'lib/app/data/models/receipt_data.dart',
+        'lib/services/pos_total_calculator.dart':
+            'lib/app/core/services/pos_total_calculator.dart',
       };
 
       for (final migration in migrations.entries) {
@@ -61,10 +67,13 @@ void main() {
         'package:postgetx/bindings/category_binding.dart',
         'package:postgetx/modules/pos/',
         'package:postgetx/bindings/pos_binding.dart',
+        'package:postgetx/models/cart_item_model.dart',
+        'package:postgetx/services/receipt_data.dart',
+        'package:postgetx/services/pos_total_calculator.dart',
       ];
 
       final violations = <String>[];
-      for (final rootPath in const ['lib', 'test']) {
+      for (final rootPath in const ['lib', 'test', 'tools']) {
         final root = Directory('${projectRoot.path}/$rootPath');
         if (!root.existsSync()) continue;
 

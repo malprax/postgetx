@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:get/get.dart';
 
-import '../../../../models/cart_item_model.dart';
+import 'package:postgetx/app/data/models/cart_item_model.dart';
 import 'package:postgetx/app/data/models/category_model.dart';
 import '../../../../models/expense_model.dart';
 import 'package:postgetx/app/data/models/menu_item_model.dart';
@@ -15,7 +15,7 @@ import '../../../../models/user_model.dart';
 import '../../../../repositories/pos_repository.dart';
 import '../../../../repositories/local_hive_repository.dart';
 import '../../../../services/printer_service.dart';
-import '../../../../services/pos_total_calculator.dart';
+import 'package:postgetx/app/core/services/pos_total_calculator.dart';
 import '../../../routes/app_routes.dart';
 import '../../../routes/browser_route_sync.dart';
 import '../../../routes/workspace_route_metadata.dart';

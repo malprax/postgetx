@@ -1,4 +1,4 @@
-import '../models/cart_item_model.dart';
+import 'package:postgetx/app/data/models/cart_item_model.dart';
 
 enum DiscountType {
   fixed,

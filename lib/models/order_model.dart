@@ -1,6 +1,6 @@
-import 'cart_item_model.dart';
+import 'package:postgetx/app/data/models/cart_item_model.dart';
 import 'order_lifecycle.dart';
-import '../services/pos_total_calculator.dart';
+import 'package:postgetx/app/core/services/pos_total_calculator.dart';
 
 class OrderModel {
   final String id;

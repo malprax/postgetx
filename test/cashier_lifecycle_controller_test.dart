@@ -9,8 +9,8 @@ import 'package:postgetx/models/order_lifecycle.dart';
 import 'package:postgetx/models/order_model.dart';
 import 'package:postgetx/repositories/local_hive_repository.dart';
 import 'package:postgetx/services/printer_service.dart';
-import 'package:postgetx/services/pos_total_calculator.dart';
-import 'package:postgetx/services/receipt_data.dart';
+import 'package:postgetx/app/core/services/pos_total_calculator.dart';
+import 'package:postgetx/app/data/models/receipt_data.dart';
 
 class _FakePrinter implements PrinterService {
   OrderModel? lastOrder;

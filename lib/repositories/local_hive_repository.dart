@@ -4,7 +4,7 @@ import 'package:crypto/crypto.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../config/app_config.dart';
-import '../models/cart_item_model.dart';
+import 'package:postgetx/app/data/models/cart_item_model.dart';
 import 'package:postgetx/app/data/models/category_model.dart';
 import 'package:postgetx/app/data/models/customer_model.dart';
 import '../models/expense_model.dart';
@@ -15,7 +15,7 @@ import '../models/order_lifecycle.dart';
 import '../models/order_model.dart';
 import '../models/role_permission.dart';
 import '../models/user_model.dart';
-import '../services/pos_total_calculator.dart';
+import 'package:postgetx/app/core/services/pos_total_calculator.dart';
 import 'package:postgetx/app/core/helpers/customer_utils.dart';
 import 'auth_repository.dart';
 import 'pos_operation_result.dart';
