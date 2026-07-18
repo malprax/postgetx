@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_icons.dart';
-import '../../models/role_permission.dart';
+import 'package:postgetx/app/data/models/role_permission.dart';
 import 'app_routes.dart';
 
 class WorkspaceDestination {

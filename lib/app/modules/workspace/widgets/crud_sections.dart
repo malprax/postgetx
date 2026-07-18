@@ -6,7 +6,7 @@ import 'package:postgetx/app/data/models/category_model.dart';
 import 'package:postgetx/app/data/models/menu_item_model.dart';
 import 'package:postgetx/app/data/models/order_lifecycle.dart';
 import 'package:postgetx/app/data/models/order_model.dart';
-import '../../../../models/role_permission.dart';
+import 'package:postgetx/app/data/models/role_permission.dart';
 import '../../../data/models/customer_model.dart';
 import 'package:postgetx/app/data/models/menu_variant.dart';
 import 'package:postgetx/app/core/services/product_image_service.dart';

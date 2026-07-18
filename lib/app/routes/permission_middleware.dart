@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
-import '../../models/role_permission.dart';
+import 'package:postgetx/app/data/models/role_permission.dart';
 import '../../repositories/local_hive_repository.dart';
 import 'app_routes.dart';
 

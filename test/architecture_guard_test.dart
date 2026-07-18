@@ -52,6 +52,11 @@ void main() {
             'lib/app/modules/tracking/bindings',
         'lib/bindings/tracking_log_binding.dart':
             'lib/app/modules/tracking/bindings',
+        'lib/models/user_model.dart': 'lib/app/data/models/user_model.dart',
+        'lib/models/role_permission.dart':
+            'lib/app/data/models/role_permission.dart',
+        'lib/modules/users': 'lib/app/modules/users',
+        'lib/bindings/users_binding.dart': 'lib/app/modules/users/bindings',
       };
 
       for (final migration in migrations.entries) {
@@ -97,6 +102,10 @@ void main() {
         'package:postgetx/modules/tracking/',
         'package:postgetx/bindings/tracking_binding.dart',
         'package:postgetx/bindings/tracking_log_binding.dart',
+        'package:postgetx/models/user_model.dart',
+        'package:postgetx/models/role_permission.dart',
+        'package:postgetx/modules/users/',
+        'package:postgetx/bindings/users_binding.dart',
       ];
 
       final violations = <String>[];

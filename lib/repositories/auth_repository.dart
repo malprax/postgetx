@@ -1,5 +1,5 @@
-import '../models/user_model.dart';
-import '../models/role_permission.dart';
+import 'package:postgetx/app/data/models/user_model.dart';
+import 'package:postgetx/app/data/models/role_permission.dart';
 
 abstract class AuthRepository {
   UserModel? get currentUser;

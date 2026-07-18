@@ -8,7 +8,7 @@ import 'package:postgetx/app/modules/pos/controllers/pos_controller.dart';
 import 'package:postgetx/app/modules/category/controllers/category_controller.dart';
 import 'package:postgetx/app/modules/menu/controllers/menu_controller.dart'
     as app_menu;
-import '../../../modules/users/controllers/user_controller.dart';
+import 'package:postgetx/app/modules/users/controllers/user_controller.dart';
 import '../../../repositories/local_hive_repository.dart';
 import '../../../themes/theme_controller.dart';
 

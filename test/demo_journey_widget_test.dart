@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:postgetx/config/app_config.dart';
-import 'package:postgetx/models/user_model.dart';
+import 'package:postgetx/app/data/models/user_model.dart';
 import 'package:postgetx/modules/auth/controllers/auth_controller.dart';
 import 'package:postgetx/modules/auth/views/login_view.dart';
 import 'package:postgetx/modules/dashboard/controllers/dashboard_controller.dart';

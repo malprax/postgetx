@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../config/app_config.dart';
-import '../../../../models/role_permission.dart';
+import 'package:postgetx/app/data/models/role_permission.dart';
 import '../../../../repositories/local_hive_repository.dart';
 import '../../../../themes/theme_controller.dart';
 import '../../../routes/app_routes.dart';

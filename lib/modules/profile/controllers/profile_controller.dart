@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 
-import '../../../models/user_model.dart';
+import 'package:postgetx/app/data/models/user_model.dart';
 import '../../../repositories/local_hive_repository.dart';
 import '../../auth/controllers/auth_controller.dart';
 

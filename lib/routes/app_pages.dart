@@ -17,7 +17,7 @@ import 'package:postgetx/modules/profile/views/profile_view.dart';
 import 'package:postgetx/app/modules/stock/views/stock_view.dart';
 import 'package:postgetx/app/modules/tracking/views/tracking_view.dart';
 
-import 'package:postgetx/modules/users/views/user_view.dart';
+import 'package:postgetx/app/modules/users/views/user_view.dart';
 import 'package:postgetx/modules/settings/views/settings_view.dart';
 import '../modules/auth/views/login_view.dart';
 import 'app_routes.dart';

@@ -1,7 +1,7 @@
 // lib/modules/users/views/users_view.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:postgetx/modules/users/controllers/user_controller.dart';
+import 'package:postgetx/app/modules/users/controllers/user_controller.dart';
 import 'user_form_view.dart';
 
 class UsersView extends StatelessWidget {
