@@ -14,7 +14,7 @@ import 'package:postgetx/app/modules/orders/views/order_view.dart';
 import 'package:postgetx/app/modules/category/views/category_view.dart';
 import 'package:postgetx/app/modules/pos/views/pos_view.dart';
 import 'package:postgetx/modules/profile/views/profile_view.dart';
-import 'package:postgetx/modules/stock/views/stock_view.dart';
+import 'package:postgetx/app/modules/stock/views/stock_view.dart';
 import 'package:postgetx/modules/tracking/views/tracking_view.dart';
 
 import 'package:postgetx/modules/users/views/user_view.dart';

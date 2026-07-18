@@ -44,6 +44,9 @@ void main() {
         'lib/services/printer_service.dart':
             'lib/app/core/services/printer_service.dart',
         'lib/modules/orders': 'lib/app/modules/orders',
+        'lib/modules/stock': 'lib/app/modules/stock',
+        'lib/bindings/stock_binding.dart': 'lib/app/modules/stock/bindings',
+        'lib/services/stock_service.dart': 'lib/app/modules/stock',
       };
 
       for (final migration in migrations.entries) {
@@ -83,6 +86,9 @@ void main() {
         'package:postgetx/services/print_service.dart',
         'package:postgetx/services/printer_service.dart',
         'package:postgetx/modules/orders/',
+        'package:postgetx/modules/stock/',
+        'package:postgetx/bindings/stock_binding.dart',
+        'package:postgetx/services/stock_service.dart',
       ];
 
       final violations = <String>[];
