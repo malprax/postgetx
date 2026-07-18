@@ -1062,9 +1062,20 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
       );
     }
 
-    if (product.variants.isEmpty || product.variants.first.price <= 0) {
+    if (product.variants.isEmpty ||
+        product.variants.any(
+          (variant) => !variant.price.isFinite || variant.price <= 0,
+        )) {
       throw const FormatException(
         'Price must be greater than zero.',
+      );
+    }
+
+    if (product.variants.any(
+      (variant) => !variant.costPrice.isFinite || variant.costPrice < 0,
+    )) {
+      throw const FormatException(
+        'Cost price cannot be negative.',
       );
     }
 
