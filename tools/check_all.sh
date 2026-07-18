@@ -9,6 +9,7 @@ bash tools/check_assets.sh
 bash tools/check_seed.sh
 bash tools/check_data_integrity.sh
 bash tools/check_offline_media.sh
+bash tools/check_bdd.sh
 dart format --set-exit-if-changed lib test
 flutter analyze
 flutter test

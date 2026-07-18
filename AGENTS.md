@@ -21,6 +21,10 @@ Read `ARCHITECTURE.md` before changing source structure.
 - Reuse existing abstractions and design-system components. Do not introduce a
   second result type, route system, theme system, repository, or shared widget
   serving the same responsibility.
+- Every new or changed business behavior must include a native Flutter BDD
+  scenario under `test/behavior/` using explicit Given, When, and Then stages.
+  BDD complements unit, widget, repository, integration, and architecture
+  tests; it does not replace them.
 
 ## Mandatory verification
 

@@ -31,6 +31,11 @@ Every completed domain migration must be recorded in
 `test/architecture_guard_test.dart`. A structural change is incomplete until
 the guard, analyzer, and complete test suite pass.
 
+Business behavior is protected by native Flutter BDD scenarios under
+`test/behavior/`. Every changed business rule must describe observable
+Given–When–Then outcomes and pass `tools/check_bdd.sh`. BDD scenarios supplement
+lower-level tests and remain independent of implementation details.
+
 Hive boxes are initialized before `runApp`. `InitialBinding` maps abstractions to local implementations. No view or controller opens a Hive box directly.
 
 Order and stock integrity rules are documented in [docs/ORDER_LIFECYCLE.md](docs/ORDER_LIFECYCLE.md). Checkout and refunds are application-level atomic repository operations with snapshot rollback and idempotency flags.
