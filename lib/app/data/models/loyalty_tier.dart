@@ -135,3 +135,22 @@ class LoyaltyTierRules {
     return restored.isValid ? restored : defaults;
   }
 }
+
+class CustomerLoyaltyTierProfile {
+  const CustomerLoyaltyTierProfile({
+    required this.customerId,
+    required this.lifetimeEligibleSpend,
+    required this.tier,
+    required this.pointsMultiplier,
+  });
+
+  final String customerId;
+  final double lifetimeEligibleSpend;
+  final LoyaltyTier tier;
+  final double pointsMultiplier;
+
+  int rewardPoints(int basePoints) {
+    if (basePoints <= 0) return 0;
+    return (basePoints * pointsMultiplier).floor();
+  }
+}

@@ -1,6 +1,7 @@
 import 'package:postgetx/app/core/services/loyalty_points_policy.dart';
 import 'package:postgetx/app/data/models/loyalty_configuration.dart';
 import 'package:postgetx/app/data/models/loyalty_ledger_entry.dart';
+import 'package:postgetx/app/data/models/loyalty_tier.dart';
 import 'package:postgetx/app/data/providers/local/hive_loyalty_provider.dart';
 import 'package:postgetx/app/data/repositories/loyalty_repository.dart';
 import 'package:postgetx/app/data/repositories/pos_operation_result.dart';
@@ -10,12 +11,18 @@ class LocalLoyaltyRepository implements LoyaltyRepository {
     this._provider, {
     required String Function() actorId,
     LoyaltyConfiguration Function()? configuration,
+    double Function(String customerId)? lifetimeEligibleSpend,
+    LoyaltyTierRules Function()? tierRules,
   })  : _actorId = actorId,
-        _configuration = configuration ?? (() => LoyaltyConfiguration.defaults);
+        _configuration = configuration ?? (() => LoyaltyConfiguration.defaults),
+        _lifetimeEligibleSpend = lifetimeEligibleSpend ?? ((_) => 0),
+        _tierRules = tierRules ?? (() => LoyaltyTierRules.defaults);
 
   final HiveLoyaltyProvider _provider;
   final String Function() _actorId;
   final LoyaltyConfiguration Function() _configuration;
+  final double Function(String customerId) _lifetimeEligibleSpend;
+  final LoyaltyTierRules Function() _tierRules;
 
   @override
   Future<List<LoyaltyLedgerEntry>> getLedger({
@@ -37,6 +44,33 @@ class LocalLoyaltyRepository implements LoyaltyRepository {
     final entries = await getLedger(customerId: customerId);
     return LoyaltyPointsPolicy.balance(
       entries.map((entry) => entry.pointsDelta),
+    );
+  }
+
+  @override
+  Future<CustomerLoyaltyTierProfile> getTierProfile(
+    String customerId,
+  ) async {
+    final normalizedCustomerId = customerId.trim();
+
+    final spending = normalizedCustomerId.isEmpty
+        ? 0.0
+        : _lifetimeEligibleSpend(normalizedCustomerId);
+
+    final safeSpending = spending.isFinite && spending > 0 ? spending : 0.0;
+
+    final configuredRules = _tierRules();
+
+    final rules =
+        configuredRules.isValid ? configuredRules : LoyaltyTierRules.defaults;
+
+    final tier = rules.resolve(safeSpending);
+
+    return CustomerLoyaltyTierProfile(
+      customerId: normalizedCustomerId,
+      lifetimeEligibleSpend: safeSpending,
+      tier: tier,
+      pointsMultiplier: rules.multiplierFor(tier),
     );
   }
 

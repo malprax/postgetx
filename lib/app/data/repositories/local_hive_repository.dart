@@ -313,6 +313,20 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
         HiveLoyaltyProvider(_box),
         actorId: () => _currentUser?.id ?? 'system',
         configuration: () => _loyaltyConfiguration,
+        lifetimeEligibleSpend: (customerId) {
+          return _maps('transactions')
+              .where(
+                (map) =>
+                    map['customerId']?.toString() == customerId &&
+                    map['status']?.toString() == OrderStatus.completed &&
+                    !(map['isDeleted'] as bool? ?? false),
+              )
+              .fold<double>(
+                0,
+                (total, map) =>
+                    total + ((map['totalAmount'] as num?)?.toDouble() ?? 0),
+              );
+        },
       );
 
   static String demoPasswordHash(String password) {

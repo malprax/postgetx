@@ -1,4 +1,5 @@
 import 'package:postgetx/app/data/models/loyalty_ledger_entry.dart';
+import 'package:postgetx/app/data/models/loyalty_tier.dart';
 import 'package:postgetx/app/data/repositories/pos_operation_result.dart';
 
 abstract class LoyaltyRepository {
@@ -7,6 +8,10 @@ abstract class LoyaltyRepository {
   });
 
   Future<int> getBalance(String customerId);
+
+  Future<CustomerLoyaltyTierProfile> getTierProfile(
+    String customerId,
+  );
 
   Future<PosOperationResult<LoyaltyLedgerEntry>> earnForOrder({
     required String customerId,
