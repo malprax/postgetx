@@ -16,7 +16,7 @@ import 'package:postgetx/app/data/models/order_model.dart';
 import 'package:postgetx/repositories/local_hive_repository.dart';
 import 'package:postgetx/app/core/services/printer_service.dart';
 import 'package:postgetx/app/core/services/pos_total_calculator.dart';
-import 'package:postgetx/themes/theme_controller.dart';
+import 'package:postgetx/app/modules/settings/controllers/theme_controller.dart';
 import 'package:postgetx/utils/rupiah_formatter.dart';
 
 class _NoopPrinter implements PrinterService {

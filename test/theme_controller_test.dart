@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:postgetx/themes/theme_controller.dart';
+import 'package:postgetx/app/modules/settings/controllers/theme_controller.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

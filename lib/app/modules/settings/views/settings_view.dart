@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../config/app_config.dart';
+import 'package:postgetx/config/app_config.dart';
 import 'package:postgetx/app/modules/dashboard/controllers/dashboard_controller.dart';
 import 'package:postgetx/app/modules/orders/controllers/order_history_controller.dart';
 import 'package:postgetx/app/modules/pos/controllers/pos_controller.dart';
@@ -9,8 +9,8 @@ import 'package:postgetx/app/modules/category/controllers/category_controller.da
 import 'package:postgetx/app/modules/menu/controllers/menu_controller.dart'
     as app_menu;
 import 'package:postgetx/app/modules/users/controllers/user_controller.dart';
-import '../../../repositories/local_hive_repository.dart';
-import '../../../themes/theme_controller.dart';
+import 'package:postgetx/repositories/local_hive_repository.dart';
+import 'package:postgetx/app/modules/settings/controllers/theme_controller.dart';
 
 class SettingsView extends StatefulWidget {
   const SettingsView({super.key});

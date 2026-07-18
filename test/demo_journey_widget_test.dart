@@ -14,7 +14,7 @@ import 'package:postgetx/app/modules/pos/controllers/pos_controller.dart';
 import 'package:postgetx/app/modules/pos/views/pos_view.dart';
 import 'package:postgetx/repositories/local_hive_repository.dart';
 import 'package:postgetx/routes/app_routes.dart';
-import 'package:postgetx/themes/app_theme.dart';
+import 'package:postgetx/app/theme/app_theme.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

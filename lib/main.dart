@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'app/app.dart';
 import 'repositories/local_hive_repository.dart';
-import 'themes/theme_controller.dart';
+import 'package:postgetx/app/modules/settings/controllers/theme_controller.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
