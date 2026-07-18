@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:postgetx/widgets/email_verification_banner.dart';
-import '../../auth/controllers/auth_controller.dart';
+import 'package:postgetx/app/modules/auth/controllers/auth_controller.dart';
 
 class DashboardCustomerView extends StatelessWidget {
   const DashboardCustomerView({super.key});

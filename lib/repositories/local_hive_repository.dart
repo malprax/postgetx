@@ -17,7 +17,7 @@ import 'package:postgetx/app/data/models/role_permission.dart';
 import 'package:postgetx/app/data/models/user_model.dart';
 import 'package:postgetx/app/core/services/pos_total_calculator.dart';
 import 'package:postgetx/app/core/helpers/customer_utils.dart';
-import 'auth_repository.dart';
+import 'package:postgetx/app/data/repositories/auth_repository.dart';
 import 'pos_operation_result.dart';
 import 'pos_repository.dart';
 

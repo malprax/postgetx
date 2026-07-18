@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../modules/auth/controllers/auth_controller.dart';
+import 'package:postgetx/app/modules/auth/controllers/auth_controller.dart';
 import '../../../widgets/main_drawer.dart';
 
 class DashboardGuestView extends StatelessWidget {

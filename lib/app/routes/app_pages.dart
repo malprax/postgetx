@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 
-import '../modules/auth/views/demo_login_view.dart';
+import 'package:postgetx/app/modules/auth/views/demo_login_view.dart';
 import '../modules/workspace/controllers/workspace_controller.dart';
 import '../modules/workspace/views/workspace_view.dart';
 import 'app_routes.dart';

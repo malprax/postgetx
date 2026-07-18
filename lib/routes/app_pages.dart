@@ -1,8 +1,8 @@
 // lib/routes/app_pages.dart
 import 'package:get/get.dart';
 import 'package:postgetx/app/modules/pos/bindings/pos_binding.dart';
-import 'package:postgetx/modules/auth/controllers/auth_controller.dart';
-import 'package:postgetx/modules/auth/views/forgot_password_view.dart';
+import 'package:postgetx/app/modules/auth/controllers/auth_controller.dart';
+import 'package:postgetx/app/modules/auth/views/forgot_password_view.dart';
 import 'package:postgetx/modules/dashboard/views/dashboard_admin_view.dart';
 import 'package:postgetx/modules/dashboard/views/dashboard_customer_view.dart';
 import 'package:postgetx/modules/dashboard/views/dashboard_guest_view.dart';
@@ -19,7 +19,7 @@ import 'package:postgetx/app/modules/tracking/views/tracking_view.dart';
 
 import 'package:postgetx/app/modules/users/views/user_view.dart';
 import 'package:postgetx/modules/settings/views/settings_view.dart';
-import '../modules/auth/views/login_view.dart';
+import 'package:postgetx/app/modules/auth/views/login_view.dart';
 import 'app_routes.dart';
 
 class AppPages {

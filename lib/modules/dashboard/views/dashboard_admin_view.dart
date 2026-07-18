@@ -5,7 +5,7 @@ import '../../../config/app_config.dart';
 import '../../../routes/app_routes.dart';
 import '../../../widgets/demo_mode_banner.dart';
 import '../../../widgets/main_drawer.dart';
-import '../../auth/controllers/auth_controller.dart';
+import 'package:postgetx/app/modules/auth/controllers/auth_controller.dart';
 import '../controllers/dashboard_controller.dart';
 import '../widgets/dashboard_summary_card.dart';
 import '../widgets/sales_chart.dart';

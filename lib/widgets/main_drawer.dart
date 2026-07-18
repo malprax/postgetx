@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../modules/auth/controllers/auth_controller.dart';
+import 'package:postgetx/app/modules/auth/controllers/auth_controller.dart';
 import '../routes/app_routes.dart';
 
 class MainDrawer extends StatelessWidget {

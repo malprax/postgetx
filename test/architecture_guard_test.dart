@@ -106,6 +106,8 @@ void main() {
         'package:postgetx/models/role_permission.dart',
         'package:postgetx/modules/users/',
         'package:postgetx/bindings/users_binding.dart',
+        'package:postgetx/modules/auth/',
+        'package:postgetx/repositories/auth_repository.dart',
       ];
 
       final violations = <String>[];

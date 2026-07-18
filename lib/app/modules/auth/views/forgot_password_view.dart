@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:postgetx/modules/auth/controllers/auth_controller.dart';
+import 'package:postgetx/app/modules/auth/controllers/auth_controller.dart';
 
 class ForgotPasswordView extends StatelessWidget {
   ForgotPasswordView({super.key});
