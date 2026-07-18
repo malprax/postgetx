@@ -16,6 +16,7 @@ import 'package:postgetx/app/data/models/order_model.dart';
 import 'package:postgetx/app/data/models/role_permission.dart';
 import 'package:postgetx/app/data/models/user_model.dart';
 import 'package:postgetx/app/core/services/pos_total_calculator.dart';
+import 'package:postgetx/app/core/services/loyalty_points_policy.dart';
 import 'package:postgetx/app/core/services/product_image_service.dart';
 import 'package:postgetx/app/core/helpers/customer_utils.dart';
 import 'package:postgetx/app/data/repositories/auth_repository.dart';
@@ -1211,6 +1212,7 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
       items: order.items,
       discountType: order.discountType,
       discountValue: order.discountValue,
+      loyaltyDiscount: order.loyaltyDiscount,
       taxType: order.taxType,
       taxValue: order.taxValue,
       amountPaid: order.amountReceived,
@@ -1223,6 +1225,10 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
         PosTotalCalculator.sameMoney(
           order.discount,
           expected.discountAmount,
+        ) &&
+        PosTotalCalculator.sameMoney(
+          order.loyaltyDiscount,
+          expected.loyaltyDiscount,
         ) &&
         PosTotalCalculator.sameMoney(
           order.taxableAmount,
@@ -1284,6 +1290,66 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
           '${map['name']} only has $stock item(s) available.',
         );
       }
+    }
+
+    return null;
+  }
+
+  Future<PosOperationResult<OrderModel>?> _validateCheckoutLoyalty(
+      OrderModel order) async {
+    if (order.loyaltyPointsRedeemed < 0 ||
+        !order.loyaltyDiscount.isFinite ||
+        order.loyaltyDiscount < 0) {
+      return PosOperationResult.failure(
+        'invalid_loyalty_redemption',
+        'Loyalty points and discount cannot be negative.',
+      );
+    }
+
+    if (order.loyaltyPointsRedeemed == 0) {
+      if (!PosTotalCalculator.sameMoney(
+        order.loyaltyDiscount,
+        0,
+      )) {
+        return PosOperationResult.failure(
+          'loyalty_discount_mismatch',
+          'A loyalty discount requires redeemed points.',
+        );
+      }
+
+      return null;
+    }
+
+    final customerId = order.customerId?.trim() ?? '';
+
+    if (customerId.isEmpty) {
+      return PosOperationResult.failure(
+        'loyalty_customer_required',
+        'Select a customer before redeeming loyalty points.',
+      );
+    }
+
+    final expectedDiscount = LoyaltyPointsPolicy.redemptionValue(
+      order.loyaltyPointsRedeemed,
+    );
+
+    if (!PosTotalCalculator.sameMoney(
+      order.loyaltyDiscount,
+      expectedDiscount,
+    )) {
+      return PosOperationResult.failure(
+        'loyalty_discount_mismatch',
+        'The loyalty discount does not match the redeemed points.',
+      );
+    }
+
+    final balance = await loyaltyRepository.getBalance(customerId);
+
+    if (balance < order.loyaltyPointsRedeemed) {
+      return PosOperationResult.failure(
+        'insufficient_loyalty_points',
+        'The customer does not have enough loyalty points.',
+      );
     }
 
     return null;
@@ -1368,6 +1434,12 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
         return validation;
       }
 
+      final loyaltyValidation = await _validateCheckoutLoyalty(order);
+
+      if (loyaltyValidation != null) {
+        return loyaltyValidation;
+      }
+
       final quantities = <String, int>{};
 
       for (final item in order.items) {
@@ -1432,6 +1504,21 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
       _writeFaultInjector?.call('after_order');
 
       final customerId = completed.customerId?.trim() ?? '';
+
+      if (completed.loyaltyPointsRedeemed > 0) {
+        final redemptionResult = await loyaltyRepository.redeemForOrder(
+          customerId: customerId,
+          orderId: completed.id,
+          points: completed.loyaltyPointsRedeemed,
+          reason: 'Checkout loyalty discount',
+        );
+
+        if (!redemptionResult.isSuccess) {
+          throw StateError(
+            redemptionResult.message ?? 'Loyalty points could not be redeemed.',
+          );
+        }
+      }
 
       if (customerId.isNotEmpty) {
         final loyaltyResult = await loyaltyRepository.earnForOrder(
@@ -1926,6 +2013,21 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
             loyaltyResult.code != 'loyalty_earning_missing') {
           throw StateError(
             loyaltyResult.message ?? 'Loyalty points could not be reversed.',
+          );
+        }
+      }
+
+      if (refunded.loyaltyPointsRedeemed > 0) {
+        final restorationResult =
+            await loyaltyRepository.restoreOrderRedemption(
+          orderId: refunded.id,
+          reason: 'Refund: ${reason.trim()}',
+        );
+
+        if (!restorationResult.isSuccess) {
+          throw StateError(
+            restorationResult.message ??
+                'Redeemed loyalty points could not be restored.',
           );
         }
       }
