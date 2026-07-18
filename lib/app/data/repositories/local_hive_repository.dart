@@ -10,6 +10,7 @@ import 'package:postgetx/app/data/models/customer_model.dart';
 import 'package:postgetx/app/data/models/expense_model.dart';
 import 'package:postgetx/app/data/models/local_notification_model.dart';
 import 'package:postgetx/app/data/models/loyalty_configuration.dart';
+import 'package:postgetx/app/data/models/loyalty_tier.dart';
 import 'package:postgetx/app/data/models/menu_item_model.dart';
 import 'package:postgetx/app/data/models/menu_variant.dart';
 import 'package:postgetx/app/data/models/order_lifecycle.dart';
@@ -1532,7 +1533,7 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
           ? 0
           : await loyaltyRepository.getBalance(customerId);
 
-      final loyaltyPointsEarned = customerId.isEmpty
+      final baseLoyaltyPoints = customerId.isEmpty
           ? 0
           : LoyaltyPointsPolicy.earnedPoints(
               order.totalAmount,
@@ -1540,6 +1541,23 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
               spendingRequired: _loyaltyConfiguration.spendPerPoint,
               minimumEligibleTransaction:
                   _loyaltyConfiguration.minimumEligibleTransaction,
+            );
+
+      final tierProfileBefore = customerId.isEmpty
+          ? null
+          : await loyaltyRepository.getTierProfile(customerId);
+
+      final projectedLifetimeSpend =
+          (tierProfileBefore?.lifetimeEligibleSpend ?? 0) + order.totalAmount;
+
+      final projectedTier =
+          LoyaltyTierRules.defaults.resolve(projectedLifetimeSpend);
+
+      final loyaltyPointsEarned = customerId.isEmpty
+          ? 0
+          : LoyaltyTierRules.defaults.rewardedPoints(
+              basePoints: baseLoyaltyPoints,
+              tier: projectedTier,
             );
 
       final loyaltyBalanceAfter = loyaltyBalanceBefore -

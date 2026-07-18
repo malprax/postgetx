@@ -104,12 +104,17 @@ class LocalLoyaltyRepository implements LoyaltyRepository {
 
     final configuration = _configuration();
 
-    final points = LoyaltyPointsPolicy.earnedPoints(
+    final basePoints = LoyaltyPointsPolicy.earnedPoints(
       eligibleAmount,
       isEnabled: configuration.isEnabled,
       spendingRequired: configuration.spendPerPoint,
       minimumEligibleTransaction: configuration.minimumEligibleTransaction,
     );
+
+    final tierProfile = await getTierProfile(customerId);
+
+    final points = tierProfile.rewardPoints(basePoints);
+
     if (points <= 0) {
       return PosOperationResult.failure(
         'no_loyalty_points',
