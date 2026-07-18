@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 
 import '../../../config/app_config.dart';
 import '../../../modules/dashboard/controllers/dashboard_controller.dart';
-import '../../../modules/orders/controller/order_history_controller.dart';
+import 'package:postgetx/app/modules/orders/controllers/order_history_controller.dart';
 import 'package:postgetx/app/modules/pos/controllers/pos_controller.dart';
 import 'package:postgetx/app/modules/category/controllers/category_controller.dart';
 import 'package:postgetx/app/modules/menu/controllers/menu_controller.dart'

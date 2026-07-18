@@ -1,6 +1,6 @@
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import '../models/order_model.dart';
+import 'package:postgetx/app/data/models/order_model.dart';
 import 'package:postgetx/app/core/services/pos_total_calculator.dart';
 import 'package:postgetx/app/data/models/receipt_data.dart';
 import 'rupiah_formatter.dart';

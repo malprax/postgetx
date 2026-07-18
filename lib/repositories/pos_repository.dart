@@ -3,7 +3,7 @@ import 'package:postgetx/app/data/models/customer_model.dart';
 import '../models/expense_model.dart';
 import 'package:postgetx/app/data/models/menu_item_model.dart';
 import 'package:postgetx/app/data/models/menu_variant.dart';
-import '../models/order_model.dart';
+import 'package:postgetx/app/data/models/order_model.dart';
 import 'notification_repository.dart';
 import 'pos_operation_result.dart';
 

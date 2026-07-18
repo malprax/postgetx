@@ -36,6 +36,14 @@ void main() {
             'lib/app/data/models/receipt_data.dart',
         'lib/services/pos_total_calculator.dart':
             'lib/app/core/services/pos_total_calculator.dart',
+        'lib/models/order_model.dart': 'lib/app/data/models/order_model.dart',
+        'lib/models/order_lifecycle.dart':
+            'lib/app/data/models/order_lifecycle.dart',
+        'lib/services/print_service.dart':
+            'lib/app/core/services/print_service.dart',
+        'lib/services/printer_service.dart':
+            'lib/app/core/services/printer_service.dart',
+        'lib/modules/orders': 'lib/app/modules/orders',
       };
 
       for (final migration in migrations.entries) {
@@ -70,6 +78,11 @@ void main() {
         'package:postgetx/models/cart_item_model.dart',
         'package:postgetx/services/receipt_data.dart',
         'package:postgetx/services/pos_total_calculator.dart',
+        'package:postgetx/models/order_model.dart',
+        'package:postgetx/models/order_lifecycle.dart',
+        'package:postgetx/services/print_service.dart',
+        'package:postgetx/services/printer_service.dart',
+        'package:postgetx/modules/orders/',
       ];
 
       final violations = <String>[];

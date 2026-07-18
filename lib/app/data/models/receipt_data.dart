@@ -1,5 +1,5 @@
 import 'package:postgetx/app/data/models/cart_item_model.dart';
-import 'package:postgetx/models/order_model.dart';
+import 'package:postgetx/app/data/models/order_model.dart';
 import 'package:postgetx/app/core/services/pos_total_calculator.dart';
 
 /// Receipt-facing snapshot copied only from a persisted [OrderModel].

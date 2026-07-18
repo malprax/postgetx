@@ -1,7 +1,7 @@
 // lib/modules/orders/views/order_view.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:postgetx/modules/orders/controller/order_controller.dart';
+import 'package:postgetx/app/modules/orders/controllers/order_controller.dart';
 
 class OrderView extends StatelessWidget {
   OrderView({super.key});

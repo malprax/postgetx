@@ -5,10 +5,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:postgetx/app/modules/workspace/controllers/workspace_controller.dart';
-import 'package:postgetx/models/order_lifecycle.dart';
-import 'package:postgetx/models/order_model.dart';
+import 'package:postgetx/app/data/models/order_lifecycle.dart';
+import 'package:postgetx/app/data/models/order_model.dart';
 import 'package:postgetx/repositories/local_hive_repository.dart';
-import 'package:postgetx/services/printer_service.dart';
+import 'package:postgetx/app/core/services/printer_service.dart';
 import 'package:postgetx/app/core/services/pos_total_calculator.dart';
 import 'package:postgetx/app/data/models/receipt_data.dart';
 

@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:postgetx/app/data/models/cart_item_model.dart';
-import 'package:postgetx/models/order_model.dart';
+import 'package:postgetx/app/data/models/order_model.dart';
 
 void main() {
   test('local transaction round-trips without cloud timestamp types', () {

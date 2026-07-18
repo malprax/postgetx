@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import '../../../models/order_model.dart';
-import '../../../repositories/local_hive_repository.dart';
+import 'package:postgetx/app/data/models/order_model.dart';
+import 'package:postgetx/repositories/local_hive_repository.dart';
 
 class OrderHistoryController extends GetxController {
   final repository = Get.find<LocalHiveRepository>();
