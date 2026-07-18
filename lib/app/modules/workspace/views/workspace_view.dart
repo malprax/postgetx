@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
-import '../../../../config/app_config.dart';
+import 'package:postgetx/app/core/config/app_config.dart';
 import 'package:postgetx/app/data/models/role_permission.dart';
 import '../../../../repositories/local_hive_repository.dart';
 import 'package:postgetx/app/modules/settings/controllers/theme_controller.dart';

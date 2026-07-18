@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:postgetx/config/app_config.dart';
+import 'package:postgetx/app/core/config/app_config.dart';
 import 'package:postgetx/app/data/models/user_model.dart';
 import 'package:postgetx/app/modules/auth/controllers/auth_controller.dart';
 import 'package:postgetx/app/modules/auth/views/login_view.dart';

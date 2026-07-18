@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-import '../config/app_config.dart';
+import 'package:postgetx/app/core/config/app_config.dart';
 import 'package:postgetx/app/data/models/cart_item_model.dart';
 import 'package:postgetx/app/data/models/category_model.dart';
 import 'package:postgetx/app/data/models/customer_model.dart';

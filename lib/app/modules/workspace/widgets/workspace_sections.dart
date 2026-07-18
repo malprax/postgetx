@@ -9,7 +9,7 @@ import 'package:postgetx/app/data/models/category_model.dart';
 import 'package:postgetx/app/data/models/order_lifecycle.dart';
 import 'package:postgetx/app/data/models/order_model.dart';
 import 'package:postgetx/app/core/services/pos_total_calculator.dart';
-import '../../../../utils/rupiah_formatter.dart';
+import 'package:postgetx/app/core/helpers/rupiah_formatter.dart';
 import '../../../shared/forms/form_validators.dart';
 import '../../../shared/widgets/malprax_button.dart';
 import '../../../shared/widgets/malprax_form_field.dart';

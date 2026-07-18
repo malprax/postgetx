@@ -5,7 +5,7 @@ import 'package:postgetx/app/data/models/user_model.dart';
 import 'package:postgetx/app/data/repositories/auth_repository.dart';
 import 'package:postgetx/repositories/local_hive_repository.dart';
 import 'package:postgetx/routes/app_routes.dart';
-import 'package:postgetx/config/app_config.dart';
+import 'package:postgetx/app/core/config/app_config.dart';
 
 class AuthController extends GetxController {
   final AuthRepository _repository = Get.find<LocalHiveRepository>();

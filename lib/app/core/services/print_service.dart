@@ -1,7 +1,7 @@
 import 'package:printing/printing.dart';
 
 import 'package:postgetx/app/data/models/order_model.dart';
-import 'package:postgetx/utils/pdf_helper.dart';
+import 'package:postgetx/app/core/services/pdf_helper.dart';
 import 'package:postgetx/app/core/services/printer_service.dart';
 
 /// Offline-safe printer implementation.

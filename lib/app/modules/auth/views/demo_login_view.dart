@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../../config/app_config.dart';
+import 'package:postgetx/app/core/config/app_config.dart';
 import '../../../../repositories/local_hive_repository.dart';
 import '../../../routes/app_routes.dart';
 import '../../../routes/browser_route_sync.dart';

@@ -114,6 +114,9 @@ void main() {
         'package:postgetx/themes/theme_controller.dart',
         'package:postgetx/themes/app_theme.dart',
         'package:postgetx/widgets/',
+        'package:postgetx/config/',
+        'package:postgetx/utils/',
+        'package:postgetx/services/order_service.dart',
       ];
 
       final violations = <String>[];

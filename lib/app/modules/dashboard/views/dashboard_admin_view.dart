@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:postgetx/config/app_config.dart';
+import 'package:postgetx/app/core/config/app_config.dart';
 import 'package:postgetx/routes/app_routes.dart';
 import 'package:postgetx/app/shared/widgets/demo_mode_banner.dart';
 import 'package:postgetx/app/shared/widgets/main_drawer.dart';
