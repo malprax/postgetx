@@ -247,6 +247,7 @@ class WorkspaceController extends GetxController {
           name: product.name,
           size: product.variants.first.size,
           price: product.variants.first.price,
+          costPrice: product.variants.first.costPrice,
           quantity: 1));
     } else if (cart[index].quantity < product.stock) {
       cart[index].quantity++;

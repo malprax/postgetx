@@ -157,6 +157,7 @@ class PosController extends GetxController {
         name: item.name,
         size: size,
         price: variant.price,
+        costPrice: variant.costPrice,
         quantity: 1,
       ));
     }
