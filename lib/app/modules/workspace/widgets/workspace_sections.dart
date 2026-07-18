@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
-import '../../../../models/menu_item_model.dart';
+import 'package:postgetx/app/data/models/menu_item_model.dart';
 import '../../../../models/category_model.dart';
 import '../../../../models/order_lifecycle.dart';
 import '../../../../models/order_model.dart';

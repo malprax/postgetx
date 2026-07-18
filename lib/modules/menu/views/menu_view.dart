@@ -1,10 +1,10 @@
 // lib/modules/menu/views/menu_view.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../models/menu_variant.dart';
+import 'package:postgetx/app/data/models/menu_variant.dart';
 import '../controllers/menu_controller.dart' as my_menu;
 import '../../category/controllers/category_controller.dart';
-import '../../../models/menu_item_model.dart';
+import 'package:postgetx/app/data/models/menu_item_model.dart';
 
 class MenuView extends StatelessWidget {
   MenuView({super.key});

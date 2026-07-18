@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../models/menu_item_model.dart';
-import '../../../models/menu_variant.dart';
+import 'package:postgetx/app/data/models/menu_item_model.dart';
+import 'package:postgetx/app/data/models/menu_variant.dart';
 import '../controllers/pos_controller.dart';
 
 class EditMenuView extends StatelessWidget {

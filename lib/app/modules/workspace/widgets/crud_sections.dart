@@ -3,13 +3,13 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../models/category_model.dart';
-import '../../../../models/menu_item_model.dart';
+import 'package:postgetx/app/data/models/menu_item_model.dart';
 import '../../../../models/order_lifecycle.dart';
 import '../../../../models/order_model.dart';
 import '../../../../models/role_permission.dart';
 import '../../../data/models/customer_model.dart';
-import '../../../../models/menu_variant.dart';
-import '../../../../services/product_image_service.dart';
+import 'package:postgetx/app/data/models/menu_variant.dart';
+import 'package:postgetx/app/core/services/product_image_service.dart';
 import '../../../../utils/rupiah_formatter.dart';
 import '../../../shared/forms/form_validators.dart';
 import '../../../shared/widgets/malprax_form_field.dart';

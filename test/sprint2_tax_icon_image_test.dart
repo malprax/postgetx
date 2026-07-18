@@ -11,12 +11,12 @@ import 'package:postgetx/app/shared/widgets/product_visual.dart';
 import 'package:postgetx/app/theme/category_icon_registry.dart';
 import 'package:postgetx/models/cart_item_model.dart';
 import 'package:postgetx/models/category_model.dart';
-import 'package:postgetx/models/menu_item_model.dart';
-import 'package:postgetx/models/menu_variant.dart';
+import 'package:postgetx/app/data/models/menu_item_model.dart';
+import 'package:postgetx/app/data/models/menu_variant.dart';
 import 'package:postgetx/models/order_model.dart';
 import 'package:postgetx/repositories/local_hive_repository.dart';
 import 'package:postgetx/services/pos_total_calculator.dart';
-import 'package:postgetx/services/product_image_service.dart';
+import 'package:postgetx/app/core/services/product_image_service.dart';
 import 'package:postgetx/services/receipt_data.dart';
 
 void main() {

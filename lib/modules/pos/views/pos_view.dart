@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
-import '../../../models/menu_variant.dart';
+import 'package:postgetx/app/data/models/menu_variant.dart';
 import '../../../routes/app_routes.dart';
 import '../../../widgets/demo_mode_banner.dart';
 import '../controllers/pos_controller.dart';

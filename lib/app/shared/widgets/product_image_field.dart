@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../models/category_model.dart';
-import '../../../models/menu_item_model.dart';
+import 'package:postgetx/app/data/models/menu_item_model.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_radius.dart';
 import '../../theme/app_spacing.dart';

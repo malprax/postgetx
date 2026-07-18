@@ -1,7 +1,7 @@
 // lib/modules/pos/widgets/menu_detail_bottom_sheet.dart
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:postgetx/models/menu_item_model.dart';
+import 'package:postgetx/app/data/models/menu_item_model.dart';
 import '../controllers/pos_controller.dart';
 
 class MenuDetailBottomSheet extends StatelessWidget {
