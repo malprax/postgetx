@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:postgetx/models/customer_model.dart';
+import 'package:postgetx/app/data/models/customer_model.dart';
 
 void main() {
   group('CustomerModel constructor', () {

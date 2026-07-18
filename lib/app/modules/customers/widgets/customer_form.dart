@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../models/customer_model.dart';
+import '../../../data/models/customer_model.dart';
 
 class CustomerForm extends StatefulWidget {
   const CustomerForm({
@@ -83,6 +83,14 @@ class _CustomerFormState extends State<CustomerForm> {
 
       if (mounted) {
         Navigator.of(context).pop(true);
+      }
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Customer gagal disimpan: $error'),
+          ),
+        );
       }
     } finally {
       if (mounted) {

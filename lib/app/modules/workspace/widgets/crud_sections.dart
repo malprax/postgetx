@@ -7,7 +7,7 @@ import '../../../../models/menu_item_model.dart';
 import '../../../../models/order_lifecycle.dart';
 import '../../../../models/order_model.dart';
 import '../../../../models/role_permission.dart';
-import '../../../../models/customer_model.dart';
+import '../../../data/models/customer_model.dart';
 import '../../../../models/menu_variant.dart';
 import '../../../../services/product_image_service.dart';
 import '../../../../utils/rupiah_formatter.dart';

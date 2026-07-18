@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:postgetx/config/app_config.dart';
-import 'package:postgetx/models/customer_model.dart';
+import 'package:postgetx/app/data/models/customer_model.dart';
 import 'package:postgetx/repositories/local_hive_repository.dart';
 
 void main() {
@@ -46,7 +46,7 @@ void main() {
     String id = '',
     String membershipId = '',
     String name = 'Budi Santoso',
-    String whatsapp = '081234567890',
+    String whatsapp = '081234567891',
     String phone = '081311112222',
     String email = 'budi@example.com',
   }) {
@@ -69,7 +69,7 @@ void main() {
     final created = await repository.createCustomer(
       createInput(
         name: '  Budi Santoso  ',
-        whatsapp: ' 0812-3456-7890 ',
+        whatsapp: ' 0812-3456-7891 ',
         phone: ' 0813-1111-2222 ',
         email: ' budi@example.com ',
       ),
@@ -78,8 +78,8 @@ void main() {
     expect(created.id, isNotEmpty);
     expect(created.membershipId, isNotEmpty);
     expect(created.name, 'Budi Santoso');
-    expect(created.whatsapp, '0812-3456-7890');
-    expect(created.normalizedWhatsapp, '6281234567890');
+    expect(created.whatsapp, '0812-3456-7891');
+    expect(created.normalizedWhatsapp, '6281234567891');
     expect(created.phone, '0813-1111-2222');
     expect(created.normalizedPhone, '6281311112222');
     expect(created.email, 'budi@example.com');
@@ -94,7 +94,7 @@ void main() {
   test('rejects duplicate WhatsApp in another format', () async {
     await repository.createCustomer(
       createInput(
-        whatsapp: '081234567890',
+        whatsapp: '081234567891',
         phone: '081311112222',
       ),
     );
@@ -103,7 +103,7 @@ void main() {
       () => repository.createCustomer(
         createInput(
           name: 'Duplicate Customer',
-          whatsapp: '+6281234567890',
+          whatsapp: '+6281234567891',
           phone: '081399999999',
           email: 'duplicate@example.com',
         ),
@@ -136,7 +136,7 @@ void main() {
     final created = await repository.createCustomer(createInput());
 
     final byWhatsapp = await repository.searchCustomers(
-      '+6281234567890',
+      '+6281234567891',
     );
 
     final byPhone = await repository.searchCustomers(
@@ -158,7 +158,7 @@ void main() {
     final created = await repository.createCustomer(createInput());
 
     final found = await repository.findCustomerByPhone(
-      '081234567890',
+      '081311112222',
     );
 
     expect(found?.id, created.id);

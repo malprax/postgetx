@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:postgetx/models/customer_model.dart';
-import 'package:postgetx/modules/customers/widgets/customer_form.dart';
+import 'package:postgetx/app/data/models/customer_model.dart';
+import 'package:postgetx/app/modules/customers/widgets/customer_form.dart';
 
 void main() {
   Widget buildSubject({
@@ -140,12 +140,22 @@ void main() {
       buildSubject(customer: customer),
     );
 
-    expect(find.text('Budi Santoso'), findsOneWidget);
-    expect(find.text('081234567890'), findsOneWidget);
-    expect(find.text('0411123456'), findsOneWidget);
-    expect(find.text('budi@example.com'), findsOneWidget);
-    expect(find.text('Makassar'), findsOneWidget);
-    expect(find.text('Pelanggan grosir'), findsOneWidget);
+    final fieldValues = tester
+        .widgetList<TextFormField>(find.byType(TextFormField))
+        .map((field) => field.controller?.text)
+        .toList();
+
+    expect(
+      fieldValues,
+      [
+        'Budi Santoso',
+        '081234567890',
+        '0411123456',
+        'budi@example.com',
+        'Makassar',
+        'Pelanggan grosir',
+      ],
+    );
   });
 
   testWidgets('submits edited customer data', (tester) async {
@@ -265,8 +275,8 @@ void main() {
       await tester.pump();
 
       expect(
-        tester.takeException(),
-        isA<StateError>(),
+        find.textContaining('Customer gagal disimpan: Bad state: Save failed'),
+        findsOneWidget,
       );
 
       await tester.pump();

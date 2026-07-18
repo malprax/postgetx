@@ -1,4 +1,4 @@
-import '../utils/customer_utils.dart';
+import '../../core/helpers/customer_utils.dart';
 
 class CustomerModel {
   final String id;

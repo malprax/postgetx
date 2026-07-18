@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:postgetx/models/customer_model.dart';
-import 'package:postgetx/repositories/customer_repository.dart';
-import 'package:postgetx/utils/customer_utils.dart';
+import 'package:postgetx/app/data/models/customer_model.dart';
+import 'package:postgetx/app/data/repositories/customer_repository.dart';
+import 'package:postgetx/app/core/helpers/customer_utils.dart';
 
 void main() {
   late FakeCustomerRepository repository;

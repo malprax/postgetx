@@ -19,7 +19,7 @@ import '../../../../services/pos_total_calculator.dart';
 import '../../../routes/app_routes.dart';
 import '../../../routes/browser_route_sync.dart';
 import '../../../routes/workspace_route_metadata.dart';
-import '../../../../models/customer_model.dart';
+import '../../../data/models/customer_model.dart';
 
 class ProductSale {
   const ProductSale(this.name, this.quantity);
