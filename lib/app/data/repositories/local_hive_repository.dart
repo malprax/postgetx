@@ -40,21 +40,26 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
   UserModel? _currentUser;
   final RepositoryWriteFaultInjector? _writeFaultInjector;
   LoyaltyConfiguration _loyaltyConfiguration;
+  LoyaltyTierRules _loyaltyTierRules;
   bool _operationInProgress = false;
 
   LocalHiveRepository({
     RepositoryWriteFaultInjector? writeFaultInjector,
     LoyaltyConfiguration loyaltyConfiguration = LoyaltyConfiguration.defaults,
+    LoyaltyTierRules loyaltyTierRules = LoyaltyTierRules.defaults,
   })  : _writeFaultInjector = writeFaultInjector,
-        _loyaltyConfiguration = loyaltyConfiguration;
+        _loyaltyConfiguration = loyaltyConfiguration,
+        _loyaltyTierRules = loyaltyTierRules;
 
   LocalHiveRepository.forBox(
     Box<dynamic> box, {
     RepositoryWriteFaultInjector? writeFaultInjector,
     LoyaltyConfiguration loyaltyConfiguration = LoyaltyConfiguration.defaults,
+    LoyaltyTierRules loyaltyTierRules = LoyaltyTierRules.defaults,
   })  : _box = box,
         _writeFaultInjector = writeFaultInjector,
-        _loyaltyConfiguration = loyaltyConfiguration;
+        _loyaltyConfiguration = loyaltyConfiguration,
+        _loyaltyTierRules = loyaltyTierRules;
 
   Future<void> initialize() async {
     await Hive.initFlutter();
@@ -310,10 +315,23 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
     _loyaltyConfiguration = configuration;
   }
 
+  LoyaltyTierRules get loyaltyTierRules => _loyaltyTierRules;
+
+  void applyLoyaltyTierRules(LoyaltyTierRules rules) {
+    final errors = rules.validate();
+
+    if (errors.isNotEmpty) {
+      throw FormatException(errors.join(' '));
+    }
+
+    _loyaltyTierRules = rules;
+  }
+
   LoyaltyRepository get loyaltyRepository => LocalLoyaltyRepository(
         HiveLoyaltyProvider(_box),
         actorId: () => _currentUser?.id ?? 'system',
         configuration: () => _loyaltyConfiguration,
+        tierRules: () => _loyaltyTierRules,
         lifetimeEligibleSpend: (customerId) {
           return _maps('transactions')
               .where(
@@ -1550,12 +1568,11 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
       final projectedLifetimeSpend =
           (tierProfileBefore?.lifetimeEligibleSpend ?? 0) + order.totalAmount;
 
-      final projectedTier =
-          LoyaltyTierRules.defaults.resolve(projectedLifetimeSpend);
+      final projectedTier = _loyaltyTierRules.resolve(projectedLifetimeSpend);
 
       final loyaltyPointsEarned = customerId.isEmpty
           ? 0
-          : LoyaltyTierRules.defaults.rewardedPoints(
+          : _loyaltyTierRules.rewardedPoints(
               basePoints: baseLoyaltyPoints,
               tier: projectedTier,
             );
