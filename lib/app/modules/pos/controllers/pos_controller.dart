@@ -11,7 +11,7 @@ import 'package:postgetx/app/data/models/category_model.dart';
 import '../views/edit_menu_view.dart';
 import 'package:postgetx/app/core/services/print_service.dart';
 import 'package:postgetx/app/core/services/pos_total_calculator.dart';
-import 'package:postgetx/repositories/local_hive_repository.dart';
+import 'package:postgetx/app/data/repositories/local_hive_repository.dart';
 import 'package:postgetx/app/modules/auth/controllers/auth_controller.dart';
 import 'package:postgetx/app/modules/dashboard/controllers/dashboard_controller.dart';
 import 'package:postgetx/app/modules/orders/controllers/order_history_controller.dart';

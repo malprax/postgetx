@@ -12,7 +12,7 @@ import 'package:postgetx/app/modules/dashboard/controllers/dashboard_controller.
 import 'package:postgetx/app/modules/dashboard/views/dashboard_admin_view.dart';
 import 'package:postgetx/app/modules/pos/controllers/pos_controller.dart';
 import 'package:postgetx/app/modules/pos/views/pos_view.dart';
-import 'package:postgetx/repositories/local_hive_repository.dart';
+import 'package:postgetx/app/data/repositories/local_hive_repository.dart';
 import 'package:postgetx/routes/app_routes.dart';
 import 'package:postgetx/app/theme/app_theme.dart';
 

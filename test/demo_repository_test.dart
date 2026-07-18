@@ -5,9 +5,9 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:postgetx/app/core/config/app_config.dart';
 import 'package:postgetx/app/data/models/cart_item_model.dart';
 import 'package:postgetx/app/data/models/customer_model.dart';
-import 'package:postgetx/models/expense_model.dart';
+import 'package:postgetx/app/data/models/expense_model.dart';
 import 'package:postgetx/app/data/models/order_model.dart';
-import 'package:postgetx/repositories/local_hive_repository.dart';
+import 'package:postgetx/app/data/repositories/local_hive_repository.dart';
 import 'package:postgetx/app/core/services/pos_total_calculator.dart';
 
 void main() {

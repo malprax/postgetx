@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:postgetx/app/core/config/app_config.dart';
 import 'package:postgetx/app/data/models/customer_model.dart';
-import 'package:postgetx/repositories/local_hive_repository.dart';
+import 'package:postgetx/app/data/repositories/local_hive_repository.dart';
 
 void main() {
   late Directory directory;

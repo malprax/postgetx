@@ -13,7 +13,7 @@ import 'package:postgetx/app/theme/app_layout.dart';
 import 'package:postgetx/app/theme/app_theme.dart';
 import 'package:postgetx/app/shared/widgets/malprax_form_field.dart';
 import 'package:postgetx/app/data/models/order_model.dart';
-import 'package:postgetx/repositories/local_hive_repository.dart';
+import 'package:postgetx/app/data/repositories/local_hive_repository.dart';
 import 'package:postgetx/app/core/services/printer_service.dart';
 import 'package:postgetx/app/core/services/pos_total_calculator.dart';
 import 'package:postgetx/app/modules/settings/controllers/theme_controller.dart';

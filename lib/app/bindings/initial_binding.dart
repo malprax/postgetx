@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 
-import '../../repositories/local_hive_repository.dart';
-import '../../repositories/pos_repository.dart';
+import 'package:postgetx/app/data/repositories/local_hive_repository.dart';
+import 'package:postgetx/app/data/repositories/pos_repository.dart';
 import 'package:postgetx/app/core/services/print_service.dart';
 import 'package:postgetx/app/core/services/printer_service.dart';
 import '../modules/workspace/controllers/workspace_controller.dart';

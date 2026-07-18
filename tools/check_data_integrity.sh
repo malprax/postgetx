@@ -18,13 +18,13 @@ if rg -n "['\"](draft|held|saved|completed|cancelled|refunded)['\"]" lib --glob 
   exit 1
 fi
 
-rg -q 'completeSale' lib/repositories/pos_repository.dart
-rg -q 'refundSale' lib/repositories/pos_repository.dart
-rg -q 'permanent_delete_disabled' lib/repositories/local_hive_repository.dart
-rg -q 'softDeleteOrder' lib/repositories/pos_repository.dart
-rg -q 'restoreOrder' lib/repositories/pos_repository.dart
-rg -q 'AppPermission' lib/repositories/local_hive_repository.dart
-rg -q 'NotificationRepository' lib/repositories/pos_repository.dart
-rg -q 'atomic_write_failed' lib/repositories/local_hive_repository.dart
+rg -q 'completeSale' lib/app/data/repositories/pos_repository.dart
+rg -q 'refundSale' lib/app/data/repositories/pos_repository.dart
+rg -q 'permanent_delete_disabled' lib/app/data/repositories/local_hive_repository.dart
+rg -q 'softDeleteOrder' lib/app/data/repositories/pos_repository.dart
+rg -q 'restoreOrder' lib/app/data/repositories/pos_repository.dart
+rg -q 'AppPermission' lib/app/data/repositories/local_hive_repository.dart
+rg -q 'NotificationRepository' lib/app/data/repositories/pos_repository.dart
+rg -q 'atomic_write_failed' lib/app/data/repositories/local_hive_repository.dart
 
 echo 'data integrity: ok'

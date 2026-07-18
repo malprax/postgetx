@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 
 import 'package:postgetx/app/data/models/user_model.dart';
-import 'package:postgetx/repositories/local_hive_repository.dart';
+import 'package:postgetx/app/data/repositories/local_hive_repository.dart';
 
 class UsersController extends GetxController {
   final repository = Get.find<LocalHiveRepository>();

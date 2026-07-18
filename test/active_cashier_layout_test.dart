@@ -9,7 +9,7 @@ import 'package:postgetx/app/modules/workspace/views/workspace_view.dart';
 import 'package:postgetx/app/modules/workspace/widgets/workspace_sections.dart';
 import 'package:postgetx/app/theme/app_theme.dart';
 import 'package:postgetx/app/data/models/order_model.dart';
-import 'package:postgetx/repositories/local_hive_repository.dart';
+import 'package:postgetx/app/data/repositories/local_hive_repository.dart';
 import 'package:postgetx/app/core/services/printer_service.dart';
 
 class _NoopPrinter implements PrinterService {

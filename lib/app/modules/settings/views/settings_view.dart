@@ -9,7 +9,7 @@ import 'package:postgetx/app/modules/category/controllers/category_controller.da
 import 'package:postgetx/app/modules/menu/controllers/menu_controller.dart'
     as app_menu;
 import 'package:postgetx/app/modules/users/controllers/user_controller.dart';
-import 'package:postgetx/repositories/local_hive_repository.dart';
+import 'package:postgetx/app/data/repositories/local_hive_repository.dart';
 import 'package:postgetx/app/modules/settings/controllers/theme_controller.dart';
 
 class SettingsView extends StatefulWidget {

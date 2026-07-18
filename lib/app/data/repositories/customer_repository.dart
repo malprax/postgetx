@@ -1,4 +1,4 @@
-import '../models/customer_model.dart';
+import 'package:postgetx/app/data/models/customer_model.dart';
 
 abstract class CustomerRepository {
   /// Mengambil seluruh customer.

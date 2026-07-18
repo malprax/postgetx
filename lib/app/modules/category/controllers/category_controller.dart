@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import 'package:postgetx/app/data/models/category_model.dart';
-import 'package:postgetx/repositories/local_hive_repository.dart';
+import 'package:postgetx/app/data/repositories/local_hive_repository.dart';
 
 class CategoryController extends GetxController {
   final repository = Get.find<LocalHiveRepository>();

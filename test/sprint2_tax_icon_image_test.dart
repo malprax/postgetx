@@ -14,7 +14,7 @@ import 'package:postgetx/app/data/models/category_model.dart';
 import 'package:postgetx/app/data/models/menu_item_model.dart';
 import 'package:postgetx/app/data/models/menu_variant.dart';
 import 'package:postgetx/app/data/models/order_model.dart';
-import 'package:postgetx/repositories/local_hive_repository.dart';
+import 'package:postgetx/app/data/repositories/local_hive_repository.dart';
 import 'package:postgetx/app/core/services/pos_total_calculator.dart';
 import 'package:postgetx/app/core/services/product_image_service.dart';
 import 'package:postgetx/app/data/models/receipt_data.dart';

@@ -26,11 +26,11 @@ if rg -n 'switch \(product\.categoryName\)|base64Decode\(' lib/app --glob '*.dar
   exit 1
 fi
 
-rg -q "'taxType'" lib/models/order_model.dart
-rg -q "'taxValue'" lib/models/order_model.dart
-rg -q "'taxAmount'" lib/models/order_model.dart
-rg -q "'iconName'" lib/models/category_model.dart
-rg -q "'imageBase64'" lib/models/menu_item_model.dart
+rg -q "'taxType'" lib/app/data/models/order_model.dart
+rg -q "'taxValue'" lib/app/data/models/order_model.dart
+rg -q "'taxAmount'" lib/app/data/models/order_model.dart
+rg -q "'iconName'" lib/app/data/models/category_model.dart
+rg -q "'imageBase64'" lib/app/data/models/menu_item_model.dart
 
 while IFS= read -r asset; do
   size=$(wc -c < "$asset")

@@ -2,7 +2,7 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 
 import 'app/app.dart';
-import 'repositories/local_hive_repository.dart';
+import 'package:postgetx/app/data/repositories/local_hive_repository.dart';
 import 'package:postgetx/app/modules/settings/controllers/theme_controller.dart';
 
 Future<void> main() async {

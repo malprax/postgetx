@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 
 import 'package:postgetx/app/data/models/user_model.dart';
-import 'package:postgetx/repositories/local_hive_repository.dart';
+import 'package:postgetx/app/data/repositories/local_hive_repository.dart';
 import 'package:postgetx/app/modules/auth/controllers/auth_controller.dart';
 
 class ProfileController extends GetxController {

@@ -57,6 +57,21 @@ void main() {
             'lib/app/data/models/role_permission.dart',
         'lib/modules/users': 'lib/app/modules/users',
         'lib/bindings/users_binding.dart': 'lib/app/modules/users/bindings',
+        'lib/modules/auth': 'lib/app/modules/auth',
+        'lib/repositories/auth_repository.dart':
+            'lib/app/data/repositories/auth_repository.dart',
+        'lib/modules/dashboard': 'lib/app/modules/dashboard',
+        'lib/modules/profile': 'lib/app/modules/profile',
+        'lib/modules/settings': 'lib/app/modules/settings',
+        'lib/themes/theme_controller.dart':
+            'lib/app/modules/settings/controllers/theme_controller.dart',
+        'lib/themes/app_theme.dart': 'lib/app/theme/app_theme.dart',
+        'lib/widgets': 'lib/app/shared/widgets',
+        'lib/config': 'lib/app/core/config',
+        'lib/utils': 'lib/app/core',
+        'lib/services/order_service.dart': 'lib/app/core/services',
+        'lib/models': 'lib/app/data/models',
+        'lib/repositories': 'lib/app/data/repositories',
       };
 
       for (final migration in migrations.entries) {
@@ -117,6 +132,8 @@ void main() {
         'package:postgetx/config/',
         'package:postgetx/utils/',
         'package:postgetx/services/order_service.dart',
+        'package:postgetx/models/',
+        'package:postgetx/repositories/',
       ];
 
       final violations = <String>[];
