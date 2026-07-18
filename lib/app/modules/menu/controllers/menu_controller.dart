@@ -1,8 +1,8 @@
 import 'package:get/get.dart';
-import '../../../models/category_model.dart';
+import 'package:postgetx/models/category_model.dart';
 import 'package:postgetx/app/data/models/menu_item_model.dart';
 import 'package:postgetx/app/data/models/menu_variant.dart';
-import '../../../repositories/local_hive_repository.dart';
+import 'package:postgetx/repositories/local_hive_repository.dart';
 
 class MenuController extends GetxController {
   final repository = Get.find<LocalHiveRepository>();

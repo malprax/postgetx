@@ -6,7 +6,8 @@ import '../../../modules/dashboard/controllers/dashboard_controller.dart';
 import '../../../modules/orders/controller/order_history_controller.dart';
 import '../../../modules/pos/controllers/pos_controller.dart';
 import '../../../modules/category/controllers/category_controller.dart';
-import '../../../modules/menu/controllers/menu_controller.dart' as app_menu;
+import 'package:postgetx/app/modules/menu/controllers/menu_controller.dart'
+    as app_menu;
 import '../../../modules/users/controllers/user_controller.dart';
 import '../../../repositories/local_hive_repository.dart';
 import '../../../themes/theme_controller.dart';

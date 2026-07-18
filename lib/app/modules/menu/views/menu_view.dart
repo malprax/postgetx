@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:postgetx/app/data/models/menu_variant.dart';
 import '../controllers/menu_controller.dart' as my_menu;
-import '../../category/controllers/category_controller.dart';
+import 'package:postgetx/modules/category/controllers/category_controller.dart';
 import 'package:postgetx/app/data/models/menu_item_model.dart';
 
 class MenuView extends StatelessWidget {
