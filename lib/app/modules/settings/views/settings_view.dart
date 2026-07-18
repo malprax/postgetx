@@ -11,6 +11,7 @@ import 'package:postgetx/app/modules/menu/controllers/menu_controller.dart'
 import 'package:postgetx/app/modules/users/controllers/user_controller.dart';
 import 'package:postgetx/app/data/repositories/local_hive_repository.dart';
 import 'package:postgetx/app/modules/settings/controllers/theme_controller.dart';
+import 'package:postgetx/app/modules/settings/widgets/loyalty_configuration_card.dart';
 
 class SettingsView extends StatefulWidget {
   const SettingsView({super.key});
@@ -92,6 +93,13 @@ class _SettingsViewState extends State<SettingsView> {
               ], selected: {
                 theme.preference.value
               }, onSelectionChanged: (value) => theme.select(value.first))),
+          const SizedBox(height: 28),
+          Text(
+            'Customer loyalty',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: 8),
+          const LoyaltyConfigurationCard(),
           const SizedBox(height: 28),
           Text('Demo data', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 8),
