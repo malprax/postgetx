@@ -10,6 +10,7 @@ import 'package:postgetx/app/data/models/role_permission.dart';
 import '../../../data/models/customer_model.dart';
 import 'package:postgetx/app/data/models/menu_variant.dart';
 import 'package:postgetx/app/data/models/loyalty_ledger_entry.dart';
+import 'package:postgetx/app/modules/customers/widgets/customer_loyalty_tier_summary.dart';
 import 'package:postgetx/app/core/services/product_image_service.dart';
 import 'package:postgetx/app/core/services/loyalty_points_policy.dart';
 import 'package:postgetx/app/core/helpers/rupiah_formatter.dart';
@@ -171,6 +172,7 @@ class CrudSection extends GetView<WorkspaceController> {
               'Email',
               'Member',
               'Contact',
+              'Tier',
               'Points',
               'Actions'
             ],
@@ -182,6 +184,12 @@ class CrudSection extends GetView<WorkspaceController> {
                       Text(customer.phone.trim().isEmpty
                           ? 'No phone'
                           : customer.phone),
+                      CustomerLoyaltyTierSummary(
+                        profile: controller.loyaltyTierProfileFor(
+                          customer.id,
+                        ),
+                        compact: true,
+                      ),
                       Text(
                         '${controller.loyaltyBalanceFor(customer.id)} pts',
                         key: ValueKey('loyalty-balance-${customer.id}'),
@@ -932,6 +940,12 @@ class CrudSection extends GetView<WorkspaceController> {
                       fontWeight: FontWeight.w800,
                       color: AppColors.primary,
                     ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              CustomerLoyaltyTierSummary(
+                profile: controller.loyaltyTierProfileFor(
+                  customer.id,
+                ),
               ),
               const SizedBox(height: AppSpacing.md),
               if (ledger.isEmpty)

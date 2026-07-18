@@ -9,6 +9,7 @@ import 'package:postgetx/app/data/models/menu_item_model.dart';
 import 'package:postgetx/app/data/models/menu_variant.dart';
 import 'package:postgetx/app/data/models/local_notification_model.dart';
 import 'package:postgetx/app/data/models/loyalty_ledger_entry.dart';
+import 'package:postgetx/app/data/models/loyalty_tier.dart';
 import 'package:postgetx/app/data/models/order_lifecycle.dart';
 import 'package:postgetx/app/data/models/order_model.dart';
 import 'package:postgetx/app/data/models/role_permission.dart';
@@ -47,6 +48,7 @@ class WorkspaceController extends GetxController {
   final orders = <OrderModel>[].obs;
   final customers = <CustomerModel>[].obs;
   final loyaltyBalances = <String, int>{}.obs;
+  final loyaltyTierProfiles = <String, CustomerLoyaltyTierProfile>{}.obs;
   final selectedCheckoutCustomer = Rxn<CustomerModel>();
   final loyaltyPointsToRedeem = 0.obs;
   final expenses = <ExpenseModel>[].obs;
@@ -104,6 +106,19 @@ class WorkspaceController extends GetxController {
       Map<String, int>.fromIterables(
         customers.map((customer) => customer.id),
         balances,
+      ),
+    );
+
+    final tierProfiles = await Future.wait(
+      customers.map(
+        (customer) => loyaltyRepository.getTierProfile(customer.id),
+      ),
+    );
+
+    loyaltyTierProfiles.assignAll(
+      Map<String, CustomerLoyaltyTierProfile>.fromIterables(
+        customers.map((customer) => customer.id),
+        tierProfiles,
       ),
     );
 
@@ -552,6 +567,18 @@ class WorkspaceController extends GetxController {
 
   int loyaltyBalanceFor(String customerId) {
     return loyaltyBalances[customerId] ?? 0;
+  }
+
+  CustomerLoyaltyTierProfile loyaltyTierProfileFor(
+    String customerId,
+  ) {
+    return loyaltyTierProfiles[customerId] ??
+        CustomerLoyaltyTierProfile(
+          customerId: customerId,
+          lifetimeEligibleSpend: 0,
+          tier: LoyaltyTier.member,
+          pointsMultiplier: 1,
+        );
   }
 
   Future<List<LoyaltyLedgerEntry>> loyaltyLedgerFor(
