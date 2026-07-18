@@ -47,6 +47,11 @@ void main() {
         'lib/modules/stock': 'lib/app/modules/stock',
         'lib/bindings/stock_binding.dart': 'lib/app/modules/stock/bindings',
         'lib/services/stock_service.dart': 'lib/app/modules/stock',
+        'lib/modules/tracking': 'lib/app/modules/tracking',
+        'lib/bindings/tracking_binding.dart':
+            'lib/app/modules/tracking/bindings',
+        'lib/bindings/tracking_log_binding.dart':
+            'lib/app/modules/tracking/bindings',
       };
 
       for (final migration in migrations.entries) {
@@ -89,6 +94,9 @@ void main() {
         'package:postgetx/modules/stock/',
         'package:postgetx/bindings/stock_binding.dart',
         'package:postgetx/services/stock_service.dart',
+        'package:postgetx/modules/tracking/',
+        'package:postgetx/bindings/tracking_binding.dart',
+        'package:postgetx/bindings/tracking_log_binding.dart',
       ];
 
       final violations = <String>[];
