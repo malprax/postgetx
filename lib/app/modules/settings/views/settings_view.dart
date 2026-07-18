@@ -11,7 +11,9 @@ import 'package:postgetx/app/modules/menu/controllers/menu_controller.dart'
 import 'package:postgetx/app/modules/users/controllers/user_controller.dart';
 import 'package:postgetx/app/data/repositories/local_hive_repository.dart';
 import 'package:postgetx/app/modules/settings/controllers/theme_controller.dart';
+import 'package:postgetx/app/modules/settings/controllers/loyalty_tier_rules_controller.dart';
 import 'package:postgetx/app/modules/settings/widgets/loyalty_configuration_card.dart';
+import 'package:postgetx/app/modules/settings/widgets/loyalty_tier_rules_form.dart';
 
 class SettingsView extends StatefulWidget {
   const SettingsView({super.key});
@@ -72,6 +74,8 @@ class _SettingsViewState extends State<SettingsView> {
   @override
   Widget build(BuildContext context) {
     final theme = Get.find<ThemeController>();
+    final tierController = Get.find<LoyaltyTierRulesController>();
+
     return Scaffold(
         appBar: AppBar(title: const Text('Demo Settings')),
         body: ListView(padding: const EdgeInsets.all(20), children: [
@@ -100,6 +104,20 @@ class _SettingsViewState extends State<SettingsView> {
           ),
           const SizedBox(height: 8),
           const LoyaltyConfigurationCard(),
+          const SizedBox(height: 20),
+          Obx(
+            () => LoyaltyTierRulesForm(
+              key: ValueKey(
+                tierController.rules.value.toMap().toString(),
+              ),
+              initialRules: tierController.rules.value,
+              onSave: (rules) async {
+                final saved = await tierController.save(rules);
+
+                return saved ? null : tierController.errorMessage.value;
+              },
+            ),
+          ),
           const SizedBox(height: 28),
           Text('Demo data', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 8),
