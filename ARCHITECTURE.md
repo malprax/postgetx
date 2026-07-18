@@ -36,6 +36,10 @@ Business behavior is protected by native Flutter BDD scenarios under
 Given–When–Then outcomes and pass `tools/check_bdd.sh`. BDD scenarios supplement
 lower-level tests and remain independent of implementation details.
 
+The complete test suite must also generate an HTML coverage report through
+`tools/check_coverage.sh`. The generated report is available locally at
+`coverage/html/index.html` and is intentionally excluded from version control.
+
 Hive boxes are initialized before `runApp`. `InitialBinding` maps abstractions to local implementations. No view or controller opens a Hive box directly.
 
 Order and stock integrity rules are documented in [docs/ORDER_LIFECYCLE.md](docs/ORDER_LIFECYCLE.md). Checkout and refunds are application-level atomic repository operations with snapshot rollback and idempotency flags.

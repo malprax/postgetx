@@ -51,3 +51,6 @@ ios/Runner/GoogleService-Info.plist
 lib/firebase_options.dart
 
 
+
+# Generated Flutter test coverage
+coverage/

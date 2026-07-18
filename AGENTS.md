@@ -35,6 +35,7 @@ dart format lib test tools
 flutter analyze
 flutter test test/architecture_guard_test.dart
 flutter test
+bash tools/check_coverage.sh
 bash tools/check_all.sh
 git diff --check
 ```

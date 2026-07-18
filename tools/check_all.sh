@@ -12,6 +12,6 @@ bash tools/check_offline_media.sh
 bash tools/check_bdd.sh
 dart format --set-exit-if-changed lib test
 flutter analyze
-flutter test
+bash tools/check_coverage.sh
 git diff --check
 echo "all checks: ok"
