@@ -15,6 +15,8 @@ class ReceiptData {
     required this.loyaltyDiscount,
     required this.loyaltyPointsEarned,
     required this.loyaltyBalanceAfter,
+    required this.loyaltyTier,
+    required this.loyaltyPointsMultiplier,
     required this.customerName,
     required this.taxableAmount,
     required this.taxType,
@@ -39,6 +41,8 @@ class ReceiptData {
         loyaltyDiscount: order.loyaltyDiscount,
         loyaltyPointsEarned: order.loyaltyPointsEarned,
         loyaltyBalanceAfter: order.loyaltyBalanceAfter,
+        loyaltyTier: order.loyaltyTier,
+        loyaltyPointsMultiplier: order.loyaltyPointsMultiplier,
         customerName: order.customerName,
         taxableAmount: order.taxableAmount,
         taxType: order.taxType,
@@ -62,6 +66,8 @@ class ReceiptData {
   final double loyaltyDiscount;
   final int loyaltyPointsEarned;
   final int loyaltyBalanceAfter;
+  final String loyaltyTier;
+  final double loyaltyPointsMultiplier;
   final String? customerName;
   final double taxableAmount;
   final TaxType taxType;

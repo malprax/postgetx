@@ -15,6 +15,8 @@ class OrderModel {
   final double loyaltyDiscount;
   final int loyaltyPointsEarned;
   final int loyaltyBalanceAfter;
+  final String loyaltyTier;
+  final double loyaltyPointsMultiplier;
   final double taxableAmount;
   final double paid;
   final double change;
@@ -66,6 +68,8 @@ class OrderModel {
     this.loyaltyDiscount = 0,
     this.loyaltyPointsEarned = 0,
     this.loyaltyBalanceAfter = 0,
+    this.loyaltyTier = 'member',
+    this.loyaltyPointsMultiplier = 1,
     double? taxableAmount,
     required this.paid,
     required this.change,
@@ -131,6 +135,8 @@ class OrderModel {
       'loyaltyDiscount': loyaltyDiscount,
       'loyaltyPointsEarned': loyaltyPointsEarned,
       'loyaltyBalanceAfter': loyaltyBalanceAfter,
+      'loyaltyTier': loyaltyTier,
+      'loyaltyPointsMultiplier': loyaltyPointsMultiplier,
       'taxableAmount': taxableAmount,
       'paid': paid,
       'change': change,
@@ -196,6 +202,9 @@ class OrderModel {
       loyaltyDiscount: (map['loyaltyDiscount'] as num?)?.toDouble() ?? 0,
       loyaltyPointsEarned: (map['loyaltyPointsEarned'] as num?)?.toInt() ?? 0,
       loyaltyBalanceAfter: (map['loyaltyBalanceAfter'] as num?)?.toInt() ?? 0,
+      loyaltyTier: map['loyaltyTier']?.toString() ?? 'member',
+      loyaltyPointsMultiplier:
+          (map['loyaltyPointsMultiplier'] as num?)?.toDouble() ?? 1,
       taxableAmount: (map['taxableAmount'] as num?)?.toDouble() ??
           subtotal -
               discount -
@@ -265,6 +274,8 @@ class OrderModel {
     double? loyaltyDiscount,
     int? loyaltyPointsEarned,
     int? loyaltyBalanceAfter,
+    String? loyaltyTier,
+    double? loyaltyPointsMultiplier,
     double? taxableAmount,
     double? paid,
     double? change,
@@ -317,6 +328,9 @@ class OrderModel {
         loyaltyDiscount: loyaltyDiscount ?? this.loyaltyDiscount,
         loyaltyPointsEarned: loyaltyPointsEarned ?? this.loyaltyPointsEarned,
         loyaltyBalanceAfter: loyaltyBalanceAfter ?? this.loyaltyBalanceAfter,
+        loyaltyTier: loyaltyTier ?? this.loyaltyTier,
+        loyaltyPointsMultiplier:
+            loyaltyPointsMultiplier ?? this.loyaltyPointsMultiplier,
         taxableAmount: taxableAmount ?? this.taxableAmount,
         paid: paid ?? this.paid,
         change: change ?? this.change,

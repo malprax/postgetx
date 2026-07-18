@@ -1584,6 +1584,8 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
       final completed = order.copyWith(
         loyaltyPointsEarned: loyaltyPointsEarned,
         loyaltyBalanceAfter: loyaltyBalanceAfter,
+        loyaltyTier: projectedTier.name,
+        loyaltyPointsMultiplier: _loyaltyTierRules.multiplierFor(projectedTier),
         status: OrderStatus.completed,
         completedAt: now,
         paidAt: now,

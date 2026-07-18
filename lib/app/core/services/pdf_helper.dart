@@ -57,6 +57,10 @@ class PdfHelper {
               pw.SizedBox(height: 10),
               pw.Text('Customer: ${receipt.customerName}'),
               pw.Text(
+                'Tier: ${receipt.loyaltyTier.toUpperCase()} '
+                '(x${receipt.loyaltyPointsMultiplier})',
+              ),
+              pw.Text(
                 'Points earned: ${receipt.loyaltyPointsEarned}',
               ),
               pw.Text(
