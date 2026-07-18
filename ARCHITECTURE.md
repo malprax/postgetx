@@ -23,8 +23,9 @@ Views only render reactive state and send user intent. Controllers aggregate che
 
 Top-level source folders such as `lib/models`, `lib/modules`,
 `lib/repositories`, `lib/services`, `lib/routes`, `lib/themes`, `lib/widgets`,
-`lib/utils`, `lib/bindings`, and `lib/config` are migration-only legacy paths.
-They must not receive new source files and will be removed domain by domain.
+`lib/utils`, `lib/bindings`, and `lib/config` are forbidden. Production source
+must remain under `lib/app`; only `lib/main.dart` is exempt. This boundary is
+enforced by `test/architecture_guard_test.dart`.
 
 Every completed domain migration must be recorded in
 `test/architecture_guard_test.dart`. A structural change is incomplete until

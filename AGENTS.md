@@ -27,10 +27,11 @@ Read `ARCHITECTURE.md` before changing source structure.
 Before handoff, run:
 
 ```text
-dart format lib test
+dart format lib test tools
 flutter analyze
 flutter test test/architecture_guard_test.dart
 flutter test
+bash tools/check_all.sh
 git diff --check
 ```
 
