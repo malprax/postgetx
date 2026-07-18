@@ -1,102 +1,80 @@
-// dashboard_controller.dart
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
+import '../../../repositories/local_hive_repository.dart';
 
 class DashboardController extends GetxController {
-  final RxInt ordersToday = 0.obs;
-  final RxInt lowStockCount = 0.obs;
-  final RxInt activeCustomers = 0.obs;
+  final repository = Get.find<LocalHiveRepository>();
 
-  final RxList<Map<String, dynamic>> salesData = <Map<String, dynamic>>[].obs;
+  final ordersToday = 0.obs;
+  final todaySales = 0.0.obs;
+  final lowStockCount = 0.obs;
+  final activeCustomers = 0.obs;
+  final salesData = <Map<String, dynamic>>[].obs;
+  final revision = 0.obs;
 
   @override
   void onInit() {
-    debugAuthContext();
-    fetchDashboardStats();
-    fetchSalesChart();
     super.onInit();
+    refreshDashboard();
   }
 
-  Future<void> debugAuthContext() async {
-    final u = FirebaseAuth.instance.currentUser;
-    await u?.getIdToken(true); // force refresh token
-
-    final token = await u?.getIdTokenResult(true);
-    final doc =
-        await FirebaseFirestore.instance.collection('users').doc(u!.uid).get();
-
-    debugPrint('DBG uid=${u.uid}');
-    debugPrint('DBG token.role=${token?.claims?['role']}');
-    debugPrint('DBG users.role=${doc.data()?['role']}');
-  }
-
-  Future<void> fetchDashboardStats() async {
+  Future<void> refreshDashboard() async {
+    final orders = await repository.getTransactions();
+    final products = await repository.getProducts();
+    final customers = await repository.getCustomers();
     final now = DateTime.now();
-    final start = DateTime(now.year, now.month, now.day);
-    final end = start.add(const Duration(days: 1));
-    final startTs = Timestamp.fromDate(start);
-    final endTs = Timestamp.fromDate(end);
 
-    // Orders today
-    try {
-      final orderSnap = await FirebaseFirestore.instance
-          .collection('orders')
-          .where('createdAt', isGreaterThanOrEqualTo: startTs)
-          .where('createdAt', isLessThan: endTs)
-          .get();
-      ordersToday.value = orderSnap.docs.length;
-    } catch (e) {
-      print('error fetching orders today: $e');
-      Get.snackbar('Error', 'Gagal mengambil data pesanan hari ini');
-    }
+    final todayOrders = orders.where(
+      (order) =>
+          order.createdAt.year == now.year &&
+          order.createdAt.month == now.month &&
+          order.createdAt.day == now.day,
+    );
 
-    // Low stock
-    final stockSnap = await FirebaseFirestore.instance
-        .collection('products')
-        .where('stock', isLessThanOrEqualTo: 5)
-        .get();
-    lowStockCount.value = stockSnap.docs.length;
+    ordersToday.value = todayOrders.length;
 
-    // Active customers
-    final userSnap = await FirebaseFirestore.instance
-        .collection('users')
-        .where('role', isEqualTo: 'customer')
-        .where('isActive', isEqualTo: true)
-        .get();
-    activeCustomers.value = userSnap.docs.length;
+    todaySales.value = todayOrders.fold<double>(
+      0,
+      (sum, order) => sum + order.totalAmount,
+    );
+
+    lowStockCount.value = products
+        .where(
+          (product) => product.stock <= product.lowStockThreshold,
+        )
+        .length;
+
+    activeCustomers.value = customers.length;
+
+    salesData.assignAll(
+      List.generate(7, (index) {
+        final day = DateTime(now.year, now.month, now.day).subtract(
+          Duration(days: 6 - index),
+        );
+
+        final total = orders
+            .where(
+              (order) =>
+                  order.createdAt.year == day.year &&
+                  order.createdAt.month == day.month &&
+                  order.createdAt.day == day.day,
+            )
+            .fold<double>(
+              0,
+              (sum, order) => sum + order.totalAmount,
+            );
+
+        return {
+          'day': '${day.day}/${day.month}',
+          'total': total,
+        };
+      }),
+    );
+
+    revision.value++;
   }
 
-  Future<void> fetchSalesChart() async {
-    final now = DateTime.now();
-    List<Map<String, dynamic>> chart = [];
+  Future<void> fetchDashboardStats() => refreshDashboard();
 
-    for (int i = 6; i >= 0; i--) {
-      final day = now.subtract(Duration(days: i));
-      final start = DateTime(day.year, day.month, day.day);
-      final end = start.add(const Duration(days: 1));
-
-      final startTs = Timestamp.fromDate(start);
-      final endTs = Timestamp.fromDate(end);
-
-      try {
-        final orders = await FirebaseFirestore.instance
-            .collection('orders')
-            .where('createdAt', isGreaterThanOrEqualTo: startTs)
-            .where('createdAt', isLessThan: endTs)
-            .get();
-
-        debugPrint('DBG probe orders.length=${orders.docs.length}');
-        chart.add({
-          'day': '${start.day}/${start.month}',
-          'total': orders.docs.length,
-        });
-      } catch (e) {
-        debugPrint('DBG probe orders error -> $e');
-      }
-    }
-
-    salesData.assignAll(chart);
-  }
+  Future<void> fetchSalesChart() => refreshDashboard();
 }

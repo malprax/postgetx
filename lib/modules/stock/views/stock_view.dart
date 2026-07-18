@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../controllers/stock_controller.dart';
 
 class StockView extends StatelessWidget {
+  StockView({super.key});
   final stockC = Get.put(StockController());
   final nameC = TextEditingController();
   final qtyC = TextEditingController();

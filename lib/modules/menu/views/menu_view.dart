@@ -7,6 +7,7 @@ import '../../category/controllers/category_controller.dart';
 import '../../../models/menu_item_model.dart';
 
 class MenuView extends StatelessWidget {
+  MenuView({super.key});
   final my_menu.MenuController menuController =
       Get.put(my_menu.MenuController());
   final CategoryController categoryController = Get.put(CategoryController());
@@ -45,7 +46,7 @@ class MenuView extends StatelessWidget {
               Obx(() {
                 final cats = categoryController.categories;
                 return DropdownButtonFormField<String>(
-                  value: cats.isNotEmpty ? cats.first.id : null,
+                  initialValue: cats.isNotEmpty ? cats.first.id : null,
                   items: cats
                       .map((cat) => DropdownMenuItem(
                             value: cat.id,
@@ -142,11 +143,11 @@ class MenuView extends StatelessWidget {
                 description: descriptionController.text.trim(),
                 categoryId: catId,
                 categoryName: catName,
-                imageUrl: '',
                 variants: variants.toList(),
               );
 
               await menuController.saveMenu(menu);
+              if (!context.mounted) return;
               Navigator.of(context).pop();
             },
             child: const Text("Simpan"),
@@ -205,10 +206,7 @@ class MenuView extends StatelessWidget {
           itemBuilder: (_, index) {
             final item = items[index];
             return ListTile(
-              leading: item.imageUrl != null && item.imageUrl!.isNotEmpty
-                  ? Image.network(item.imageUrl!,
-                      width: 50, height: 50, fit: BoxFit.cover)
-                  : const Icon(Icons.image_not_supported),
+              leading: const Icon(Icons.inventory_2_outlined),
               title: Text(item.name),
               subtitle: Text(item.categoryName!),
               trailing: IconButton(

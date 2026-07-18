@@ -9,7 +9,12 @@ class MenuItemModel {
   final String? categoryName; // only for display
   final List<MenuVariant> variants;
   final String? description;
-  final String? imageUrl;
+  final String imageBase64;
+  final String imageMimeType;
+  final String imageName;
+  final String sku;
+  final int stock;
+  final int lowStockThreshold;
 
   MenuItemModel({
     required this.id,
@@ -18,7 +23,12 @@ class MenuItemModel {
     this.categoryName,
     required this.variants,
     this.description,
-    this.imageUrl,
+    this.imageBase64 = '',
+    this.imageMimeType = '',
+    this.imageName = '',
+    this.sku = '',
+    this.stock = 0,
+    this.lowStockThreshold = 5,
   });
 
   factory MenuItemModel.fromMap(String id, Map<String, dynamic> data) {
@@ -32,7 +42,12 @@ class MenuItemModel {
               .toList() ??
           [],
       description: data['description'],
-      imageUrl: data['imageUrl'],
+      imageBase64: data['imageBase64']?.toString() ?? '',
+      imageMimeType: data['imageMimeType']?.toString() ?? '',
+      imageName: data['imageName']?.toString() ?? '',
+      sku: data['sku']?.toString() ?? id.toUpperCase(),
+      stock: (data['stock'] as num?)?.toInt() ?? 0,
+      lowStockThreshold: (data['lowStockThreshold'] as num?)?.toInt() ?? 5,
     );
   }
 
@@ -43,7 +58,12 @@ class MenuItemModel {
       'categoryName': categoryName, // stored for display
       'variants': variants.map((v) => v.toMap()).toList(),
       'description': description,
-      'imageUrl': imageUrl,
+      'imageBase64': imageBase64,
+      'imageMimeType': imageMimeType,
+      'imageName': imageName,
+      'sku': sku,
+      'stock': stock,
+      'lowStockThreshold': lowStockThreshold,
     };
   }
 
@@ -54,7 +74,12 @@ class MenuItemModel {
     String? categoryName,
     List<MenuVariant>? variants,
     String? description,
-    String? imageUrl,
+    String? imageBase64,
+    String? imageMimeType,
+    String? imageName,
+    String? sku,
+    int? stock,
+    int? lowStockThreshold,
   }) {
     return MenuItemModel(
       id: id ?? this.id,
@@ -63,7 +88,14 @@ class MenuItemModel {
       categoryName: categoryName ?? this.categoryName,
       variants: variants ?? this.variants,
       description: description ?? this.description,
-      imageUrl: imageUrl ?? this.imageUrl,
+      imageBase64: imageBase64 ?? this.imageBase64,
+      imageMimeType: imageMimeType ?? this.imageMimeType,
+      imageName: imageName ?? this.imageName,
+      sku: sku ?? this.sku,
+      stock: stock ?? this.stock,
+      lowStockThreshold: lowStockThreshold ?? this.lowStockThreshold,
     );
   }
+
+  bool get hasImage => imageBase64.trim().isNotEmpty;
 }

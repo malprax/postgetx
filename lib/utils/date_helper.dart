@@ -21,7 +21,7 @@ class DateHelper {
     return DateFormat("yyyy-MM-dd HH:mm").format(date);
   }
 
-  /// Dapatkan tanggal hari ini dalam string (misalnya untuk ID dokumen Firestore)
+  /// Dapatkan tanggal hari ini dalam string untuk ID lokal.
   static String todayAsString() {
     return formatShortDate(DateTime.now());
   }

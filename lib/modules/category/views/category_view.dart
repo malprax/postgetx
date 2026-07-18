@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../controllers/category_controller.dart';
 
 class CategoryView extends StatelessWidget {
+  CategoryView({super.key});
   final CategoryController controller = Get.put(CategoryController());
 
   final TextEditingController nameController = TextEditingController();

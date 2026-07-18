@@ -68,27 +68,12 @@ class MainDrawer extends StatelessWidget {
               title: 'User Management',
               route: Routes.users,
             ),
-            _drawerTile(
-              icon: Icons.receipt_long,
-              title: 'Audit Logs',
-              route: Routes.auditlogs,
-            ),
           ],
 
           // =======================
           // Customer
           // =======================
           if (user != null && role == 'customer') ...[
-            _drawerTile(
-              icon: Icons.loyalty,
-              title: 'Loyalty Program',
-              route: Routes.loyalty,
-            ),
-            _drawerTile(
-              icon: Icons.shopping_cart_checkout,
-              title: 'Pre-Order',
-              route: Routes.preorder,
-            ),
             _drawerTile(
               icon: Icons.track_changes,
               title: 'Order Tracking',
@@ -105,6 +90,11 @@ class MainDrawer extends StatelessWidget {
               title: 'My Profile',
               route: Routes.profile,
             ),
+          if (user != null)
+            _drawerTile(
+                icon: Icons.settings,
+                title: 'Demo Settings',
+                route: Routes.settings),
 
           // =======================
           // Logout (semua login)

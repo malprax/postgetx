@@ -1,58 +1,45 @@
-// lib/modules/users/controllers/user_controller.dart
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+
 import '../../../models/user_model.dart';
+import '../../../repositories/local_hive_repository.dart';
 
 class UsersController extends GetxController {
+  final repository = Get.find<LocalHiveRepository>();
+
   final userList = <UserModel>[].obs;
   final isLoading = false.obs;
 
   @override
   void onInit() {
-    fetchUsers();
     super.onInit();
+    fetchUsers();
   }
 
   Future<void> fetchUsers() async {
+    isLoading.value = true;
+
     try {
-      isLoading.value = true;
-      final snapshot =
-          await FirebaseFirestore.instance.collection('users').get();
-
-      final users = snapshot.docs.map((doc) {
-        return UserModel.fromMap(doc.id, doc.data());
-      }).toList();
-
-      userList.assignAll(users);
-    } catch (e) {
-      print("[UsersController] Error fetching users: $e");
-      Get.snackbar("Gagal Memuat Pengguna",
-          "Pastikan Anda memiliki izin sebagai admin.");
+      userList.assignAll(
+        await repository.getUsers(),
+      );
     } finally {
       isLoading.value = false;
     }
   }
 
   Future<void> toggleStatus(UserModel user) async {
-    try {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .update({
-        'isActive': !user.isActive,
-      });
-      fetchUsers();
-    } catch (e) {
-      Get.snackbar("Error", "Gagal mengubah status: $e");
-    }
+    await repository.saveUser(
+      user.copyWith(
+        isActive: !user.isActive,
+        updatedAt: DateTime.now(),
+      ),
+    );
+
+    await fetchUsers();
   }
 
-  Future<void> deleteUser(String uid) async {
-    try {
-      await FirebaseFirestore.instance.collection('users').doc(uid).delete();
-      fetchUsers();
-    } catch (e) {
-      Get.snackbar("Error", "Gagal menghapus pengguna: $e");
-    }
+  Future<void> deleteUser(String id) async {
+    await repository.deleteUser(id);
+    await fetchUsers();
   }
 }

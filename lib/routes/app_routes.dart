@@ -7,6 +7,7 @@ abstract class Routes {
 
   static const users = '/users';
   static const profile = '/profile';
+  static const settings = '/settings';
   static const auditlogs = '/audit-logs';
 
   static const menuform = '/menu-form';

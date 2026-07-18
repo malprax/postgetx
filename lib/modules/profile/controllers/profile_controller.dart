@@ -1,63 +1,67 @@
 import 'package:get/get.dart';
-import 'package:postgetx/services/auth_service.dart';
-import 'package:postgetx/services/storage_service.dart';
+
 import '../../../models/user_model.dart';
-import '../../../services/user_service.dart';
+import '../../../repositories/local_hive_repository.dart';
 import '../../auth/controllers/auth_controller.dart';
-import 'dart:io';
-import 'package:image_picker/image_picker.dart';
 
 class ProfileController extends GetxController {
   final auth = Get.find<AuthController>();
-  final userService = UserService();
-  final storageService = StorageService();
+  final repository = Get.find<LocalHiveRepository>();
 
-  final authService = AuthService();
-
-  final Rxn<UserModel> user = Rxn<UserModel>();
-  final RxBool isLoading = false.obs;
+  final user = Rxn<UserModel>();
+  final isLoading = false.obs;
 
   @override
   void onInit() {
-    user.value = auth.currentUserModel.value;
     super.onInit();
+    user.value = auth.currentUserModel.value;
   }
 
-  Future<void> updateName(String newName) async {
+  Future<void> updateName(String name) async {
+    final current = user.value;
+
+    if (current == null) {
+      return;
+    }
+
+    final trimmedName = name.trim();
+
+    if (trimmedName.isEmpty) {
+      Get.snackbar(
+        'Nama tidak valid',
+        'Nama pengguna wajib diisi.',
+      );
+      return;
+    }
+
     isLoading.value = true;
 
-    final updated = user.value!.copyWith(name: newName);
-    await userService.saveUser(updated);
-
-    user.value = updated;
-    auth.currentUserModel.value = updated;
-
-    isLoading.value = false;
-    Get.snackbar('Berhasil', 'Nama berhasil diperbarui');
-  }
-
-  Future<void> sendResetPassword(String email) async {
     try {
-      await authService.sendPasswordReset(email);
-      Get.snackbar("Berhasil", "Link ganti password dikirim ke $email");
-    } catch (e) {
-      Get.snackbar("Gagal", e.toString());
+      final updated = current.copyWith(
+        name: trimmedName,
+        updatedAt: DateTime.now(),
+      );
+
+      await repository.saveUser(updated);
+
+      user.value = updated;
+      auth.currentUserModel.value = updated;
+    } finally {
+      isLoading.value = false;
     }
   }
 
+  Future<void> sendResetPassword(String email) async {
+    Get.snackbar(
+      'Offline demo',
+      'Passwords are local; use demo123.',
+    );
+  }
+
   Future<void> uploadProfilePicture() async {
-    final picker = ImagePicker();
-    final picked = await picker.pickImage(source: ImageSource.gallery);
-    if (picked == null) return;
-
-    final url = await storageService.uploadUserPhoto(
-        File(picked.path), user.value!.uid);
-
-    final updated = user.value!.copyWith(photoUrl: url);
-    await userService.saveUser(updated);
-    user.value = updated;
-    auth.currentUserModel.value = updated;
-
-    Get.snackbar("Berhasil", "Foto profil diperbarui");
+    Get.snackbar(
+      'Offline demo',
+      'Profile photo upload is disabled.',
+    );
   }
 }

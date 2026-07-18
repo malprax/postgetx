@@ -1,172 +1,51 @@
-// lib/modules/auth/controllers/auth_controller.dart
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import '../../../models/user_model.dart';
+import '../../../repositories/auth_repository.dart';
+import '../../../repositories/local_hive_repository.dart';
 import '../../../routes/app_routes.dart';
+import '../../../config/app_config.dart';
 
 class AuthController extends GetxController {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  final currentUser = Rxn<User>();
-  final firebaseUser = Rxn<User>();
+  final AuthRepository _repository = Get.find<LocalHiveRepository>();
   final currentUserModel = Rxn<UserModel>();
-  final emailVerified = false.obs;
-  final isUserModelLoaded = false.obs;
+  final emailVerified = true.obs;
+  final isUserModelLoaded = true.obs;
   final isPasswordVisible = false.obs;
-
-  // TextEditingControllers
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
+  final emailController = TextEditingController(text: AppConfig.demoEmail);
+  final passwordController =
+      TextEditingController(text: AppConfig.demoPassword);
   final nameController = TextEditingController();
 
-  @override
-  void onInit() {
-    super.onInit();
-    _auth.authStateChanges().listen((user) async {
-      currentUser.value = user;
-      firebaseUser.value = user;
-
-      if (user != null) {
-        await loadUserModel(user.uid);
-        emailVerified.value = user.emailVerified;
-
-        // Redirect jika berada di login atau root
-        if (Get.currentRoute == Routes.login || Get.currentRoute == '/') {
-          _redirectBasedOnRole();
-        }
-      } else {
-        currentUserModel.value = null;
-        emailVerified.value = false;
-        isUserModelLoaded.value = true;
-      }
-    });
-  }
-
-  Future<void> loadUserModel(String uid) async {
-    final doc =
-        await FirebaseFirestore.instance.collection('users').doc(uid).get();
-    if (doc.exists) {
-      currentUserModel.value =
-          UserModel.fromMap(doc.id, doc.data() as Map<String, dynamic>);
-    }
-    isUserModelLoaded.value = true;
-  }
-
-  Future<void> sendVerificationEmail() async {
-    final user = _auth.currentUser;
-    if (user != null && !user.emailVerified) {
-      await user.sendEmailVerification();
-    }
-  }
-
-  Future<void> reloadEmailStatus() async {
-    final user = _auth.currentUser;
-    if (user != null) {
-      await user.reload();
-      final refreshedUser = _auth.currentUser!;
-      firebaseUser.value = refreshedUser;
-      emailVerified.value = refreshedUser.emailVerified;
-    }
-  }
-
-  Future<void> forgotPassword() async {
-    final email = emailController.text.trim();
-    if (email.isEmpty) {
-      Get.snackbar('Error', 'Email harus diisi');
-      return;
-    }
-    try {
-      await _auth.sendPasswordResetEmail(email: email);
-      Get.snackbar('Terkirim', 'Link reset password telah dikirim.');
-    } catch (e) {
-      Get.snackbar('Gagal', 'Terjadi kesalahan: $e');
-    }
-  }
-
   Future<void> login() async {
-    final email = emailController.text.trim();
-    final password = passwordController.text.trim();
-
-    if (email.isEmpty || password.isEmpty) {
-      Get.snackbar('Error', 'Email dan Password harus diisi');
-      return;
-    }
-
     try {
-      final result = await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
+      currentUserModel.value = await _repository.login(
+        email: emailController.text.trim(),
+        password: passwordController.text,
       );
-
-      if (!result.user!.emailVerified) {
-        Get.snackbar(
-            'Email Belum Aktif', 'Silakan verifikasi email terlebih dahulu.');
-        await _auth.signOut();
-        return;
-      }
-
-      await loadUserModel(result.user!.uid);
-      _redirectBasedOnRole();
-    } catch (e) {
-      Get.snackbar('Login Gagal', 'Terjadi kesalahan: $e');
+      Get.offAllNamed(Routes.dashboard);
+    } catch (error) {
+      Get.snackbar('Local demo login failed', error.toString());
     }
   }
 
-  void _redirectBasedOnRole() {
-    // Gunakan route dashboard saja → AppPages akan memilih view berdasarkan role
-    Get.offAllNamed(Routes.dashboard);
-  }
-
-  Future<void> register({required String role}) async {
-    final name = nameController.text.trim();
-    final email = emailController.text.trim();
-    final password = passwordController.text.trim();
-
-    if (name.isEmpty || email.isEmpty || password.isEmpty) {
-      Get.snackbar('Error', 'Semua field wajib diisi');
-      return;
-    }
-
-    try {
-      final result = await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-
-      final uid = result.user!.uid;
-
-      await FirebaseFirestore.instance.collection('users').doc(uid).set({
-        'name': name,
-        'email': email,
-        'role': role,
-        'isActive': true,
-        'createdAt': FieldValue.serverTimestamp(),
-      });
-
-      await FirebaseFirestore.instance.collection('roles').doc(uid).set({
-        'role': role,
-      });
-
-      await sendVerificationEmail();
-      Get.snackbar('Berhasil', 'Registrasi berhasil. Verifikasi email Anda.');
-      await logout();
-    } catch (e) {
-      Get.snackbar('Gagal Registrasi', 'Terjadi kesalahan: $e');
-    }
+  Future<void> loginAsDemo() async {
+    emailController.text = AppConfig.demoEmail;
+    passwordController.text = AppConfig.demoPassword;
+    await login();
   }
 
   Future<void> logout() async {
-    await _auth.signOut();
-    currentUser.value = null;
-    firebaseUser.value = null;
+    await _repository.logout();
     currentUserModel.value = null;
-    emailVerified.value = false;
-    isUserModelLoaded.value = false;
-    emailController.clear();
-    passwordController.clear();
-    nameController.clear();
+    Get.offAllNamed(Routes.login);
   }
+
+  Future<void> forgotPassword() async =>
+      Get.snackbar('Offline demo', 'Use password demo123. No email is sent.');
+  Future<void> sendVerificationEmail() async {}
+  Future<void> reloadEmailStatus() async => emailVerified.value = true;
+  Future<void> register({required String role}) async =>
+      Get.snackbar('Offline demo', 'Account registration is disabled.');
 }

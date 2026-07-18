@@ -46,10 +46,10 @@ class MenuDetailBottomSheet extends StatelessWidget {
 
           ...item.variants.map(
             (variant) => ListTile(
-              title: Text(variant.size ?? '-'),
-              trailing: Text(currencyFormat.format(variant.price ?? 0)),
+              title: Text(variant.size),
+              trailing: Text(currencyFormat.format(variant.price)),
               onTap: () {
-                controller.addItem(item, variant.size ?? '-');
+                controller.addItem(item, variant.size);
                 Navigator.pop(context);
               },
             ),

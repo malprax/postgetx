@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/pos_controller.dart';
-import '../../../models/category_model.dart';
 
 class AddCategoryView extends StatelessWidget {
   AddCategoryView({super.key});

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:postgetx/modules/orders/controller/order_controller.dart';
 
 class OrderView extends StatelessWidget {
+  OrderView({super.key});
   final orderC = Get.put(OrderController());
   final customerC = TextEditingController();
   final itemC = TextEditingController();

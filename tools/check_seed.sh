@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+rg -q "seedVersion" lib/repositories/local_hive_repository.dart
+for key in users categories products customers transactions expenses notifications; do
+  rg -q "'$key'" lib/repositories/local_hive_repository.dart
+done
+rg -q "currentSchemaVersion = 5" lib/repositories/local_hive_repository.dart
+rg -q "owner@demo.local" lib/config/app_config.dart
+rg -q "staff@demo.local" lib/config/app_config.dart
+echo "seed: ok"

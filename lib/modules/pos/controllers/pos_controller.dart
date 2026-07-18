@@ -1,24 +1,29 @@
 // lib/modules/pos/controllers/pos_controller.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:logger/web.dart';
 import '../../../models/menu_item_model.dart';
 import '../../../models/cart_item_model.dart';
 import '../../../models/menu_variant.dart';
 import '../../../models/order_model.dart';
+import '../../../models/order_lifecycle.dart';
 import '../../../models/category_model.dart';
 import '../views/edit_menu_view.dart';
 import '../../../services/print_service.dart';
+import '../../../services/pos_total_calculator.dart';
+import '../../../repositories/local_hive_repository.dart';
+import '../../auth/controllers/auth_controller.dart';
+import '../../dashboard/controllers/dashboard_controller.dart';
+import '../../orders/controller/order_history_controller.dart';
 
 class PosController extends GetxController {
   final logger = Logger();
-  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  final LocalHiveRepository repository = Get.find<LocalHiveRepository>();
   final PrintService _printService = PrintService();
 
   RxBool isPaymentEmpty = true.obs;
   RxBool isPaymentSufficient = true.obs;
+  RxBool processingCheckout = false.obs;
   RxList<MenuItemModel> allMenus = <MenuItemModel>[].obs;
   RxList<CartItemModel> cartItems = <CartItemModel>[].obs;
   RxList<CategoryModel> categories = <CategoryModel>[].obs;
@@ -49,17 +54,13 @@ class PosController extends GetxController {
 
   Future<void> fetchMenus() async {
     try {
-      final snapshot = await firestore.collection('menus').get();
-      allMenus.assignAll(snapshot.docs.map((doc) {
-        final data = doc.data();
-        return MenuItemModel.fromMap(doc.id, data);
-      }).toList());
+      allMenus.assignAll(await repository.getProducts());
 
       if (selectedCategory.value != null) {
         filterMenuByCategory(selectedCategory.value!.id);
       }
     } catch (e) {
-      print('❌ Error fetching menus: $e');
+      debugPrint('Error fetching menus: $e');
     }
   }
 
@@ -76,34 +77,70 @@ class PosController extends GetxController {
   }
 
   Future<void> checkoutAndPrint() async {
-    currentUserEmail.value = FirebaseAuth.instance.currentUser?.email ?? '';
-    recalculateTotal(); // pastikan paidAmount dan totalChange terupdate
+    if (processingCheckout.value) return;
+    processingCheckout.value = true;
+    try {
+      currentUserEmail.value =
+          Get.find<AuthController>().currentUserModel.value?.email ??
+              'demo@local';
+      recalculateTotal(); // pastikan paidAmount dan totalChange terupdate
 
-    if (!isPaymentSufficient.value) {
-      Get.snackbar('Error', 'Pembayaran kurang');
-      return;
+      if (!isPaymentSufficient.value) {
+        Get.snackbar('Error', 'Pembayaran kurang');
+        return;
+      }
+
+      final id = DateTime.now().millisecondsSinceEpoch.toString();
+      final calculation = const PosTotalCalculator().calculate(
+        items: cartItems,
+        discountType: DiscountType.percentage,
+        discountValue: discount.value,
+        amountPaid: double.tryParse(payment.text.trim()) ?? 0,
+      );
+
+      final order = OrderModel(
+        orderId: id,
+        id: id,
+        items: cartItems.toList(),
+        subtotal: calculation.subtotal,
+        discountType: calculation.discountType,
+        discountValue: calculation.discountValue,
+        discount: calculation.discountAmount,
+        taxableAmount: calculation.taxableAmount,
+        taxType: calculation.taxType,
+        taxValue: calculation.taxValue,
+        taxAmount: calculation.taxAmount,
+        totalAmount: calculation.total,
+        paid: calculation.amountPaid,
+        change: calculation.change,
+        createdBy: currentUserEmail.value,
+        createdAt: DateTime.now(),
+        status: OrderStatus.draft,
+        receiptStatus: ReceiptState.pending,
+      );
+
+      final result = await repository.completeSale(order);
+      if (!result.isSuccess) {
+        Get.snackbar('Checkout failed', result.message!);
+        return;
+      }
+      if (Get.isRegistered<DashboardController>()) {
+        await Get.find<DashboardController>().refreshDashboard();
+      }
+      if (Get.isRegistered<OrderHistoryController>()) {
+        await Get.find<OrderHistoryController>().fetchOrders();
+      }
+
+      await _printService.printOrder(result.value!);
+      await repository.updateReceiptStatus(
+          result.value!.id, ReceiptState.printed);
+
+      resetCart();
+      Get.snackbar(
+          'Sale complete', 'Saved locally. Dashboard totals are updated.');
+    } finally {
+      processingCheckout.value = false;
     }
-
-    final id = DateTime.now().millisecondsSinceEpoch.toString();
-
-    final order = OrderModel(
-      orderId: id,
-      id: id,
-      items: cartItems.toList(),
-      totalAmount: totalAmount.value, // total sebelum diskon
-      discount: discount.value,
-      paid: double.tryParse(payment.text.trim()) ?? 0.0,
-      change: totalChange.value,
-      createdBy: currentUserEmail.value,
-      createdAt: Timestamp.now(),
-    );
-
-    await firestore.collection('orders').doc(order.id).set(order.toMap());
-
-    await _printService.printOrder(order); // ✅ panggil printer
-
-    resetCart();
-    Get.snackbar('Sukses', 'Pembayaran dan cetak nota berhasil');
   }
 
   void addItem(MenuItemModel item, String size) {
@@ -159,44 +196,68 @@ class PosController extends GetxController {
 
     final paid = double.tryParse(paidText) ?? 0.0;
 
-    totalAmount.value =
-        cartItems.fold(0.0, (sum, item) => sum + (item.price * item.quantity));
-    totalAfterDiscount.value =
-        totalAmount.value * ((100 - discount.value) / 100);
-
-    final change = paid - totalAfterDiscount.value;
-    totalChange.value = change < 0 ? 0.0 : change;
-
-    isPaymentSufficient.value = paid >= totalAfterDiscount.value;
+    final calculation = const PosTotalCalculator().calculate(
+      items: cartItems,
+      discountType: DiscountType.percentage,
+      discountValue: discount.value,
+      amountPaid: paid,
+    );
+    totalAmount.value = calculation.subtotal;
+    totalAfterDiscount.value = calculation.total;
+    totalChange.value = calculation.change;
+    isPaymentSufficient.value = paid >= calculation.total;
   }
 
   Future<void> checkout() async {
-    if (cartItems.isEmpty) return;
+    if (cartItems.isEmpty || processingCheckout.value) return;
+    processingCheckout.value = true;
+    try {
+      final user = Get.find<AuthController>().currentUserModel.value;
+      if (user == null) {
+        Get.snackbar('Error', 'User belum login');
+        return;
+      }
 
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      Get.snackbar('Error', 'User belum login');
-      return;
+      final orderId =
+          "ORD-${DateTime.now().millisecondsSinceEpoch}-${DateTime.now().second}";
+      final calculation = const PosTotalCalculator().calculate(
+        items: cartItems,
+        discountType: DiscountType.percentage,
+        discountValue: discount.value,
+        amountPaid: double.tryParse(payment.text.trim()) ?? 0,
+      );
+
+      final order = OrderModel(
+        id: orderId,
+        orderId: orderId,
+        items: cartItems.toList(),
+        subtotal: calculation.subtotal,
+        discountType: calculation.discountType,
+        discountValue: calculation.discountValue,
+        discount: calculation.discountAmount,
+        taxableAmount: calculation.taxableAmount,
+        taxType: calculation.taxType,
+        taxValue: calculation.taxValue,
+        taxAmount: calculation.taxAmount,
+        totalAmount: calculation.total,
+        paid: calculation.amountPaid,
+        change: calculation.change,
+        createdAt: DateTime.now(),
+        createdBy: user.uid,
+        status: OrderStatus.draft,
+        receiptStatus: ReceiptState.pending,
+      );
+
+      final result = await repository.completeSale(order);
+      if (!result.isSuccess) {
+        Get.snackbar('Checkout failed', result.message!);
+        return;
+      }
+      Get.snackbar('Sukses', 'Order berhasil disimpan');
+      resetCart();
+    } finally {
+      processingCheckout.value = false;
     }
-
-    final orderId =
-        "ORD-${DateTime.now().millisecondsSinceEpoch}-${DateTime.now().second}";
-
-    final order = OrderModel(
-      id: '',
-      orderId: orderId,
-      items: cartItems.toList(),
-      totalAmount: totalAmount.value,
-      discount: discount.value,
-      paid: double.tryParse(payment.text) ?? 0.0,
-      change: totalChange.value,
-      createdAt: Timestamp.now(),
-      createdBy: user.uid,
-    );
-
-    await firestore.collection('orders').add(order.toMap());
-    Get.snackbar('Sukses', 'Order berhasil disimpan');
-    resetCart();
   }
 
   void resetCart() {
@@ -210,11 +271,7 @@ class PosController extends GetxController {
 
   Future<void> fetchCategories() async {
     try {
-      final snapshot = await firestore.collection('categories').get();
-      final fetched = snapshot.docs.map((doc) {
-        final data = doc.data();
-        return CategoryModel.fromMap(doc.id, data);
-      }).toList();
+      final fetched = await repository.getCategories();
 
       categories.assignAll(fetched);
 
@@ -222,7 +279,7 @@ class PosController extends GetxController {
         selectedCategory.value = fetched.first;
       }
     } catch (e) {
-      print('❌ Error fetching categories: $e');
+      debugPrint('Error fetching categories: $e');
     }
   }
 
@@ -267,8 +324,7 @@ class PosController extends GetxController {
       return;
     }
 
-    final doc = await firestore.collection('categories').add({'name': name});
-    final newCategory = CategoryModel(id: doc.id, name: name);
+    final newCategory = await repository.addCategory(name);
 
     categories.add(newCategory);
     selectedCategory.value = newCategory;
@@ -305,7 +361,7 @@ class PosController extends GetxController {
             ),
             const SizedBox(height: 8),
             DropdownButtonFormField<CategoryModel>(
-              value: selected,
+              initialValue: selected,
               decoration: const InputDecoration(labelText: 'Kategori'),
               items: categories
                   .map((cat) => DropdownMenuItem(
@@ -354,27 +410,13 @@ class PosController extends GetxController {
     required CategoryModel category,
     required String image,
   }) async {
-    final newMenu = {
-      'name': name,
-      'categoryId': category.id,
-      'categoryName': category.name,
-      'imageUrl': image,
-      'variants': [
-        {'size': 'default', 'price': price.toDouble()}
-      ],
-      'createdAt': FieldValue.serverTimestamp(),
-    };
-
-    final doc = await firestore.collection('menus').add(newMenu);
-
-    allMenus.add(MenuItemModel(
-      id: doc.id,
-      name: name,
-      categoryId: category.id,
-      categoryName: category.name,
-      imageUrl: image,
-      variants: [MenuVariant(size: 'default', price: price.toDouble())],
-    ));
+    allMenus.add(await repository.addProduct(
+        name: name,
+        categoryId: category.id,
+        categoryName: category.name,
+        sku: 'POS-${DateTime.now().microsecondsSinceEpoch}',
+        stock: 0,
+        variants: [MenuVariant(size: 'default', price: price.toDouble())]));
 
     Get.snackbar('Berhasil', 'Menu "$name" ditambahkan');
   }
@@ -382,13 +424,9 @@ class PosController extends GetxController {
   Future<void> editMenu(
       String menuId, String newName, List<MenuVariant> updatedVariants) async {
     try {
-      await firestore.collection('menus').doc(menuId).update({
-        'name': newName,
-        'variants': updatedVariants
-            .map((v) => {'size': v.size, 'price': v.price})
-            .toList(),
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
+      final current = allMenus.firstWhere((menu) => menu.id == menuId);
+      await repository.updateProduct(
+          current.copyWith(name: newName, variants: updatedVariants));
 
       await fetchMenus(); // Refresh menu list
       Get.snackbar('Sukses', 'Menu berhasil diperbarui');
@@ -408,85 +446,28 @@ class PosController extends GetxController {
     final index = allMenus.indexWhere((m) => m.id == menuId);
     if (index == -1) return;
 
-    await firestore.collection('menus').doc(menuId).update({
-      'name': name,
-      'variants': [
-        {'size': 'default', 'price': price},
-      ],
-    });
-
     final updated = allMenus[index];
-    allMenus[index] = updated.copyWith(
+    final replacement = updated.copyWith(
       name: name,
       variants: [MenuVariant(size: 'default', price: price)],
     );
+    await repository.updateProduct(replacement);
+    allMenus[index] = replacement;
 
     allMenus.refresh();
     Get.snackbar('Berhasil', 'Menu diperbarui');
   }
 
   Future<void> deleteMenu(MenuItemModel menu) async {
-    await firestore.collection('menus').doc(menu.id).delete();
+    await repository.deleteProduct(menu.id);
     allMenus.removeWhere((m) => m.id == menu.id);
     Get.snackbar('Sukses', 'Menu dihapus');
   }
 
   Future<void> migrateMenuCategoryId() async {
     try {
-      logger.i("🔄 Memulai proses migrasi categoryId...");
-
-      final menuSnapshot = await firestore.collection('menus').get();
-      logger.i("📦 Total menu ditemukan: ${menuSnapshot.docs.length}");
-
-      final categorySnapshot = await firestore.collection('categories').get();
-      logger.i("📁 Total kategori ditemukan: ${categorySnapshot.docs.length}");
-
-      final categoryMap = {
-        for (var doc in categorySnapshot.docs) doc['name']: doc.id,
-      };
-      logger.d("🗺️ categoryMap: $categoryMap");
-
-      int updatedCount = 0;
-
-      for (var doc in menuSnapshot.docs) {
-        final data = doc.data();
-        final menuId = doc.id;
-        final menuName = data['name'] ?? 'Unknown';
-
-        logger.d("🔍 Memeriksa menu: $menuId ($menuName)");
-
-        if (!data.containsKey('categoryId') &&
-            data.containsKey('categoryName')) {
-          final categoryName = data['categoryName'];
-          final categoryId = categoryMap[categoryName];
-
-          logger.d(
-              "➡️ Menu '$menuName' pakai categoryName: $categoryName → categoryId: $categoryId");
-
-          if (categoryId != null) {
-            await firestore.collection('menus').doc(menuId).update({
-              'categoryId': categoryId,
-            });
-            updatedCount++;
-            logger.i(
-                "✅ Berhasil update menu '$menuName' ($menuId) → categoryId: $categoryId");
-          } else {
-            logger.w(
-                "⚠️ Tidak ditemukan categoryId untuk categoryName: $categoryName");
-          }
-        } else {
-          logger.d(
-              "⏭️ Lewatkan menu $menuId, sudah punya categoryId atau tidak punya categoryName.");
-        }
-      }
-
-      logger.i("🎉 Migrasi selesai. Total menu diperbarui: $updatedCount");
-
-      Get.snackbar(
-        'Migrasi Selesai',
-        '$updatedCount menu diperbarui.',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      logger.i('Local data already uses category IDs.');
+      Get.snackbar('Offline demo', 'No migration is required.');
     } catch (e, stacktrace) {
       logger.e(
         "❌ Terjadi error saat migrasi",

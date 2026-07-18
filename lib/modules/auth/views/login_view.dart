@@ -1,170 +1,111 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:postgetx/modules/auth/controllers/auth_controller.dart';
-import 'register_view.dart';
+
+import '../../../config/app_config.dart';
+import '../controllers/auth_controller.dart';
 
 class LoginView extends StatelessWidget {
   LoginView({super.key});
-
-  final AuthController authController = Get.put(AuthController());
+  final auth = Get.find<AuthController>();
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-
+    final colors = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 195, 213, 248),
-      body: Stack(
-        children: [
-          Center(
-            child: Container(
-              width: 800,
-              height: 500,
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(32),
-              ),
-              child: Row(
-                children: [
-                  /// Illustration
-                  Expanded(
-                    child: Image.asset(
-                      'assets/login_amico.png', // pastikan asset ini ada di pubspec.yaml
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                  const VerticalDivider(width: 32),
-
-                  /// Form Section
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text(
-                          "Login",
-                          style: TextStyle(
-                            fontSize: 26,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                        TextField(
-                          controller: authController.emailController,
-                          decoration: InputDecoration(
-                            labelText: 'Email',
-                            prefixIcon: const Icon(Icons.email_outlined),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Obx(() => TextField(
-                              controller: authController.passwordController,
-                              obscureText:
-                                  !authController.isPasswordVisible.value,
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 980),
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(28),
+                  child: LayoutBuilder(builder: (context, constraints) {
+                    final compact = constraints.maxWidth < 720;
+                    final intro = Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.point_of_sale_rounded,
+                              size: 54, color: colors.primary),
+                          const SizedBox(height: 20),
+                          Text(AppConfig.productName,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headlineMedium
+                                  ?.copyWith(fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 8),
+                          Text(AppConfig.subtitle,
+                              style: Theme.of(context).textTheme.titleMedium),
+                          const SizedBox(height: 20),
+                          const Text(
+                              'Explore a complete offline checkout flow in under three minutes. Everything stays in this browser.'),
+                          const SizedBox(height: 16),
+                          const Chip(
+                              avatar: Icon(Icons.lock_outline, size: 18),
+                              label: Text('Local demo data only')),
+                          const SizedBox(height: 12),
+                          const Text(AppConfig.versionLabel),
+                        ]);
+                    final form = Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text('Enter the demo',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headlineSmall
+                                  ?.copyWith(fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 8),
+                          const Text(
+                              'Credentials are visible and pre-filled for public visitors.'),
+                          const SizedBox(height: 20),
+                          TextField(
+                              controller: auth.emailController,
+                              keyboardType: TextInputType.emailAddress,
+                              decoration: const InputDecoration(
+                                  labelText: 'Demo email',
+                                  prefixIcon: Icon(Icons.email_outlined))),
+                          const SizedBox(height: 12),
+                          Obx(() => TextField(
+                              controller: auth.passwordController,
+                              obscureText: !auth.isPasswordVisible.value,
                               decoration: InputDecoration(
-                                labelText: 'Password',
-                                prefixIcon: const Icon(Icons.lock_outline),
-                                suffixIcon: IconButton(
-                                  icon: Icon(
-                                    authController.isPasswordVisible.value
-                                        ? Icons.visibility
-                                        : Icons.visibility_off,
-                                  ),
-                                  onPressed: () {
-                                    authController.isPasswordVisible.toggle();
-                                  },
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                            )),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: TextButton(
-                            onPressed: () {
-                              Get.toNamed(
-                                  '/forgot-password'); // Pastikan rute ini ada di AppRoutes
-                            },
-                            child: const Text("Forgot Password?"),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 48,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              authController.login();
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  const Color.fromARGB(255, 5, 82, 236),
-                              foregroundColor:
-                                  const Color.fromARGB(237, 255, 255, 255),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            child: const Text("Log In"),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        const Text("Or Continue With"),
-                        const SizedBox(height: 12),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Icon(Icons.g_mobiledata, size: 32),
-                            SizedBox(width: 16),
-                            Icon(Icons.facebook, size: 32),
-                            SizedBox(width: 16),
-                            Icon(Icons.apple, size: 32),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        TextButton(
-                          onPressed: () {
-                            Get.to(
-                                () => RegisterView(enableRoleSelection: false));
-                          },
-                          child: const Text.rich(
-                            TextSpan(
-                              children: [
-                                TextSpan(text: "Don't have an account? "),
-                                TextSpan(
-                                  text: "Sign Up here",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                )
-                              ],
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                ],
+                                  labelText: 'Demo password',
+                                  prefixIcon: const Icon(Icons.lock_outline),
+                                  suffixIcon: IconButton(
+                                      onPressed: auth.isPasswordVisible.toggle,
+                                      icon: Icon(auth.isPasswordVisible.value
+                                          ? Icons.visibility_off
+                                          : Icons.visibility))))),
+                          const SizedBox(height: 12),
+                          SelectableText(
+                              '${AppConfig.demoEmail}  •  ${AppConfig.demoPassword}',
+                              textAlign: TextAlign.center),
+                          const SizedBox(height: 16),
+                          FilledButton.icon(
+                              onPressed: auth.loginAsDemo,
+                              icon: const Icon(Icons.play_arrow_rounded),
+                              label: const Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 14),
+                                  child: Text('Enter Demo'))),
+                        ]);
+                    if (compact) {
+                      return Column(
+                          children: [intro, const SizedBox(height: 32), form]);
+                    }
+                    return Row(children: [
+                      Expanded(child: intro),
+                      const SizedBox(width: 48),
+                      Expanded(child: form)
+                    ]);
+                  }),
+                ),
               ),
             ),
           ),
-
-          /// ⬅️ Back Button
-          Positioned(
-            top: 40,
-            left: 24,
-            child: IconButton(
-              icon: const Icon(Icons.arrow_back),
-              color: Colors.black87,
-              tooltip: 'Kembali',
-              onPressed: () {
-                Get.back();
-              },
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

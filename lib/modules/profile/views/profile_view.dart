@@ -14,8 +14,9 @@ class ProfileView extends StatelessWidget {
       appBar: AppBar(title: const Text('Profil Saya')),
       body: Obx(() {
         final user = controller.user.value;
-        if (user == null)
+        if (user == null) {
           return const Center(child: CircularProgressIndicator());
+        }
 
         nameC.text = user.name;
 
@@ -25,16 +26,13 @@ class ProfileView extends StatelessWidget {
             children: [
               Center(
                 child: Obx(() {
-                  final photoUrl = controller.user.value?.photoUrl;
                   return Stack(
                     alignment: Alignment.bottomRight,
                     children: [
                       CircleAvatar(
                         radius: 50,
-                        backgroundImage: photoUrl != null && photoUrl.isNotEmpty
-                            ? NetworkImage(photoUrl)
-                            : const AssetImage('assets/default_avatar.png')
-                                as ImageProvider,
+                        backgroundImage:
+                            const AssetImage('assets/default_avatar.png'),
                       ),
                       IconButton(
                         icon: const Icon(Icons.camera_alt),

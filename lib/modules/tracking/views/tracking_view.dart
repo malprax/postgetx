@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../controllers/tracking_controller.dart';
 
 class TrackingView extends StatelessWidget {
+  TrackingView({super.key});
   final trackingC = Get.put(TrackingController());
   final orderIdC = TextEditingController();
 

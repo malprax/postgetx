@@ -1,28 +1,25 @@
 // lib/routes/app_pages.dart
 import 'package:get/get.dart';
 import 'package:postgetx/bindings/pos_binding.dart';
-import 'package:postgetx/modules/audit/views/audit_log_view.dart';
 import 'package:postgetx/modules/auth/controllers/auth_controller.dart';
 import 'package:postgetx/modules/auth/views/forgot_password_view.dart';
 import 'package:postgetx/modules/dashboard/views/dashboard_admin_view.dart';
 import 'package:postgetx/modules/dashboard/views/dashboard_customer_view.dart';
 import 'package:postgetx/modules/dashboard/views/dashboard_guest_view.dart';
 import 'package:postgetx/modules/dashboard/views/dashboard_staff_view.dart';
-import 'package:postgetx/modules/loyalty/views/loyalty_view.dart';
 import 'package:postgetx/modules/menu/views/menu_form_view.dart';
 import 'package:postgetx/modules/orders/views/order_history_view.dart';
 
 import 'package:postgetx/modules/orders/views/order_view.dart';
 import 'package:postgetx/modules/category/views/category_view.dart';
 import 'package:postgetx/modules/pos/views/pos_view.dart';
-import 'package:postgetx/modules/preorder/views/preorder_view.dart';
 import 'package:postgetx/modules/profile/views/profile_view.dart';
 import 'package:postgetx/modules/stock/views/stock_view.dart';
 import 'package:postgetx/modules/tracking/views/tracking_view.dart';
 
 import 'package:postgetx/modules/users/views/user_view.dart';
+import 'package:postgetx/modules/settings/views/settings_view.dart';
 import '../modules/auth/views/login_view.dart';
-import '../modules/auth/views/register_view.dart';
 import 'app_routes.dart';
 
 class AppPages {
@@ -30,12 +27,6 @@ class AppPages {
     GetPage(
       name: Routes.login,
       page: () => LoginView(),
-    ),
-    GetPage(
-      name: Routes.register,
-      page: () => RegisterView(
-        enableRoleSelection: false,
-      ),
     ),
     GetPage(
       name: Routes.forgotPassword,
@@ -67,10 +58,7 @@ class AppPages {
       name: Routes.profile,
       page: () => const ProfileView(),
     ),
-    GetPage(
-      name: Routes.auditlogs,
-      page: () => const AuditLogView(),
-    ),
+    GetPage(name: Routes.settings, page: () => const SettingsView()),
     GetPage(
       name: Routes.menuform,
       page: () => MenuFormView(),
@@ -97,20 +85,8 @@ class AppPages {
       page: () => OrderHistoryView(),
     ),
     GetPage(
-      name: Routes.loyalty,
-      page: () => LoyaltyView(),
-    ),
-    GetPage(
-      name: Routes.preorder,
-      page: () => PreorderView(),
-    ),
-    GetPage(
       name: Routes.tracking,
       page: () => TrackingView(),
-    ),
-    GetPage(
-      name: Routes.audit,
-      page: () => AuditLogView(),
     ),
   ];
 }
