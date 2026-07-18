@@ -9,6 +9,7 @@ import 'package:postgetx/app/data/models/category_model.dart';
 import 'package:postgetx/app/data/models/customer_model.dart';
 import 'package:postgetx/app/data/models/expense_model.dart';
 import 'package:postgetx/app/data/models/local_notification_model.dart';
+import 'package:postgetx/app/data/models/loyalty_configuration.dart';
 import 'package:postgetx/app/data/models/menu_item_model.dart';
 import 'package:postgetx/app/data/models/menu_variant.dart';
 import 'package:postgetx/app/data/models/order_lifecycle.dart';
@@ -37,17 +38,22 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
   late Box<dynamic> _box;
   UserModel? _currentUser;
   final RepositoryWriteFaultInjector? _writeFaultInjector;
+  LoyaltyConfiguration _loyaltyConfiguration;
   bool _operationInProgress = false;
 
   LocalHiveRepository({
     RepositoryWriteFaultInjector? writeFaultInjector,
-  }) : _writeFaultInjector = writeFaultInjector;
+    LoyaltyConfiguration loyaltyConfiguration = LoyaltyConfiguration.defaults,
+  })  : _writeFaultInjector = writeFaultInjector,
+        _loyaltyConfiguration = loyaltyConfiguration;
 
   LocalHiveRepository.forBox(
     Box<dynamic> box, {
     RepositoryWriteFaultInjector? writeFaultInjector,
+    LoyaltyConfiguration loyaltyConfiguration = LoyaltyConfiguration.defaults,
   })  : _box = box,
-        _writeFaultInjector = writeFaultInjector;
+        _writeFaultInjector = writeFaultInjector,
+        _loyaltyConfiguration = loyaltyConfiguration;
 
   Future<void> initialize() async {
     await Hive.initFlutter();
@@ -289,9 +295,24 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
   @override
   UserModel? get currentUser => _currentUser;
 
+  LoyaltyConfiguration get loyaltyConfiguration => _loyaltyConfiguration;
+
+  void applyLoyaltyConfiguration(
+    LoyaltyConfiguration configuration,
+  ) {
+    final errors = configuration.validate();
+
+    if (errors.isNotEmpty) {
+      throw FormatException(errors.join(' '));
+    }
+
+    _loyaltyConfiguration = configuration;
+  }
+
   LoyaltyRepository get loyaltyRepository => LocalLoyaltyRepository(
         HiveLoyaltyProvider(_box),
         actorId: () => _currentUser?.id ?? 'system',
+        configuration: () => _loyaltyConfiguration,
       );
 
   static String demoPasswordHash(String password) {
@@ -1329,8 +1350,19 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
       );
     }
 
+    final configuration = _loyaltyConfiguration;
+
+    if (!configuration.isEnabled) {
+      return PosOperationResult.failure(
+        'loyalty_disabled',
+        'Loyalty redemption is currently disabled.',
+      );
+    }
+
     final expectedDiscount = LoyaltyPointsPolicy.redemptionValue(
       order.loyaltyPointsRedeemed,
+      isEnabled: configuration.isEnabled,
+      valuePerPoint: configuration.redeemValuePerPoint,
     );
 
     if (!PosTotalCalculator.sameMoney(
@@ -1345,10 +1377,27 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
 
     final balance = await loyaltyRepository.getBalance(customerId);
 
+    final payableBeforeLoyalty = order.taxableAmount + order.loyaltyDiscount;
+
+    final maximumPoints = LoyaltyPointsPolicy.maximumRedeemablePoints(
+      availablePoints: balance,
+      payableAmount: payableBeforeLoyalty,
+      valuePerPoint: configuration.redeemValuePerPoint,
+      maximumRedemptionPercentage: configuration.maximumRedemptionPercentage,
+      isEnabled: configuration.isEnabled,
+    );
+
     if (balance < order.loyaltyPointsRedeemed) {
       return PosOperationResult.failure(
         'insufficient_loyalty_points',
         'The customer does not have enough loyalty points.',
+      );
+    }
+
+    if (order.loyaltyPointsRedeemed > maximumPoints) {
+      return PosOperationResult.failure(
+        'loyalty_redemption_limit_exceeded',
+        'Redeemed points exceed the configured transaction limit.',
       );
     }
 
@@ -1471,7 +1520,13 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
 
       final loyaltyPointsEarned = customerId.isEmpty
           ? 0
-          : LoyaltyPointsPolicy.earnedPoints(order.totalAmount);
+          : LoyaltyPointsPolicy.earnedPoints(
+              order.totalAmount,
+              isEnabled: _loyaltyConfiguration.isEnabled,
+              spendingRequired: _loyaltyConfiguration.spendPerPoint,
+              minimumEligibleTransaction:
+                  _loyaltyConfiguration.minimumEligibleTransaction,
+            );
 
       final loyaltyBalanceAfter = loyaltyBalanceBefore -
           order.loyaltyPointsRedeemed +

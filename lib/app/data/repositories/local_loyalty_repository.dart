@@ -1,4 +1,5 @@
 import 'package:postgetx/app/core/services/loyalty_points_policy.dart';
+import 'package:postgetx/app/data/models/loyalty_configuration.dart';
 import 'package:postgetx/app/data/models/loyalty_ledger_entry.dart';
 import 'package:postgetx/app/data/providers/local/hive_loyalty_provider.dart';
 import 'package:postgetx/app/data/repositories/loyalty_repository.dart';
@@ -8,10 +9,13 @@ class LocalLoyaltyRepository implements LoyaltyRepository {
   LocalLoyaltyRepository(
     this._provider, {
     required String Function() actorId,
-  }) : _actorId = actorId;
+    LoyaltyConfiguration Function()? configuration,
+  })  : _actorId = actorId,
+        _configuration = configuration ?? (() => LoyaltyConfiguration.defaults);
 
   final HiveLoyaltyProvider _provider;
   final String Function() _actorId;
+  final LoyaltyConfiguration Function() _configuration;
 
   @override
   Future<List<LoyaltyLedgerEntry>> getLedger({
@@ -64,7 +68,14 @@ class LocalLoyaltyRepository implements LoyaltyRepository {
       );
     }
 
-    final points = LoyaltyPointsPolicy.earnedPoints(eligibleAmount);
+    final configuration = _configuration();
+
+    final points = LoyaltyPointsPolicy.earnedPoints(
+      eligibleAmount,
+      isEnabled: configuration.isEnabled,
+      spendingRequired: configuration.spendPerPoint,
+      minimumEligibleTransaction: configuration.minimumEligibleTransaction,
+    );
     if (points <= 0) {
       return PosOperationResult.failure(
         'no_loyalty_points',
