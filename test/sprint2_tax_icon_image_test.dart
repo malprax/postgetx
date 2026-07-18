@@ -10,7 +10,7 @@ import 'package:postgetx/app/shared/widgets/category_icon_picker.dart';
 import 'package:postgetx/app/shared/widgets/product_visual.dart';
 import 'package:postgetx/app/theme/category_icon_registry.dart';
 import 'package:postgetx/models/cart_item_model.dart';
-import 'package:postgetx/models/category_model.dart';
+import 'package:postgetx/app/data/models/category_model.dart';
 import 'package:postgetx/app/data/models/menu_item_model.dart';
 import 'package:postgetx/app/data/models/menu_variant.dart';
 import 'package:postgetx/models/order_model.dart';

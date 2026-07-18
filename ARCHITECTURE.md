@@ -8,15 +8,27 @@ Malprax follows a modular, offline-first architecture inspired by the Portfolio 
 
 Views only render reactive state and send user intent. Controllers aggregate checkout and dashboard behavior. Repository interfaces are the stable boundary for a future backend, but this release contains no cloud provider. Models remain serialization-safe. Printer behavior stays behind `PrinterService`; the default adapter opens a PDF preview.
 
-## Project map
+## Canonical project map
 
-- `lib/app`: composition, routes, bindings, modules, design system, shared UI.
-- `lib/models`: domain records.
-- `lib/repositories`: backend-agnostic contracts and Hive implementations.
-- `lib/services`: printing and preserved business services.
-- `lib/themes/theme_controller.dart`: persisted theme preference.
+- `lib/app/core`: cross-application configuration, helpers, and services.
+- `lib/app/data`: models, providers, and backend-agnostic repositories.
+- `lib/app/modules`: business features with their bindings, controllers,
+  views, and feature-local widgets.
+- `lib/app/routes`: the only application navigation source.
+- `lib/app/shared`: reusable layouts, forms, and presentation components.
+- `lib/app/theme`: the only design system and theme source.
+- `lib/main.dart`: application entry point.
 - `test`: repository, model, controller, and responsive journey coverage.
 - `tools`: validation, backup, restore, and tree export scripts.
+
+Top-level source folders such as `lib/models`, `lib/modules`,
+`lib/repositories`, `lib/services`, `lib/routes`, `lib/themes`, `lib/widgets`,
+`lib/utils`, `lib/bindings`, and `lib/config` are migration-only legacy paths.
+They must not receive new source files and will be removed domain by domain.
+
+Every completed domain migration must be recorded in
+`test/architecture_guard_test.dart`. A structural change is incomplete until
+the guard, analyzer, and complete test suite pass.
 
 Hive boxes are initialized before `runApp`. `InitialBinding` maps abstractions to local implementations. No view or controller opens a Hive box directly.
 

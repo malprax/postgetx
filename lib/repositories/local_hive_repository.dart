@@ -5,7 +5,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import '../config/app_config.dart';
 import '../models/cart_item_model.dart';
-import '../models/category_model.dart';
+import 'package:postgetx/app/data/models/category_model.dart';
 import 'package:postgetx/app/data/models/customer_model.dart';
 import '../models/expense_model.dart';
 import '../models/local_notification_model.dart';
