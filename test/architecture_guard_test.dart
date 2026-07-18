@@ -109,6 +109,7 @@ void main() {
         'package:postgetx/modules/auth/',
         'package:postgetx/repositories/auth_repository.dart',
         'package:postgetx/modules/dashboard/',
+        'package:postgetx/modules/profile/',
       ];
 
       final violations = <String>[];
