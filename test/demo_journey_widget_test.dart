@@ -13,7 +13,7 @@ import 'package:postgetx/app/modules/dashboard/views/dashboard_admin_view.dart';
 import 'package:postgetx/app/modules/pos/controllers/pos_controller.dart';
 import 'package:postgetx/app/modules/pos/views/pos_view.dart';
 import 'package:postgetx/app/data/repositories/local_hive_repository.dart';
-import 'package:postgetx/routes/app_routes.dart';
+import 'package:postgetx/app/routes/app_routes.dart';
 import 'package:postgetx/app/theme/app_theme.dart';
 
 void main() {
@@ -42,11 +42,11 @@ void main() {
 
   testWidgets('demo entry exposes visible seeded credentials', (tester) async {
     await tester.pumpWidget(GetMaterialApp(
-      initialRoute: Routes.login,
+      initialRoute: AppRoutes.login,
       getPages: [
-        GetPage(name: Routes.login, page: () => LoginView()),
+        GetPage(name: AppRoutes.login, page: () => LoginView()),
         GetPage(
-            name: Routes.dashboard,
+            name: AppRoutes.cashier,
             page: () => const Scaffold(body: Text('dashboard-ready'))),
       ],
     ));

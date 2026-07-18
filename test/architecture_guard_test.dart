@@ -72,6 +72,8 @@ void main() {
         'lib/services/order_service.dart': 'lib/app/core/services',
         'lib/models': 'lib/app/data/models',
         'lib/repositories': 'lib/app/data/repositories',
+        'lib/routes': 'lib/app/routes',
+        'lib/bindings': 'lib/app/bindings',
       };
 
       for (final migration in migrations.entries) {
@@ -134,6 +136,8 @@ void main() {
         'package:postgetx/services/order_service.dart',
         'package:postgetx/models/',
         'package:postgetx/repositories/',
+        'package:postgetx/routes/',
+        'package:postgetx/bindings/',
       ];
 
       final violations = <String>[];

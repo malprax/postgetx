@@ -8,7 +8,7 @@ import 'package:postgetx/app/core/config/app_config.dart';
 import 'package:postgetx/app/data/models/role_permission.dart';
 import 'package:postgetx/app/data/repositories/local_hive_repository.dart';
 import 'package:postgetx/app/modules/settings/controllers/theme_controller.dart';
-import '../../../routes/app_routes.dart';
+import 'package:postgetx/app/routes/app_routes.dart';
 import '../../../routes/browser_route_sync.dart';
 import '../../../routes/workspace_route_metadata.dart';
 import '../../../shared/widgets/malprax_panel.dart';

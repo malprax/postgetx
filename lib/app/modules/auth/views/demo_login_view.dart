@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 
 import 'package:postgetx/app/core/config/app_config.dart';
 import 'package:postgetx/app/data/repositories/local_hive_repository.dart';
-import '../../../routes/app_routes.dart';
+import 'package:postgetx/app/routes/app_routes.dart';
 import '../../../routes/browser_route_sync.dart';
 import '../../../shared/forms/form_validators.dart';
 import '../../../shared/widgets/malprax_form_field.dart';

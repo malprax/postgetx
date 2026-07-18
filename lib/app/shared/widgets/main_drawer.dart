@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:postgetx/app/modules/auth/controllers/auth_controller.dart';
-import 'package:postgetx/routes/app_routes.dart';
+import 'package:postgetx/app/routes/app_routes.dart';
 
 class MainDrawer extends StatelessWidget {
   MainDrawer({super.key});
@@ -35,27 +35,27 @@ class MainDrawer extends StatelessWidget {
             _drawerTile(
               icon: Icons.dashboard,
               title: 'Dashboard',
-              route: Routes.dashboard,
+              route: AppRoutes.cashier,
             ),
             _drawerTile(
               icon: Icons.store,
               title: 'POS',
-              route: Routes.pos,
+              route: AppRoutes.cashier,
             ),
             _drawerTile(
               icon: Icons.inventory,
               title: 'Stock',
-              route: Routes.stock,
+              route: AppRoutes.inventory,
             ),
             _drawerTile(
               icon: Icons.receipt,
               title: 'Orders',
-              route: Routes.orders,
+              route: AppRoutes.orders,
             ),
             _drawerTile(
               icon: Icons.category,
               title: 'Category',
-              route: Routes.category,
+              route: AppRoutes.products,
             ),
           ],
 
@@ -66,7 +66,7 @@ class MainDrawer extends StatelessWidget {
             _drawerTile(
               icon: Icons.supervised_user_circle,
               title: 'User Management',
-              route: Routes.users,
+              route: AppRoutes.settings,
             ),
           ],
 
@@ -77,7 +77,7 @@ class MainDrawer extends StatelessWidget {
             _drawerTile(
               icon: Icons.track_changes,
               title: 'Order Tracking',
-              route: Routes.tracking,
+              route: AppRoutes.orders,
             ),
           ],
 
@@ -88,13 +88,13 @@ class MainDrawer extends StatelessWidget {
             _drawerTile(
               icon: Icons.person,
               title: 'My Profile',
-              route: Routes.profile,
+              route: AppRoutes.settings,
             ),
           if (user != null)
             _drawerTile(
                 icon: Icons.settings,
                 title: 'Demo Settings',
-                route: Routes.settings),
+                route: AppRoutes.settings),
 
           // =======================
           // Logout (semua login)

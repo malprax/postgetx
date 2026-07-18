@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:postgetx/app/core/config/app_config.dart';
-import 'package:postgetx/routes/app_routes.dart';
+import 'package:postgetx/app/routes/app_routes.dart';
 import 'package:postgetx/app/shared/widgets/demo_mode_banner.dart';
 import 'package:postgetx/app/shared/widgets/main_drawer.dart';
 import 'package:postgetx/app/modules/auth/controllers/auth_controller.dart';
@@ -81,12 +81,11 @@ class DashboardAdminView extends StatelessWidget {
                           const SizedBox(height: 20),
                           Wrap(spacing: 12, runSpacing: 12, children: [
                             FilledButton.icon(
-                                onPressed: () => Get.toNamed(Routes.pos),
+                                onPressed: () => Get.toNamed(AppRoutes.cashier),
                                 icon: const Icon(Icons.point_of_sale),
                                 label: const Text('Open POS / Cashier')),
                             OutlinedButton.icon(
-                                onPressed: () =>
-                                    Get.toNamed(Routes.orderHistory),
+                                onPressed: () => Get.toNamed(AppRoutes.orders),
                                 icon: const Icon(Icons.history),
                                 label: const Text('Transaction History'))
                           ]),

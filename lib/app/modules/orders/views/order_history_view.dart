@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:printing/printing.dart';
 
-import 'package:postgetx/routes/app_routes.dart';
+import 'package:postgetx/app/routes/app_routes.dart';
 import 'package:postgetx/app/core/services/print_service.dart';
 import 'package:postgetx/app/core/services/pdf_helper.dart';
 import 'package:postgetx/app/shared/widgets/demo_mode_banner.dart';
@@ -74,7 +74,7 @@ class OrderHistoryView extends StatelessWidget {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Get.offAllNamed(Routes.dashboard),
+        onPressed: () => Get.offAllNamed(AppRoutes.cashier),
         icon: const Icon(Icons.dashboard_outlined),
         label: const Text('Dashboard'),
       ),

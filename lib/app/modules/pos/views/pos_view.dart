@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 import 'package:postgetx/app/data/models/menu_variant.dart';
-import 'package:postgetx/routes/app_routes.dart';
+import 'package:postgetx/app/routes/app_routes.dart';
 import 'package:postgetx/app/shared/widgets/demo_mode_banner.dart';
 import '../controllers/pos_controller.dart';
 
@@ -23,7 +23,7 @@ class PosView extends StatelessWidget {
           actions: [
             IconButton(
                 tooltip: 'Transaction history',
-                onPressed: () => Get.toNamed(Routes.orderHistory),
+                onPressed: () => Get.toNamed(AppRoutes.orders),
                 icon: const Icon(Icons.history))
           ],
         ),

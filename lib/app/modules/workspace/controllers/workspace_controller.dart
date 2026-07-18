@@ -16,7 +16,7 @@ import 'package:postgetx/app/data/repositories/pos_repository.dart';
 import 'package:postgetx/app/data/repositories/local_hive_repository.dart';
 import 'package:postgetx/app/core/services/printer_service.dart';
 import 'package:postgetx/app/core/services/pos_total_calculator.dart';
-import '../../../routes/app_routes.dart';
+import 'package:postgetx/app/routes/app_routes.dart';
 import '../../../routes/browser_route_sync.dart';
 import '../../../routes/workspace_route_metadata.dart';
 import '../../../data/models/customer_model.dart';

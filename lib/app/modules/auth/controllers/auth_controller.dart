@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:postgetx/app/data/models/user_model.dart';
 import 'package:postgetx/app/data/repositories/auth_repository.dart';
 import 'package:postgetx/app/data/repositories/local_hive_repository.dart';
-import 'package:postgetx/routes/app_routes.dart';
+import 'package:postgetx/app/routes/app_routes.dart';
 import 'package:postgetx/app/core/config/app_config.dart';
 
 class AuthController extends GetxController {
@@ -24,7 +24,7 @@ class AuthController extends GetxController {
         email: emailController.text.trim(),
         password: passwordController.text,
       );
-      Get.offAllNamed(Routes.dashboard);
+      Get.offAllNamed(AppRoutes.cashier);
     } catch (error) {
       Get.snackbar('Local demo login failed', error.toString());
     }
@@ -39,7 +39,7 @@ class AuthController extends GetxController {
   Future<void> logout() async {
     await _repository.logout();
     currentUserModel.value = null;
-    Get.offAllNamed(Routes.login);
+    Get.offAllNamed(AppRoutes.login);
   }
 
   Future<void> forgotPassword() async =>

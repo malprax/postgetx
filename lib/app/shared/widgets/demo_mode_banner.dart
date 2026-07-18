@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:postgetx/app/core/config/app_config.dart';
-import 'package:postgetx/routes/app_routes.dart';
+import 'package:postgetx/app/routes/app_routes.dart';
 
 class DemoModeBanner extends StatelessWidget {
   const DemoModeBanner({super.key});
@@ -24,7 +24,7 @@ class DemoModeBanner extends StatelessWidget {
                 child: Text(
                     'Demo Mode — Data is stored only in this browser and may be reset.')),
             TextButton(
-                onPressed: () => Get.toNamed(Routes.settings),
+                onPressed: () => Get.toNamed(AppRoutes.settings),
                 child: const Text('Settings')),
           ],
         ),
