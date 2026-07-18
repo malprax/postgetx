@@ -1,6 +1,6 @@
 // lib/routes/app_pages.dart
 import 'package:get/get.dart';
-import 'package:postgetx/bindings/pos_binding.dart';
+import 'package:postgetx/app/modules/pos/bindings/pos_binding.dart';
 import 'package:postgetx/modules/auth/controllers/auth_controller.dart';
 import 'package:postgetx/modules/auth/views/forgot_password_view.dart';
 import 'package:postgetx/modules/dashboard/views/dashboard_admin_view.dart';
@@ -12,7 +12,7 @@ import 'package:postgetx/modules/orders/views/order_history_view.dart';
 
 import 'package:postgetx/modules/orders/views/order_view.dart';
 import 'package:postgetx/app/modules/category/views/category_view.dart';
-import 'package:postgetx/modules/pos/views/pos_view.dart';
+import 'package:postgetx/app/modules/pos/views/pos_view.dart';
 import 'package:postgetx/modules/profile/views/profile_view.dart';
 import 'package:postgetx/modules/stock/views/stock_view.dart';
 import 'package:postgetx/modules/tracking/views/tracking_view.dart';

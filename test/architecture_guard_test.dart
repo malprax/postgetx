@@ -27,6 +27,9 @@ void main() {
         'lib/modules/category': 'lib/app/modules/category',
         'lib/bindings/category_binding.dart':
             'lib/app/modules/category/bindings',
+        'lib/modules/pos': 'lib/app/modules/pos',
+        'lib/bindings/pos_binding.dart':
+            'lib/app/modules/pos/bindings/pos_binding.dart',
       };
 
       for (final migration in migrations.entries) {
@@ -56,6 +59,8 @@ void main() {
         'package:postgetx/models/category_model.dart',
         'package:postgetx/modules/category/',
         'package:postgetx/bindings/category_binding.dart',
+        'package:postgetx/modules/pos/',
+        'package:postgetx/bindings/pos_binding.dart',
       ];
 
       final violations = <String>[];

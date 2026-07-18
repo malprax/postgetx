@@ -3,18 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:logger/web.dart';
 import 'package:postgetx/app/data/models/menu_item_model.dart';
-import '../../../models/cart_item_model.dart';
+import 'package:postgetx/models/cart_item_model.dart';
 import 'package:postgetx/app/data/models/menu_variant.dart';
-import '../../../models/order_model.dart';
-import '../../../models/order_lifecycle.dart';
+import 'package:postgetx/models/order_model.dart';
+import 'package:postgetx/models/order_lifecycle.dart';
 import 'package:postgetx/app/data/models/category_model.dart';
 import '../views/edit_menu_view.dart';
-import '../../../services/print_service.dart';
-import '../../../services/pos_total_calculator.dart';
-import '../../../repositories/local_hive_repository.dart';
-import '../../auth/controllers/auth_controller.dart';
-import '../../dashboard/controllers/dashboard_controller.dart';
-import '../../orders/controller/order_history_controller.dart';
+import 'package:postgetx/services/print_service.dart';
+import 'package:postgetx/services/pos_total_calculator.dart';
+import 'package:postgetx/repositories/local_hive_repository.dart';
+import 'package:postgetx/modules/auth/controllers/auth_controller.dart';
+import 'package:postgetx/modules/dashboard/controllers/dashboard_controller.dart';
+import 'package:postgetx/modules/orders/controller/order_history_controller.dart';
 
 class PosController extends GetxController {
   final logger = Logger();
