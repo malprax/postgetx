@@ -19,6 +19,9 @@ import 'package:postgetx/app/core/services/pos_total_calculator.dart';
 import 'package:postgetx/app/core/services/product_image_service.dart';
 import 'package:postgetx/app/core/helpers/customer_utils.dart';
 import 'package:postgetx/app/data/repositories/auth_repository.dart';
+import 'package:postgetx/app/data/providers/local/hive_loyalty_provider.dart';
+import 'package:postgetx/app/data/repositories/local_loyalty_repository.dart';
+import 'package:postgetx/app/data/repositories/loyalty_repository.dart';
 import 'pos_operation_result.dart';
 import 'pos_repository.dart';
 
@@ -26,7 +29,7 @@ typedef RepositoryWriteFaultInjector = void Function(String stage);
 
 class LocalHiveRepository implements AuthRepository, PosRepository {
   static const _boxName = 'retail_pos_demo';
-  static const currentSchemaVersion = 7;
+  static const currentSchemaVersion = 8;
   static const _sessionKey = 'currentSessionUserId';
   static const _customerSequenceKey = 'customerSequence';
 
@@ -208,6 +211,10 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
       await _putMaps('expenses', const []);
     }
 
+    if (!_box.containsKey(HiveLoyaltyProvider.storageKey)) {
+      await HiveLoyaltyProvider(_box).clear();
+    }
+
     if (!_box.containsKey(_customerSequenceKey)) {
       await _box.put(_customerSequenceKey, customers.length);
     }
@@ -280,6 +287,11 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
 
   @override
   UserModel? get currentUser => _currentUser;
+
+  LoyaltyRepository get loyaltyRepository => LocalLoyaltyRepository(
+        HiveLoyaltyProvider(_box),
+        actorId: () => _currentUser?.id ?? 'system',
+      );
 
   static String demoPasswordHash(String password) {
     return sha256
@@ -2737,6 +2749,8 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
         updatedAt: now,
       ).toMap(),
     ]);
+
+    await HiveLoyaltyProvider(_box).clear();
 
     await _putMaps('expenses', [
       ExpenseModel(
