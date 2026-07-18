@@ -108,6 +108,7 @@ void main() {
         'package:postgetx/bindings/users_binding.dart',
         'package:postgetx/modules/auth/',
         'package:postgetx/repositories/auth_repository.dart',
+        'package:postgetx/modules/dashboard/',
       ];
 
       final violations = <String>[];

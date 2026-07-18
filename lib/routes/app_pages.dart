@@ -3,10 +3,10 @@ import 'package:get/get.dart';
 import 'package:postgetx/app/modules/pos/bindings/pos_binding.dart';
 import 'package:postgetx/app/modules/auth/controllers/auth_controller.dart';
 import 'package:postgetx/app/modules/auth/views/forgot_password_view.dart';
-import 'package:postgetx/modules/dashboard/views/dashboard_admin_view.dart';
-import 'package:postgetx/modules/dashboard/views/dashboard_customer_view.dart';
-import 'package:postgetx/modules/dashboard/views/dashboard_guest_view.dart';
-import 'package:postgetx/modules/dashboard/views/dashboard_staff_view.dart';
+import 'package:postgetx/app/modules/dashboard/views/dashboard_admin_view.dart';
+import 'package:postgetx/app/modules/dashboard/views/dashboard_customer_view.dart';
+import 'package:postgetx/app/modules/dashboard/views/dashboard_guest_view.dart';
+import 'package:postgetx/app/modules/dashboard/views/dashboard_staff_view.dart';
 import 'package:postgetx/app/modules/menu/views/menu_form_view.dart';
 import 'package:postgetx/app/modules/orders/views/order_history_view.dart';
 
