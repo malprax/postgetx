@@ -28,6 +28,7 @@ class PosTotals {
     required this.discountType,
     required this.discountValue,
     required this.discountAmount,
+    required this.loyaltyDiscount,
     required this.taxableAmount,
     required this.taxType,
     required this.taxValue,
@@ -41,6 +42,7 @@ class PosTotals {
   final DiscountType discountType;
   final double discountValue;
   final double discountAmount;
+  final double loyaltyDiscount;
   final double taxableAmount;
   final TaxType taxType;
   final double taxValue;
@@ -62,6 +64,7 @@ class PosTotalCalculator {
     required Iterable<CartItemModel> items,
     required DiscountType discountType,
     required double discountValue,
+    double loyaltyDiscount = 0,
     TaxType taxType = TaxType.percentage,
     double taxValue = 10,
     double? amountPaid,
@@ -75,7 +78,12 @@ class PosTotalCalculator {
     };
     final discountAmount =
         _rupiah(requestedDiscount.clamp(0, subtotal).toDouble());
-    final taxableAmount = _rupiah(subtotal - discountAmount);
+    final amountAfterDiscount = _rupiah(subtotal - discountAmount);
+    final safeLoyaltyDiscount = loyaltyDiscount.isFinite ? loyaltyDiscount : 0;
+    final appliedLoyaltyDiscount = _rupiah(
+      safeLoyaltyDiscount.clamp(0, amountAfterDiscount),
+    );
+    final taxableAmount = _rupiah(amountAfterDiscount - appliedLoyaltyDiscount);
     final safeTaxValue = taxValue.isFinite ? taxValue : 0;
     final normalizedTaxValue = switch (taxType) {
       TaxType.none => 0.0,
@@ -98,6 +106,7 @@ class PosTotalCalculator {
           ? safeValue.clamp(0, 100).toDouble()
           : _rupiah(safeValue.clamp(0, double.infinity)),
       discountAmount: discountAmount,
+      loyaltyDiscount: appliedLoyaltyDiscount,
       taxableAmount: taxableAmount,
       taxType: taxType,
       taxValue: normalizedTaxValue,

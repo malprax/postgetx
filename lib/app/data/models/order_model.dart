@@ -11,6 +11,8 @@ class OrderModel {
   final double discount;
   final DiscountType discountType;
   final double discountValue;
+  final int loyaltyPointsRedeemed;
+  final double loyaltyDiscount;
   final double taxableAmount;
   final double paid;
   final double change;
@@ -58,6 +60,8 @@ class OrderModel {
     required this.discount,
     this.discountType = DiscountType.fixed,
     double? discountValue,
+    this.loyaltyPointsRedeemed = 0,
+    this.loyaltyDiscount = 0,
     double? taxableAmount,
     required this.paid,
     required this.change,
@@ -103,8 +107,8 @@ class OrderModel {
         taxValue = taxValue ?? taxAmount ?? tax ?? 0,
         subtotal = subtotal ?? _itemsSubtotal(items),
         discountValue = discountValue ?? discount,
-        taxableAmount =
-            taxableAmount ?? (subtotal ?? _itemsSubtotal(items)) - discount,
+        taxableAmount = taxableAmount ??
+            (subtotal ?? _itemsSubtotal(items)) - discount - loyaltyDiscount,
         stockApplied = stockApplied ??
             status == OrderStatus.completed || status == OrderStatus.refunded,
         stockRestored = stockRestored ?? status == OrderStatus.refunded,
@@ -119,6 +123,8 @@ class OrderModel {
       'discount': discount,
       'discountType': discountType.name,
       'discountValue': discountValue,
+      'loyaltyPointsRedeemed': loyaltyPointsRedeemed,
+      'loyaltyDiscount': loyaltyDiscount,
       'taxableAmount': taxableAmount,
       'paid': paid,
       'change': change,
@@ -179,8 +185,13 @@ class OrderModel {
       discount: discount,
       discountType: DiscountType.fromStorage(map['discountType']),
       discountValue: (map['discountValue'] as num?)?.toDouble() ?? discount,
-      taxableAmount:
-          (map['taxableAmount'] as num?)?.toDouble() ?? subtotal - discount,
+      loyaltyPointsRedeemed:
+          (map['loyaltyPointsRedeemed'] as num?)?.toInt() ?? 0,
+      loyaltyDiscount: (map['loyaltyDiscount'] as num?)?.toDouble() ?? 0,
+      taxableAmount: (map['taxableAmount'] as num?)?.toDouble() ??
+          subtotal -
+              discount -
+              ((map['loyaltyDiscount'] as num?)?.toDouble() ?? 0),
       paid: (map['paid'] ?? 0).toDouble(),
       change: (map['change'] ?? 0).toDouble(),
       createdAt: createdAt,
@@ -242,6 +253,8 @@ class OrderModel {
     double? discount,
     DiscountType? discountType,
     double? discountValue,
+    int? loyaltyPointsRedeemed,
+    double? loyaltyDiscount,
     double? taxableAmount,
     double? paid,
     double? change,
@@ -289,6 +302,9 @@ class OrderModel {
         discount: discount ?? this.discount,
         discountType: discountType ?? this.discountType,
         discountValue: discountValue ?? this.discountValue,
+        loyaltyPointsRedeemed:
+            loyaltyPointsRedeemed ?? this.loyaltyPointsRedeemed,
+        loyaltyDiscount: loyaltyDiscount ?? this.loyaltyDiscount,
         taxableAmount: taxableAmount ?? this.taxableAmount,
         paid: paid ?? this.paid,
         change: change ?? this.change,
