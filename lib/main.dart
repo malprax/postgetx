@@ -2,9 +2,11 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 
 import 'app/app.dart';
+import 'package:postgetx/app/data/providers/local/capital_protection_configuration_provider.dart';
 import 'package:postgetx/app/data/providers/local/loyalty_configuration_provider.dart';
 import 'package:postgetx/app/data/providers/local/loyalty_tier_rules_provider.dart';
 import 'package:postgetx/app/data/repositories/local_hive_repository.dart';
+import 'package:postgetx/app/modules/settings/controllers/capital_protection_configuration_controller.dart';
 import 'package:postgetx/app/modules/settings/controllers/loyalty_configuration_controller.dart';
 import 'package:postgetx/app/modules/settings/controllers/loyalty_tier_rules_controller.dart';
 import 'package:postgetx/app/modules/settings/controllers/theme_controller.dart';
@@ -37,6 +39,19 @@ Future<void> main() async {
 
   Get.put<LoyaltyTierRulesController>(
     loyaltyTierRulesController,
+    permanent: true,
+  );
+
+  final capitalProtectionProvider =
+      await CapitalProtectionConfigurationProvider.create();
+
+  final capitalProtectionController = CapitalProtectionConfigurationController(
+    capitalProtectionProvider,
+    repository,
+  )..load();
+
+  Get.put<CapitalProtectionConfigurationController>(
+    capitalProtectionController,
     permanent: true,
   );
 

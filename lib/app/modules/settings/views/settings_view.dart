@@ -10,8 +10,10 @@ import 'package:postgetx/app/modules/menu/controllers/menu_controller.dart'
     as app_menu;
 import 'package:postgetx/app/modules/users/controllers/user_controller.dart';
 import 'package:postgetx/app/data/repositories/local_hive_repository.dart';
+import 'package:postgetx/app/modules/settings/controllers/capital_protection_configuration_controller.dart';
 import 'package:postgetx/app/modules/settings/controllers/theme_controller.dart';
 import 'package:postgetx/app/modules/settings/controllers/loyalty_tier_rules_controller.dart';
+import 'package:postgetx/app/modules/settings/widgets/capital_protection_configuration_form.dart';
 import 'package:postgetx/app/modules/settings/widgets/loyalty_configuration_card.dart';
 import 'package:postgetx/app/modules/settings/widgets/loyalty_tier_rules_form.dart';
 
@@ -75,6 +77,8 @@ class _SettingsViewState extends State<SettingsView> {
   Widget build(BuildContext context) {
     final theme = Get.find<ThemeController>();
     final tierController = Get.find<LoyaltyTierRulesController>();
+    final capitalController =
+        Get.find<CapitalProtectionConfigurationController>();
 
     return Scaffold(
         appBar: AppBar(title: const Text('Demo Settings')),
@@ -115,6 +119,26 @@ class _SettingsViewState extends State<SettingsView> {
                 final saved = await tierController.save(rules);
 
                 return saved ? null : tierController.errorMessage.value;
+              },
+            ),
+          ),
+          const SizedBox(height: 28),
+          Text(
+            'Capital protection',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: 8),
+          Obx(
+            () => CapitalProtectionConfigurationForm(
+              key: ValueKey(
+                capitalController.configuration.value.toMap().toString(),
+              ),
+              initialConfiguration: capitalController.configuration.value,
+              saving: capitalController.saving.value,
+              onSave: (configuration) async {
+                final saved = await capitalController.save(configuration);
+
+                return saved ? null : capitalController.errorMessage.value;
               },
             ),
           ),

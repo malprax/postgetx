@@ -7,6 +7,7 @@ import 'package:postgetx/app/core/config/app_config.dart';
 import 'package:postgetx/app/data/models/cart_item_model.dart';
 import 'package:postgetx/app/data/models/capital_health_summary.dart';
 import 'package:postgetx/app/data/models/capital_ledger_entry.dart';
+import 'package:postgetx/app/data/models/capital_protection_configuration.dart';
 import 'package:postgetx/app/data/models/category_model.dart';
 import 'package:postgetx/app/data/models/customer_model.dart';
 import 'package:postgetx/app/data/models/expense_model.dart';
@@ -45,25 +46,32 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
   final RepositoryWriteFaultInjector? _writeFaultInjector;
   LoyaltyConfiguration _loyaltyConfiguration;
   LoyaltyTierRules _loyaltyTierRules;
+  CapitalProtectionConfiguration _capitalProtectionConfiguration;
   bool _operationInProgress = false;
 
   LocalHiveRepository({
     RepositoryWriteFaultInjector? writeFaultInjector,
     LoyaltyConfiguration loyaltyConfiguration = LoyaltyConfiguration.defaults,
     LoyaltyTierRules loyaltyTierRules = LoyaltyTierRules.defaults,
+    CapitalProtectionConfiguration capitalProtectionConfiguration =
+        CapitalProtectionConfiguration.defaults,
   })  : _writeFaultInjector = writeFaultInjector,
         _loyaltyConfiguration = loyaltyConfiguration,
-        _loyaltyTierRules = loyaltyTierRules;
+        _loyaltyTierRules = loyaltyTierRules,
+        _capitalProtectionConfiguration = capitalProtectionConfiguration;
 
   LocalHiveRepository.forBox(
     Box<dynamic> box, {
     RepositoryWriteFaultInjector? writeFaultInjector,
     LoyaltyConfiguration loyaltyConfiguration = LoyaltyConfiguration.defaults,
     LoyaltyTierRules loyaltyTierRules = LoyaltyTierRules.defaults,
+    CapitalProtectionConfiguration capitalProtectionConfiguration =
+        CapitalProtectionConfiguration.defaults,
   })  : _box = box,
         _writeFaultInjector = writeFaultInjector,
         _loyaltyConfiguration = loyaltyConfiguration,
-        _loyaltyTierRules = loyaltyTierRules;
+        _loyaltyTierRules = loyaltyTierRules,
+        _capitalProtectionConfiguration = capitalProtectionConfiguration;
 
   Future<void> initialize() async {
     await Hive.initFlutter();
@@ -475,6 +483,21 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
     _loyaltyTierRules = rules;
   }
 
+  CapitalProtectionConfiguration get capitalProtectionConfiguration =>
+      _capitalProtectionConfiguration;
+
+  void applyCapitalProtectionConfiguration(
+    CapitalProtectionConfiguration configuration,
+  ) {
+    final errors = configuration.validate();
+
+    if (errors.isNotEmpty) {
+      throw FormatException(errors.join(' '));
+    }
+
+    _capitalProtectionConfiguration = configuration;
+  }
+
   LoyaltyRepository get loyaltyRepository => LocalLoyaltyRepository(
         HiveLoyaltyProvider(_box),
         actorId: () => _currentUser?.id ?? 'system',
@@ -499,6 +522,7 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
   Future<CapitalHealthSummary> getCapitalHealthSummary() async {
     return CapitalHealthCalculator.calculate(
       entries: await getCapitalLedger(),
+      configuration: _capitalProtectionConfiguration,
     );
   }
 
@@ -541,6 +565,7 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
     final allocation = CapitalProtectionPolicy.allocate(
       salesRevenue: salesRevenue < 0 ? 0 : salesRevenue,
       costBasis: restockRequirement < 0 ? 0 : restockRequirement,
+      configuration: _capitalProtectionConfiguration,
     );
 
     final previousWithdrawals =
