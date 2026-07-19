@@ -17,6 +17,7 @@ import '../../../theme/app_layout.dart';
 import '../../../theme/app_radius.dart';
 import '../../../theme/app_spacing.dart';
 import '../../capital/widgets/capital_health_summary_card.dart';
+import '../../capital/widgets/capital_ledger_history.dart';
 import '../controllers/workspace_controller.dart';
 import '../widgets/crud_sections.dart';
 import '../widgets/workspace_sections.dart';
@@ -733,6 +734,10 @@ class _ModuleContent extends GetView<WorkspaceController> {
                                 ),
                               );
                             },
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          CapitalLedgerHistory(
+                            entries: controller.capitalLedger,
                           ),
                           const SizedBox(height: AppSpacing.md),
                         ],

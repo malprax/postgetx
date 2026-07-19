@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:get/get.dart';
 
 import 'package:postgetx/app/data/models/capital_health_summary.dart';
+import 'package:postgetx/app/data/models/capital_ledger_entry.dart';
 import 'package:postgetx/app/data/models/cart_item_model.dart';
 import 'package:postgetx/app/data/models/category_model.dart';
 import 'package:postgetx/app/data/models/expense_model.dart';
@@ -54,6 +55,7 @@ class WorkspaceController extends GetxController {
   final loyaltyPointsToRedeem = 0.obs;
   final expenses = <ExpenseModel>[].obs;
   final capitalHealth = Rxn<CapitalHealthSummary>();
+  final capitalLedger = <CapitalLedgerEntry>[].obs;
   final notifications = <LocalNotificationModel>[].obs;
   final trashOrders = <OrderModel>[].obs;
   final cart = <CartItemModel>[].obs;
@@ -128,8 +130,13 @@ class WorkspaceController extends GetxController {
     notifications.assignAll(results[5] as List<LocalNotificationModel>);
 
     if (repository is LocalHiveRepository) {
-      capitalHealth.value =
-          await (repository as LocalHiveRepository).getCapitalHealthSummary();
+      final localRepository = repository as LocalHiveRepository;
+
+      capitalHealth.value = await localRepository.getCapitalHealthSummary();
+
+      capitalLedger.assignAll(
+        await localRepository.getCapitalLedger(),
+      );
     }
 
     loading.value = false;
