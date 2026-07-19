@@ -1,0 +1,134 @@
+import 'package:flutter/material.dart';
+import 'package:postgetx/app/core/helpers/rupiah_formatter.dart';
+import 'package:postgetx/app/data/models/capital_health_summary.dart';
+import 'package:postgetx/app/theme/app_radius.dart';
+import 'package:postgetx/app/theme/app_spacing.dart';
+
+class CapitalHealthSummaryCard extends StatelessWidget {
+  const CapitalHealthSummaryCard({
+    super.key,
+    required this.summary,
+  });
+
+  final CapitalHealthSummary summary;
+
+  Color get statusColor => switch (summary.status) {
+        CapitalHealthStatus.safe => Colors.green,
+        CapitalHealthStatus.warning => Colors.orange,
+        CapitalHealthStatus.highRisk => Colors.red,
+      };
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      key: const ValueKey('capital-health-summary'),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Expanded(
+                  child: Text(
+                    'Capital Protection',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+                Container(
+                  key: const ValueKey('capital-health-status'),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: statusColor.withValues(alpha: .14),
+                    borderRadius: BorderRadius.circular(AppRadius.pill),
+                  ),
+                  child: Text(
+                    summary.statusLabel,
+                    style: TextStyle(
+                      color: statusColor,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Wrap(
+              spacing: AppSpacing.lg,
+              runSpacing: AppSpacing.md,
+              children: [
+                _Metric(
+                  label: 'Protected Restock Capital',
+                  value: summary.protectedCapital,
+                ),
+                _Metric(
+                  label: 'Gross Margin',
+                  value: summary.grossMargin,
+                ),
+                _Metric(
+                  label: 'Operational Reserve',
+                  value: summary.operationalReserve,
+                ),
+                _Metric(
+                  label: 'Owner Withdrawals',
+                  value: summary.ownerWithdrawals,
+                ),
+                _Metric(
+                  label: 'Safe to Use',
+                  value: summary.safeToUseRemaining,
+                ),
+                _Metric(
+                  label: 'Protected Capital Used',
+                  value: summary.protectedCapitalUsed,
+                  warning: summary.protectedCapitalUsed > 0,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Metric extends StatelessWidget {
+  const _Metric({
+    required this.label,
+    required this.value,
+    this.warning = false,
+  });
+
+  final String label;
+  final double value;
+  final bool warning;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 190,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+          const SizedBox(height: 3),
+          Text(
+            RupiahFormatter.format(value),
+            style: TextStyle(
+              fontWeight: FontWeight.w800,
+              color: warning ? Colors.red : null,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

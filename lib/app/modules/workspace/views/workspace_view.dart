@@ -16,6 +16,7 @@ import '../../../theme/app_colors.dart';
 import '../../../theme/app_layout.dart';
 import '../../../theme/app_radius.dart';
 import '../../../theme/app_spacing.dart';
+import '../../capital/widgets/capital_health_summary_card.dart';
 import '../controllers/workspace_controller.dart';
 import '../widgets/crud_sections.dart';
 import '../widgets/workspace_sections.dart';
@@ -709,22 +710,34 @@ class _ModuleContent extends GetView<WorkspaceController> {
           }.contains(section)
               ? CrudSection(section: section)
               : section == 'Reports'
-                  ? LayoutBuilder(builder: (context, constraints) {
-                      if (constraints.maxWidth < 700) {
-                        return const Column(children: [
-                          SalesStats(),
-                          SizedBox(height: AppSpacing.md),
-                          TopSelling(),
-                        ]);
-                      }
-                      return const Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(child: SalesStats()),
-                            SizedBox(width: AppSpacing.md),
-                            Expanded(child: TopSelling()),
-                          ]);
-                    })
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        if (controller.capitalHealth.value != null) ...[
+                          CapitalHealthSummaryCard(
+                            summary: controller.capitalHealth.value!,
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                        ],
+                        LayoutBuilder(builder: (context, constraints) {
+                          if (constraints.maxWidth < 700) {
+                            return const Column(children: [
+                              SalesStats(),
+                              SizedBox(height: AppSpacing.md),
+                              TopSelling(),
+                            ]);
+                          }
+                          return const Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(child: SalesStats()),
+                              SizedBox(width: AppSpacing.md),
+                              Expanded(child: TopSelling()),
+                            ],
+                          );
+                        }),
+                      ],
+                    )
                   : section == 'Settings'
                       ? _Settings(controller: controller)
                       : const SizedBox.shrink(),

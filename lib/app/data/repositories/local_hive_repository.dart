@@ -5,6 +5,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import 'package:postgetx/app/core/config/app_config.dart';
 import 'package:postgetx/app/data/models/cart_item_model.dart';
+import 'package:postgetx/app/data/models/capital_health_summary.dart';
 import 'package:postgetx/app/data/models/capital_ledger_entry.dart';
 import 'package:postgetx/app/data/models/category_model.dart';
 import 'package:postgetx/app/data/models/customer_model.dart';
@@ -21,6 +22,7 @@ import 'package:postgetx/app/data/models/user_model.dart';
 import 'package:postgetx/app/core/services/pos_total_calculator.dart';
 import 'package:postgetx/app/core/services/loyalty_points_policy.dart';
 import 'package:postgetx/app/core/services/product_image_service.dart';
+import 'package:postgetx/app/modules/capital/domain/capital_health_calculator.dart';
 import 'package:postgetx/app/modules/capital/domain/capital_protection_policy.dart';
 import 'package:postgetx/app/core/helpers/customer_utils.dart';
 import 'package:postgetx/app/data/repositories/auth_repository.dart';
@@ -349,6 +351,12 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
               );
         },
       );
+
+  Future<CapitalHealthSummary> getCapitalHealthSummary() async {
+    return CapitalHealthCalculator.calculate(
+      entries: await getCapitalLedger(),
+    );
+  }
 
   Future<PosOperationResult<CapitalLedgerEntry>> recordOwnerWithdrawal({
     required double amount,

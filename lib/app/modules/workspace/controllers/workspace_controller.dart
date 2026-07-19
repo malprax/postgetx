@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:get/get.dart';
 
+import 'package:postgetx/app/data/models/capital_health_summary.dart';
 import 'package:postgetx/app/data/models/cart_item_model.dart';
 import 'package:postgetx/app/data/models/category_model.dart';
 import 'package:postgetx/app/data/models/expense_model.dart';
@@ -52,6 +53,7 @@ class WorkspaceController extends GetxController {
   final selectedCheckoutCustomer = Rxn<CustomerModel>();
   final loyaltyPointsToRedeem = 0.obs;
   final expenses = <ExpenseModel>[].obs;
+  final capitalHealth = Rxn<CapitalHealthSummary>();
   final notifications = <LocalNotificationModel>[].obs;
   final trashOrders = <OrderModel>[].obs;
   final cart = <CartItemModel>[].obs;
@@ -124,6 +126,12 @@ class WorkspaceController extends GetxController {
 
     expenses.assignAll(results[4] as List<ExpenseModel>);
     notifications.assignAll(results[5] as List<LocalNotificationModel>);
+
+    if (repository is LocalHiveRepository) {
+      capitalHealth.value =
+          await (repository as LocalHiveRepository).getCapitalHealthSummary();
+    }
+
     loading.value = false;
   }
 
