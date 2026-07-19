@@ -5,6 +5,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import 'package:postgetx/app/core/config/app_config.dart';
 import 'package:postgetx/app/data/models/cart_item_model.dart';
+import 'package:postgetx/app/data/models/capital_ledger_entry.dart';
 import 'package:postgetx/app/data/models/category_model.dart';
 import 'package:postgetx/app/data/models/customer_model.dart';
 import 'package:postgetx/app/data/models/expense_model.dart';
@@ -347,6 +348,18 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
               );
         },
       );
+
+  Future<List<CapitalLedgerEntry>> getCapitalLedger() async {
+    final entries = _maps(CapitalLedgerEntry.storageKey)
+        .map(CapitalLedgerEntry.fromMap)
+        .toList();
+
+    entries.sort(
+      (a, b) => a.createdAt.compareTo(b.createdAt),
+    );
+
+    return entries;
+  }
 
   static String demoPasswordHash(String password) {
     return sha256
@@ -1470,6 +1483,7 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
     final productSnapshot = _maps('products');
     final orderSnapshot = _maps('transactions');
     final loyaltySnapshot = _maps(HiveLoyaltyProvider.storageKey);
+    final capitalSnapshot = _maps(CapitalLedgerEntry.storageKey);
 
     try {
       if (order.status != OrderStatus.draft &&
@@ -1658,6 +1672,34 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
 
       _upsertOrder(updatedOrders, completed);
 
+      final restockRequirement = completed.items.fold<double>(
+        0,
+        (total, item) => total + item.lineCost,
+      );
+      final salesRevenue = completed.taxableAmount;
+      final capitalEntry = CapitalLedgerEntry(
+        id: 'capital-sale-${completed.id}',
+        orderId: completed.id,
+        type: CapitalLedgerEntryType.saleAllocation,
+        salesRevenueDelta: salesRevenue,
+        restockRequirementDelta: restockRequirement,
+        grossMarginDelta: salesRevenue - restockRequirement,
+        createdAt: now,
+        actorId: actor.id,
+        reason: 'Protected capital from completed sale',
+      );
+      final updatedCapitalLedger = capitalSnapshot
+          .map(
+            (map) => Map<String, dynamic>.from(map),
+          )
+          .toList()
+        ..removeWhere(
+          (map) =>
+              map['orderId'] == completed.id &&
+              map['type'] == CapitalLedgerEntryType.saleAllocation.name,
+        )
+        ..add(capitalEntry.toMap());
+
       if (updatedOrders.length > AppConfig.maxDemoTransactions) {
         updatedOrders.removeRange(
           0,
@@ -1670,6 +1712,12 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
 
       await _putMaps('transactions', updatedOrders);
       _writeFaultInjector?.call('after_order');
+
+      await _putMaps(
+        CapitalLedgerEntry.storageKey,
+        updatedCapitalLedger,
+      );
+      _writeFaultInjector?.call('after_capital_ledger');
 
       if (completed.loyaltyPointsRedeemed > 0) {
         final redemptionResult = await loyaltyRepository.redeemForOrder(
@@ -1726,6 +1774,10 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
         await _putMaps(
           HiveLoyaltyProvider.storageKey,
           loyaltySnapshot,
+        );
+        await _putMaps(
+          CapitalLedgerEntry.storageKey,
+          capitalSnapshot,
         );
 
         return PosOperationResult.failure(
@@ -2076,6 +2128,7 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
     final productSnapshot = _maps('products');
     final orderSnapshot = _maps('transactions');
     final loyaltySnapshot = _maps(HiveLoyaltyProvider.storageKey);
+    final capitalSnapshot = _maps(CapitalLedgerEntry.storageKey);
 
     try {
       final index = orderSnapshot.indexWhere(
@@ -2161,11 +2214,51 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
 
       updatedOrders[index] = _orderMap(refunded);
 
+      final updatedCapitalLedger = capitalSnapshot
+          .map(
+            (map) => Map<String, dynamic>.from(map),
+          )
+          .toList();
+      final originalCapitalMap = updatedCapitalLedger
+          .where(
+            (map) =>
+                map['orderId'] == refunded.id &&
+                map['type'] == CapitalLedgerEntryType.saleAllocation.name,
+          )
+          .firstOrNull;
+
+      if (originalCapitalMap != null) {
+        final original = CapitalLedgerEntry.fromMap(
+          originalCapitalMap,
+        );
+
+        updatedCapitalLedger.add(
+          CapitalLedgerEntry(
+            id: 'capital-refund-${refunded.id}',
+            orderId: refunded.id,
+            type: CapitalLedgerEntryType.refundReversal,
+            salesRevenueDelta: -original.salesRevenueDelta,
+            restockRequirementDelta: -original.restockRequirementDelta,
+            grossMarginDelta: -original.grossMarginDelta,
+            createdAt: now,
+            actorId: _currentUser!.id,
+            reason: reason.trim(),
+            reversesEntryId: original.id,
+          ).toMap(),
+        );
+      }
+
       await _putMaps('products', updatedProducts);
       _writeFaultInjector?.call('after_refund_products');
 
       await _putMaps('transactions', updatedOrders);
       _writeFaultInjector?.call('after_refund_order');
+
+      await _putMaps(
+        CapitalLedgerEntry.storageKey,
+        updatedCapitalLedger,
+      );
+      _writeFaultInjector?.call('after_refund_capital_ledger');
 
       final customerId = refunded.customerId?.trim() ?? '';
 
@@ -2218,6 +2311,10 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
         await _putMaps(
           HiveLoyaltyProvider.storageKey,
           loyaltySnapshot,
+        );
+        await _putMaps(
+          CapitalLedgerEntry.storageKey,
+          capitalSnapshot,
         );
 
         return PosOperationResult.failure(
