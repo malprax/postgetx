@@ -699,6 +699,47 @@ class WorkspaceController extends GetxController {
         _ => orders,
       };
 
+  Future<bool> recordOwnerWithdrawal({
+    required double amount,
+    required String reason,
+  }) async {
+    if (repository is! LocalHiveRepository) {
+      _showOperationError(
+        'Capital protection storage is unavailable.',
+      );
+      return false;
+    }
+
+    final result =
+        await (repository as LocalHiveRepository).recordOwnerWithdrawal(
+      amount: amount,
+      reason: reason,
+    );
+
+    if (!result.isSuccess) {
+      _showOperationError(
+        result.message ?? 'Owner withdrawal was not saved.',
+      );
+      return false;
+    }
+
+    await refreshData();
+
+    if (Get.context != null) {
+      Get.snackbar(
+        result.value!.usesProtectedCapital
+            ? 'Protected capital warning'
+            : 'Owner withdrawal recorded',
+        result.value!.usesProtectedCapital
+            ? 'This withdrawal used protected restock capital.'
+            : 'The withdrawal remains within safe profit.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+
+    return true;
+  }
+
   Future<void> saveExpense(
       {String? id,
       required String title,

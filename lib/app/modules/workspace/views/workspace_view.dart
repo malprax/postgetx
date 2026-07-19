@@ -716,6 +716,23 @@ class _ModuleContent extends GetView<WorkspaceController> {
                         if (controller.capitalHealth.value != null) ...[
                           CapitalHealthSummaryCard(
                             summary: controller.capitalHealth.value!,
+                            onRecordWithdrawal: () {
+                              showDialog<bool>(
+                                context: context,
+                                builder: (_) => OwnerWithdrawalDialog(
+                                  summary: controller.capitalHealth.value!,
+                                  onSubmit: (
+                                    amount,
+                                    reason,
+                                  ) {
+                                    return controller.recordOwnerWithdrawal(
+                                      amount: amount,
+                                      reason: reason,
+                                    );
+                                  },
+                                ),
+                              );
+                            },
                           ),
                           const SizedBox(height: AppSpacing.md),
                         ],
