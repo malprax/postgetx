@@ -1527,6 +1527,41 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
         return validation;
       }
 
+      final trustedItems = <CartItemModel>[];
+
+      for (final item in order.items) {
+        final productMap = productSnapshot.firstWhere(
+          (map) => map['id'] == item.id,
+        );
+        final product = MenuItemModel.fromMap(
+          productMap['id'] as String,
+          productMap,
+        );
+        final matchingVariants = product.variants.where(
+          (variant) => variant.size == item.size,
+        );
+
+        if (matchingVariants.isEmpty) {
+          return PosOperationResult.failure(
+            'product_variant_missing',
+            'The selected variant for ${item.name} is no longer available.',
+          );
+        }
+
+        final trustedVariant = matchingVariants.first;
+
+        if (!trustedVariant.hasCostBasis) {
+          return PosOperationResult.failure(
+            'cost_basis_missing',
+            'Set a valid cost price for ${item.name} before checkout.',
+          );
+        }
+
+        trustedItems.add(
+          item.copyWith(costPrice: trustedVariant.costPrice),
+        );
+      }
+
       final loyaltyValidation = await _validateCheckoutLoyalty(order);
 
       if (loyaltyValidation != null) {
@@ -1593,6 +1628,7 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
           loyaltyPointsEarned;
 
       final completed = order.copyWith(
+        items: trustedItems,
         loyaltyPointsEarned: loyaltyPointsEarned,
         loyaltyBalanceAfter: loyaltyBalanceAfter,
         loyaltyTier: projectedTier.name,
