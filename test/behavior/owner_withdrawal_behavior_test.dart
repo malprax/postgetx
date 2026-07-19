@@ -96,8 +96,11 @@ void main() {
         isTrue,
       );
 
+      final healthBefore = await repository.getCapitalHealthSummary();
+      final withdrawalAmount = healthBefore.safeToUseRemaining + 1400;
+
       final result = await repository.recordOwnerWithdrawal(
-        amount: 5000,
+        amount: withdrawalAmount,
         reason: 'Emergency personal consumption',
       );
 
@@ -109,7 +112,7 @@ void main() {
         (entry) => entry.type == CapitalLedgerEntryType.ownerWithdrawal,
       );
 
-      expect(stored.withdrawalAmount, 5000);
+      expect(stored.withdrawalAmount, withdrawalAmount);
       expect(stored.protectedCapitalImpact, 1400);
     },
   );

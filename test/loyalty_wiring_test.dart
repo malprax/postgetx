@@ -57,6 +57,6 @@ void main() {
   });
 
   test('schema version includes loyalty ledger migration', () {
-    expect(LocalHiveRepository.currentSchemaVersion, 8);
+    expect(LocalHiveRepository.currentSchemaVersion, 9);
   });
 }

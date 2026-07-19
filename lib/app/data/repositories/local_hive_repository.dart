@@ -36,7 +36,7 @@ typedef RepositoryWriteFaultInjector = void Function(String stage);
 
 class LocalHiveRepository implements AuthRepository, PosRepository {
   static const _boxName = 'retail_pos_demo';
-  static const currentSchemaVersion = 8;
+  static const currentSchemaVersion = 9;
   static const _sessionKey = 'currentSessionUserId';
   static const _customerSequenceKey = 'customerSequence';
 
@@ -83,6 +83,7 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
 
     if (version >= currentSchemaVersion) {
       await _ensureCompleteDemoSalesSeed();
+      await _backfillCapitalLedger();
       return;
     }
 
@@ -238,6 +239,7 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
 
     await _box.put('seedVersion', currentSchemaVersion);
     await _ensureCompleteDemoSalesSeed();
+    await _backfillCapitalLedger();
   }
 
   static String _seedIconName(String? name) => switch (name) {
@@ -248,6 +250,148 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
         'Household' => 'household',
         _ => 'other',
       };
+
+  Future<void> _backfillCapitalLedger() async {
+    final transactions = _maps('transactions');
+    final products = _maps('products');
+    final ledger = _maps(CapitalLedgerEntry.storageKey);
+
+    final existingSaleOrderIds = ledger
+        .where(
+          (map) => map['type'] == CapitalLedgerEntryType.saleAllocation.name,
+        )
+        .map((map) => map['orderId']?.toString())
+        .toSet();
+
+    final existingRefundOrderIds = ledger
+        .where(
+          (map) => map['type'] == CapitalLedgerEntryType.refundReversal.name,
+        )
+        .map((map) => map['orderId']?.toString())
+        .toSet();
+
+    var changed = false;
+
+    for (final transaction in transactions) {
+      final id = transaction['id']?.toString() ?? '';
+
+      if (id.isEmpty) continue;
+
+      final order = OrderModel.fromMap(id, transaction);
+      final isCompleted =
+          order.status == OrderStatus.completed && order.stockApplied;
+      final isRefunded =
+          order.status == OrderStatus.refunded && order.stockApplied;
+
+      if (!isCompleted && !isRefunded) continue;
+
+      final trustedItems = <CartItemModel>[];
+      var costBasisAvailable = true;
+
+      for (final item in order.items) {
+        if (item.hasCostBasis) {
+          trustedItems.add(item);
+          continue;
+        }
+
+        final productMaps = products.where(
+          (map) => map['id'] == item.id,
+        );
+
+        if (productMaps.isEmpty) {
+          costBasisAvailable = false;
+          break;
+        }
+
+        final product = MenuItemModel.fromMap(
+          productMaps.first['id'] as String,
+          productMaps.first,
+        );
+        final variants = product.variants.where(
+          (variant) => variant.size == item.size,
+        );
+
+        if (variants.isEmpty || !variants.first.hasCostBasis) {
+          costBasisAvailable = false;
+          break;
+        }
+
+        trustedItems.add(
+          item.copyWith(costPrice: variants.first.costPrice),
+        );
+      }
+
+      if (!costBasisAvailable || trustedItems.isEmpty) continue;
+
+      final salesRevenue = order.taxableAmount;
+
+      if (!salesRevenue.isFinite || salesRevenue < 0) continue;
+
+      final restockRequirement = trustedItems.fold<double>(
+        0,
+        (total, item) => total + item.lineCost,
+      );
+
+      CapitalLedgerEntry? allocation;
+
+      if (!existingSaleOrderIds.contains(id)) {
+        allocation = CapitalLedgerEntry(
+          id: 'capital-sale-$id',
+          orderId: id,
+          type: CapitalLedgerEntryType.saleAllocation,
+          salesRevenueDelta: salesRevenue,
+          restockRequirementDelta: restockRequirement,
+          grossMarginDelta: salesRevenue - restockRequirement,
+          createdAt: order.completedAt ?? order.createdAt,
+          actorId: order.createdBy.isEmpty ? 'migration' : order.createdBy,
+          reason: 'Backfilled protected capital',
+        );
+
+        ledger.add(allocation.toMap());
+        existingSaleOrderIds.add(id);
+        changed = true;
+      } else {
+        final allocationMap = ledger.firstWhere(
+          (map) =>
+              map['orderId'] == id &&
+              map['type'] == CapitalLedgerEntryType.saleAllocation.name,
+        );
+        allocation = CapitalLedgerEntry.fromMap(
+          allocationMap,
+        );
+      }
+
+      if (isRefunded && !existingRefundOrderIds.contains(id)) {
+        ledger.add(
+          CapitalLedgerEntry(
+            id: 'capital-refund-$id',
+            orderId: id,
+            type: CapitalLedgerEntryType.refundReversal,
+            salesRevenueDelta: -allocation.salesRevenueDelta,
+            restockRequirementDelta: -allocation.restockRequirementDelta,
+            grossMarginDelta: -allocation.grossMarginDelta,
+            createdAt: order.refundedAt ?? order.createdAt,
+            actorId: order.refundedBy?.trim().isNotEmpty == true
+                ? order.refundedBy!
+                : 'migration',
+            reason: order.refundReason?.trim().isNotEmpty == true
+                ? order.refundReason!
+                : 'Backfilled refund reversal',
+            reversesEntryId: allocation.id,
+          ).toMap(),
+        );
+        existingRefundOrderIds.add(id);
+        changed = true;
+      }
+    }
+
+    if (changed || !_box.containsKey(CapitalLedgerEntry.storageKey)) {
+      await _putMaps(
+        CapitalLedgerEntry.storageKey,
+        ledger,
+      );
+    }
+  }
 
   Future<void> _ensureCompleteDemoSalesSeed() async {
     final transactions = _maps('transactions');
@@ -3531,5 +3675,7 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
         },
       ),
     );
+
+    await _backfillCapitalLedger();
   }
 }
