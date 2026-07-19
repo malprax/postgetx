@@ -454,6 +454,7 @@ class WorkspaceController extends GetxController {
       required String name,
       required String categoryId,
       required double price,
+      required double costPrice,
       required int stock,
       required int threshold,
       required String sku,
@@ -466,7 +467,13 @@ class WorkspaceController extends GetxController {
           name: name,
           categoryId: categoryId,
           categoryName: category.name,
-          variants: [MenuVariant(size: 'Regular', price: price)],
+          variants: [
+            MenuVariant(
+              size: 'Regular',
+              price: price,
+              costPrice: costPrice,
+            ),
+          ],
           sku: sku,
           stock: stock,
           lowStockThreshold: threshold,
@@ -479,7 +486,13 @@ class WorkspaceController extends GetxController {
           name: name,
           categoryId: categoryId,
           categoryName: category.name,
-          variants: [MenuVariant(size: 'Regular', price: price)],
+          variants: [
+            MenuVariant(
+              size: 'Regular',
+              price: price,
+              costPrice: costPrice,
+            ),
+          ],
           stock: stock,
           lowStockThreshold: threshold,
           sku: sku,

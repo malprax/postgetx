@@ -198,7 +198,8 @@ void main() {
     final price = find.descendant(
       of: find.byType(AlertDialog),
       matching: find.byWidgetPredicate((widget) =>
-          widget is TextField && widget.decoration?.labelText == 'Price'),
+          widget is TextField &&
+          widget.decoration?.labelText == 'Selling Price'),
     );
     expect(tester.widget<TextField>(productName).decoration?.hintText,
         'Example: Mineral Water 600ml');

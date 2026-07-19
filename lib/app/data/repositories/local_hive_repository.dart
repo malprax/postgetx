@@ -2824,6 +2824,7 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
           {
             'size': 'Regular',
             'price': 7500.0,
+            'costPrice': 4500.0,
           },
         ],
         'description': '',
@@ -2843,6 +2844,7 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
           {
             'size': 'Regular',
             'price': 12500.0,
+            'costPrice': 8000.0,
           },
         ],
         'description': '',
@@ -2862,6 +2864,7 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
           {
             'size': 'Regular',
             'price': 15000.0,
+            'costPrice': 9500.0,
           },
         ],
         'description': '',
@@ -2881,6 +2884,7 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
           {
             'size': '5 kg',
             'price': 69000.0,
+            'costPrice': 60000.0,
           },
         ],
         'description': '',
@@ -2900,6 +2904,7 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
           {
             'size': 'Regular',
             'price': 27500.0,
+            'costPrice': 19000.0,
           },
         ],
         'description': '',
@@ -2919,6 +2924,7 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
           {
             'size': 'Regular',
             'price': 17500.0,
+            'costPrice': 11000.0,
           },
         ],
         'description': '',
@@ -2938,6 +2944,7 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
           {
             'size': 'Regular',
             'price': 32500.0,
+            'costPrice': 24000.0,
           },
         ],
         'description': '',
@@ -2957,6 +2964,7 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
           {
             'size': 'Regular',
             'price': 18000.0,
+            'costPrice': 12000.0,
           },
         ],
         'description': '',
@@ -2976,6 +2984,7 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
           {
             'size': '1 kg',
             'price': 45000.0,
+            'costPrice': 36000.0,
           },
         ],
         'description': '',
@@ -2995,6 +3004,7 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
           {
             'size': '1 L',
             'price': 29500.0,
+            'costPrice': 25000.0,
           },
         ],
         'description': '',

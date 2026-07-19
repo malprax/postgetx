@@ -21,6 +21,7 @@ import '../../../shared/widgets/malprax_table.dart';
 import '../../../shared/widgets/category_icon_picker.dart';
 import '../../../shared/widgets/product_image_field.dart';
 import '../../../shared/widgets/product_visual.dart';
+import '../../../shared/widgets/product_pricing_fields.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_spacing.dart';
 import '../../../theme/category_icon_registry.dart';
@@ -675,6 +676,8 @@ class CrudSection extends GetView<WorkspaceController> {
     final sku = TextEditingController(text: product?.sku ?? '');
     final price = TextEditingController(
         text: '${product?.variants.firstOrNull?.price ?? ''}');
+    final costPrice = TextEditingController(
+        text: '${product?.variants.firstOrNull?.costPrice ?? ''}');
     final stock = TextEditingController(text: '${product?.stock ?? 10}');
     final threshold =
         TextEditingController(text: '${product?.lowStockThreshold ?? 5}');
@@ -761,9 +764,12 @@ class CrudSection extends GetView<WorkspaceController> {
                                     categoryId: categoryId ?? '',
                                     variants: [
                                       MenuVariant(
-                                          size: 'Regular',
-                                          price:
-                                              double.tryParse(price.text) ?? 0)
+                                        size: 'Regular',
+                                        price: double.tryParse(price.text) ?? 0,
+                                        costPrice:
+                                            double.tryParse(costPrice.text) ??
+                                                0,
+                                      )
                                     ],
                                     imageBase64: imageBase64,
                                     imageMimeType: imageMimeType,
@@ -801,30 +807,23 @@ class CrudSection extends GetView<WorkspaceController> {
                                   }),
                                 ),
                                 const SizedBox(height: 10),
-                                Row(children: [
-                                  Expanded(
-                                      child: MalpraxFormField(
-                                          controller: price,
-                                          label: 'Price',
-                                          hint: 'Example: 7500',
-                                          keyboardType: const TextInputType
-                                              .numberWithOptions(decimal: true),
-                                          textInputAction: TextInputAction.next,
-                                          validator: (value) =>
-                                              FormValidators.positiveNumber(
-                                                  value, 'Price'))),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                      child: MalpraxFormField(
-                                          controller: stock,
-                                          label: 'Stock Quantity',
-                                          hint: 'Example: 24',
-                                          keyboardType: TextInputType.number,
-                                          textInputAction: TextInputAction.next,
-                                          validator: (value) =>
-                                              FormValidators.nonNegativeNumber(
-                                                  value, 'Stock quantity'))),
-                                ]),
+                                ProductPricingFields(
+                                  sellingPriceController: price,
+                                  costPriceController: costPrice,
+                                ),
+                                const SizedBox(height: 10),
+                                MalpraxFormField(
+                                  controller: stock,
+                                  label: 'Stock Quantity',
+                                  hint: 'Example: 24',
+                                  keyboardType: TextInputType.number,
+                                  textInputAction: TextInputAction.next,
+                                  validator: (value) =>
+                                      FormValidators.nonNegativeNumber(
+                                    value,
+                                    'Stock quantity',
+                                  ),
+                                ),
                                 const SizedBox(height: 10),
                                 MalpraxFormField(
                                     controller: threshold,
@@ -856,6 +855,8 @@ class CrudSection extends GetView<WorkspaceController> {
                                       name: name.text.trim(),
                                       categoryId: categoryId!,
                                       price: double.tryParse(price.text) ?? 0,
+                                      costPrice:
+                                          double.tryParse(costPrice.text) ?? 0,
                                       stock: int.tryParse(stock.text) ?? 0,
                                       threshold:
                                           int.tryParse(threshold.text) ?? 5,
@@ -871,6 +872,7 @@ class CrudSection extends GetView<WorkspaceController> {
     name.dispose();
     sku.dispose();
     price.dispose();
+    costPrice.dispose();
     stock.dispose();
     threshold.dispose();
   }
