@@ -21,6 +21,7 @@ import 'package:postgetx/app/data/models/user_model.dart';
 import 'package:postgetx/app/core/services/pos_total_calculator.dart';
 import 'package:postgetx/app/core/services/loyalty_points_policy.dart';
 import 'package:postgetx/app/core/services/product_image_service.dart';
+import 'package:postgetx/app/modules/capital/domain/capital_protection_policy.dart';
 import 'package:postgetx/app/core/helpers/customer_utils.dart';
 import 'package:postgetx/app/data/repositories/auth_repository.dart';
 import 'package:postgetx/app/data/providers/local/hive_loyalty_provider.dart';
@@ -348,6 +349,100 @@ class LocalHiveRepository implements AuthRepository, PosRepository {
               );
         },
       );
+
+  Future<PosOperationResult<CapitalLedgerEntry>> recordOwnerWithdrawal({
+    required double amount,
+    required String reason,
+  }) async {
+    if (!hasPermission(AppPermission.manageCapitalProtection)) {
+      return _permissionDenied(
+        AppPermission.manageCapitalProtection,
+      );
+    }
+
+    if (!amount.isFinite || amount <= 0) {
+      return PosOperationResult.failure(
+        'invalid_withdrawal_amount',
+        'Owner withdrawal must be greater than zero.',
+      );
+    }
+
+    if (reason.trim().isEmpty) {
+      return PosOperationResult.failure(
+        'withdrawal_reason_required',
+        'Enter a reason for the owner withdrawal.',
+      );
+    }
+
+    final currentMaps = _maps(CapitalLedgerEntry.storageKey);
+    final entries = currentMaps.map(CapitalLedgerEntry.fromMap).toList();
+
+    final salesRevenue = entries.fold<double>(
+      0,
+      (total, entry) => total + entry.salesRevenueDelta,
+    );
+    final restockRequirement = entries.fold<double>(
+      0,
+      (total, entry) => total + entry.restockRequirementDelta,
+    );
+
+    final allocation = CapitalProtectionPolicy.allocate(
+      salesRevenue: salesRevenue < 0 ? 0 : salesRevenue,
+      costBasis: restockRequirement < 0 ? 0 : restockRequirement,
+    );
+
+    final previousWithdrawals =
+        entries.where((entry) => entry.isOwnerWithdrawal).fold<double>(
+              0,
+              (total, entry) => total + entry.withdrawalAmount,
+            );
+
+    final remainingSafeToUse = allocation.safeToUse > previousWithdrawals
+        ? allocation.safeToUse - previousWithdrawals
+        : 0.0;
+
+    final protectedCapitalImpact =
+        amount > remainingSafeToUse ? amount - remainingSafeToUse : 0.0;
+
+    final now = DateTime.now();
+    final entry = CapitalLedgerEntry(
+      id: 'capital-withdrawal-${now.microsecondsSinceEpoch}',
+      orderId: '',
+      type: CapitalLedgerEntryType.ownerWithdrawal,
+      salesRevenueDelta: 0,
+      restockRequirementDelta: 0,
+      grossMarginDelta: 0,
+      withdrawalAmount: amount,
+      protectedCapitalImpact: protectedCapitalImpact,
+      createdAt: now,
+      actorId: _currentUser!.id,
+      reason: reason.trim(),
+    );
+
+    await _putMaps(
+      CapitalLedgerEntry.storageKey,
+      [
+        ...currentMaps,
+        entry.toMap(),
+      ],
+    );
+
+    await _notify(
+      type: entry.usesProtectedCapital
+          ? 'protectedCapitalUsed'
+          : 'ownerWithdrawal',
+      title: entry.usesProtectedCapital
+          ? 'Protected capital used'
+          : 'Owner withdrawal recorded',
+      message: reason.trim(),
+      entityType: 'capital',
+      entityId: entry.id,
+      route: '/cashier/reports',
+      severity: entry.usesProtectedCapital ? 'warning' : 'info',
+    );
+
+    return PosOperationResult.success(entry);
+  }
 
   Future<List<CapitalLedgerEntry>> getCapitalLedger() async {
     final entries = _maps(CapitalLedgerEntry.storageKey)

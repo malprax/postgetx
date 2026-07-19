@@ -1,6 +1,7 @@
 enum CapitalLedgerEntryType {
   saleAllocation,
   refundReversal,
+  ownerWithdrawal,
 }
 
 class CapitalLedgerEntry {
@@ -15,6 +16,8 @@ class CapitalLedgerEntry {
     required this.actorId,
     this.reason = '',
     this.reversesEntryId,
+    this.withdrawalAmount = 0,
+    this.protectedCapitalImpact = 0,
   });
 
   static const storageKey = 'capitalLedger';
@@ -29,8 +32,14 @@ class CapitalLedgerEntry {
   final String actorId;
   final String reason;
   final String? reversesEntryId;
+  final double withdrawalAmount;
+  final double protectedCapitalImpact;
 
   bool get isReversal => type == CapitalLedgerEntryType.refundReversal;
+
+  bool get isOwnerWithdrawal => type == CapitalLedgerEntryType.ownerWithdrawal;
+
+  bool get usesProtectedCapital => protectedCapitalImpact > 0;
 
   Map<String, dynamic> toMap() {
     return {
@@ -44,6 +53,8 @@ class CapitalLedgerEntry {
       'actorId': actorId,
       'reason': reason,
       'reversesEntryId': reversesEntryId,
+      'withdrawalAmount': withdrawalAmount,
+      'protectedCapitalImpact': protectedCapitalImpact,
     };
   }
 
@@ -66,6 +77,9 @@ class CapitalLedgerEntry {
       actorId: map['actorId']?.toString() ?? 'system',
       reason: map['reason']?.toString() ?? '',
       reversesEntryId: map['reversesEntryId']?.toString(),
+      withdrawalAmount: (map['withdrawalAmount'] as num?)?.toDouble() ?? 0,
+      protectedCapitalImpact:
+          (map['protectedCapitalImpact'] as num?)?.toDouble() ?? 0,
     );
   }
 }
